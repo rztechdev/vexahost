@@ -1,0 +1,148 @@
+<div class="space-y-6">
+    {{-- Header Slide Konfirmasi --}}
+    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-semibold flex items-center justify-center" x-text="isDirectCheckout ? '3' : '4'"></span>
+            <h2 class="font-bold text-slate-900 text-lg">Konfirmasi Pembayaran</h2>
+        </div>
+        <p class="text-sm text-slate-600">
+            Periksa kembali detail pesanan, rincian biaya, dan metode pembayaran Anda sebelum melanjutkan pembayaran.
+        </p>
+    </div>
+
+    {{-- Card 1: Metode Pembayaran Terpilih --}}
+    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Metode Pembayaran Terpilih</h3>
+            </div>
+            <button type="button" @click="currentSlide = 2"
+                    class="text-xs font-semibold text-[#4A6FA5] hover:text-black transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-100 border border-slate-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+                <span>Ubah Metode</span>
+            </button>
+        </div>
+
+        <template x-if="selectedPaymentMethod">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-12 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 shrink-0">
+                        <img :src="'/images/payments/' + selectedPaymentMethod.image"
+                             :alt="selectedPaymentMethod.name"
+                             class="max-w-full max-h-full object-contain">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h4 class="text-base font-bold text-slate-900" x-text="selectedPaymentMethod.name"></h4>
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">Verifikasi Otomatis</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5" x-text="selectedPaymentMethod.description"></p>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-500 sm:text-right shrink-0">
+                    <span class="block text-slate-400">Batas Waktu Bayar:</span>
+                    <span class="font-bold text-slate-800">24 Jam setelah checkout</span>
+                </div>
+            </div>
+        </template>
+
+        <template x-if="!selectedPaymentMethod">
+            <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center justify-between">
+                <span>Belum ada metode pembayaran yang dipilih.</span>
+                <button type="button" @click="currentSlide = 2" class="underline font-bold">Pilih Sekarang →</button>
+            </div>
+        </template>
+    </div>
+
+    {{-- Card 2: Full Breakdown Harga (Rincian Lengkap Tagihan) --}}
+    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs space-y-4">
+        <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Rincian Tagihan (Full Breakdown)</h3>
+        </div>
+
+        <div class="space-y-2.5 text-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="font-medium text-slate-800" x-text="currentSpec ? currentSpec.name : 'Paket VPS'"></span>
+                    <span class="text-xs text-slate-500 block">Langganan 1 Bulan</span>
+                </div>
+                <span class="font-mono-code font-bold text-slate-900" x-text="formatRupiah(currentBaseMonthlyPrice)"></span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-600">
+                <span>Biaya Setup &amp; Provisioning Server</span>
+                <span class="font-semibold text-emerald-600">GRATIS (Rp 0)</span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-600">
+                <span>Proteksi Anti-DDoS &amp; Automated Health Check</span>
+                <span class="font-semibold text-emerald-600">Termasuk</span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-600">
+                <span>Pajak (PPN 11%)</span>
+                <span class="text-slate-500 font-medium">Rp 0 (Sudah Termasuk)</span>
+            </div>
+
+            <div class="border-t border-slate-200 pt-4 mt-3 flex items-center justify-between">
+                <div>
+                    <span class="text-sm font-bold text-slate-900 block">Total Tagihan Bersih</span>
+                    <span class="text-xs text-slate-500">Tarif flat perpanjangan bulanan</span>
+                </div>
+                <div class="text-right">
+                    <span class="font-mono-code text-2xl font-black text-emerald-600" x-text="formatRupiah(totalPrice)"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card 3: Ringkasan Spesifikasi Server --}}
+    <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/70 shadow-xs space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Ringkasan Konfigurasi Layanan</h3>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-white border border-slate-200 text-slate-700"
+                  x-text="isDatabasePackage ? 'Managed Database' : (isAiPackage ? 'AI Combo' : 'Cloud VPS')"></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">Hostname / VPS Name:</span>
+                <span class="font-bold font-mono-code text-slate-900" x-text="vpsName || '-'"></span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">Paket &amp; Resource:</span>
+                <span class="font-bold text-slate-900" x-text="currentSpec ? (currentSpec.name + ' (' + currentSpec.cpu + ' Core / ' + currentSpec.ram + ' GB RAM / ' + currentSpec.disk + ' GB NVMe)') : '-'"></span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">Datacenter &amp; Provider:</span>
+                <span class="font-bold text-slate-900" x-text="(provider === 'tencent' ? 'Tencent Cloud' : 'Cloudeka by Lintasarta') + ' · ' + (datacenter === 'indonesia' ? 'Jakarta, ID' : 'Singapore')"></span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">Sistem Operasi / Stack:</span>
+                <span class="font-bold text-slate-900" x-text="isDatabasePackage ? ('Engine: ' + dbEngineLabel + ' (' + (dbManager === 'cloudbeaver' ? 'CloudBeaver Web GUI' : 'CLI Only') + ')') : ((os === 'ubuntu2404' ? 'Ubuntu 24.04' : 'Ubuntu 22.04') + ' · ' + controlPanelLabel)"></span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card 4: Jaminan Keamanan & Informasi Transaksi --}}
+    <div class="border border-slate-200 rounded-xl p-4 bg-white space-y-2 text-xs text-slate-600 shadow-xs">
+        <div class="flex items-center gap-2 font-semibold text-slate-800">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span>Transaksi Aman &amp; Terverifikasi Otomatis</span>
+        </div>
+        <ul class="space-y-1.5 pl-6 list-disc text-slate-500">
+            <li>Instruksi lengkap (QR Code / Nomor Virtual Account) akan langsung tampil di halaman berikutnya setelah Anda menekan tombol <strong>Bayar Sekarang</strong>.</li>
+            <li>Invoice resmi dan konfirmasi pembayaran akan otomatis dikirimkan ke alamat email Anda.</li>
+            <li>Server langsung disiapkan secara otomatis oleh sistem kami segera setelah pembayaran berhasil diverifikasi.</li>
+        </ul>
+    </div>
+</div>

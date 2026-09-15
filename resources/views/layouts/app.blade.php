@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title ?? 'VexaHost — Enterprise Cloud VPS Terjangkau untuk Pelajar & Developer' }}</title>
+    <meta name="description" content="Platform cloud VPS berkinerja tinggi dengan harga terjangkau di Indonesia. Didesain untuk pelajar, pengembang freelance, dan startup modern. Created by RZ Digital Creative.">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
+      x-data="{ mobileMenu: false, mobileProduk: false, mobileVps: false, mobileAi: false, mobileDb: false }">
+
+    @php
+        $navVpsSpecs = $vpsSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'vps')->orderBy('sell_price', 'asc')->get();
+        $navAiSpecs = $aiSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
+        $navDbSpecs = $dbSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
+    @endphp
+
+    <!-- Enterprise Navbar -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Brand Logo (Left) -->
+                <a href="{{ route('home') }}" class="flex items-center space-x-3 shrink-0">
+                    <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-9 w-auto object-contain">
+                    <span class="text-xl font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+                </a>
+
+                <!-- Right Group: Nav Links pepet ke Button Masuk -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <nav class="flex items-center space-x-5 text-sm font-medium text-slate-700">
+
+                        <!-- Beranda -->
+                        <a href="{{ route('home') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('home') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                            <span class="relative pb-0.5">
+                                Beranda
+                                <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('home') ? 'w-full' : 'w-0' }}"></span>
+                            </span>
+                        </a>
+
+                        <!-- Dropdown Produk -->
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                            <button @click="open = !open"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                <span class="relative pb-0.5">
+                                    Produk
+                                    <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
+                                          :class="open ? 'w-full' : 'w-0'"></span>
+                                </span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4A6FA5] transition-transform duration-200" :class="open ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 style="display: none;">
+                                
+                                <a href="{{ route('home') }}#pricing" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">Cloud VPS</p>
+                                        <p class="text-xs text-slate-500 leading-snug">Compute KVM andal, NVMe SSD &amp; root access.</p>
+                                    </div>
+                                </a>
+
+                                <a href="{{ route('home') }}#ai-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">AI Combo Packages</p>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 leading-snug">Zero setup coding agent &amp; private workstation.</p>
+                                    </div>
+                                </a>
+
+                                <a href="{{ route('home') }}#database-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">Managed Database</p>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 leading-snug">Dedicated DB VPS bebas OOM crash &amp; latency rendah.</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Paket VPS -->
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                            <button @click="open = !open"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                <span class="relative pb-0.5">
+                                    Paket VPS
+                                    <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
+                                          :class="open ? 'w-full' : 'w-0'"></span>
+                                </span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4A6FA5] transition-transform duration-200" :class="open ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 style="display: none;">
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilihan Paket VPS</p>
+                                </div>
+                                @foreach($navVpsSpecs as $spec)
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                        <div>
+                                            <div class="flex items-center gap-1.5">
+                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                @if($spec->name === 'Standard')
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                @endif
+                                            </div>
+                                            <p class="text-[11px] text-slate-400">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                    </a>
+                                @endforeach
+                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                    <a href="{{ route('home') }}#pricing" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
+                                        Lihat Semua Paket VPS &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown AI Agent -->
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                            <button @click="open = !open"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                <span class="relative pb-0.5">
+                                    AI Agent
+                                    <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
+                                          :class="open ? 'w-full' : 'w-0'"></span>
+                                </span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4A6FA5] transition-transform duration-200" :class="open ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 style="display: none;">
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Paket AI Coding &amp; Automation</p>
+                                </div>
+                                @foreach($navAiSpecs as $spec)
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                        <div class="pr-2">
+                                            <div class="flex items-center gap-1.5">
+                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                @if($spec->id == 8)
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                @endif
+                                            </div>
+                                            <p class="text-[11px] text-slate-400 line-clamp-1">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                    </a>
+                                @endforeach
+                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                    <a href="{{ route('home') }}#ai-packages" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
+                                        Lihat Semua Fitur AI &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Database -->
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                            <button @click="open = !open"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                <span class="relative pb-0.5">
+                                    Database
+                                    <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
+                                          :class="open ? 'w-full' : 'w-0'"></span>
+                                </span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4A6FA5] transition-transform duration-200" :class="open ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 style="display: none;">
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dedicated Database VPS</p>
+                                </div>
+                                @foreach($navDbSpecs as $spec)
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                        <div class="pr-2">
+                                            <div class="flex items-center gap-1.5">
+                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                @if($spec->id == 12)
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                @endif
+                                            </div>
+                                            <p class="text-[11px] text-slate-400">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB NVMe</p>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                    </a>
+                                @endforeach
+                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                    <a href="{{ route('home') }}#database-packages" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
+                                        Lihat Semua Fitur Database &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Docs -->
+                        <a href="{{ route('docs') }}" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('docs') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                            <span class="relative pb-0.5">
+                                Docs
+                                <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('docs') ? 'w-full' : 'w-0' }}"></span>
+                            </span>
+                            <svg class="w-3 h-3 text-slate-400 group-hover:text-[#4A6FA5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+
+                        <!-- WA Gateway -->
+                        <a href="https://wa.flustra.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors text-slate-700">
+                            <span class="relative pb-0.5">
+                                WA Gateway
+                                <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
+                            </span>
+                            <svg class="w-3 h-3 text-slate-400 group-hover:text-[#4A6FA5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+
+                        <!-- Status -->
+                        <a href="{{ route('status') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('status') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                            <span class="relative pb-0.5">
+                                Status
+                                <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('status') ? 'w-full' : 'w-0' }}"></span>
+                            </span>
+                        </a>
+                    </nav>
+
+                    <!-- Divider tipis -->
+                    <div class="h-4 w-px bg-slate-200"></div>
+
+                    <!-- Tombol Aksi (Masuk & Pesan) rapat dengan menu -->
+                    <div class="flex items-center space-x-3">
+                        @auth
+                            @if(auth()->user()->is_admin)
+                                <a href="{{ route('admin.index') }}" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200 hover:bg-amber-100 transition-colors">
+                                    Admin Area
+                                </a>
+                            @endif
+                            <a href="{{ route('dashboard.index') }}" class="px-4 py-2 text-sm font-medium rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 transition-colors">
+                                Dashboard
+                            </a>
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-sm font-medium text-slate-500 hover:text-rose-600 transition-colors px-2 py-2">
+                                    Keluar
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors shadow-xs">
+                                Masuk
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <div class="flex md:hidden items-center gap-2">
+                    @guest
+                        <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-black">
+                            Masuk
+                        </a>
+                    @else
+                        <a href="{{ route('dashboard.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-slate-100">
+                            Dashboard
+                        </a>
+                    @endguest
+                    <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path x-show="mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" style="display: none;"></path>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Mobile Dropdown Navigation -->
+            <div x-show="mobileMenu" x-transition class="md:hidden border-t border-slate-200 py-4 space-y-2" style="display: none;">
+                <!-- Beranda -->
+                <a href="{{ route('home') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-semibold {{ request()->routeIs('home') ? 'text-[#4A6FA5] bg-blue-50/50' : 'text-slate-800' }} rounded-lg hover:bg-slate-50">
+                    Beranda
+                </a>
+
+                <!-- Accordion Produk -->
+                <div>
+                    <button @click="mobileProduk = !mobileProduk" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                        <span>Produk Cloud</span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileProduk ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="mobileProduk" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
+                        <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">Cloud VPS KVM</a>
+                        <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                            <span>AI Combo Packages</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                        </a>
+                        <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                            <span>Managed Database</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Accordion Paket VPS -->
+                <div>
+                    <button @click="mobileVps = !mobileVps" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                        <span>Paket VPS</span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileVps ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="mobileVps" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
+                        @foreach($navVpsSpecs as $spec)
+                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                                <span>{{ $spec->name }}</span>
+                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            </a>
+                        @endforeach
+                        <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Paket VPS &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Accordion AI Agent -->
+                <div>
+                    <button @click="mobileAi = !mobileAi" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                        <span>AI Agent</span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileAi ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="mobileAi" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
+                        @foreach($navAiSpecs as $spec)
+                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                                <span>{{ $spec->name }}</span>
+                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            </a>
+                        @endforeach
+                        <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur AI &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Accordion Database -->
+                <div>
+                    <button @click="mobileDb = !mobileDb" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                        <span>Database (DB)</span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileDb ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="mobileDb" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
+                        @foreach($navDbSpecs as $spec)
+                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                                <span>{{ $spec->name }}</span>
+                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            </a>
+                        @endforeach
+                        <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur Database &rarr;</a>
+                    </div>
+                </div>
+                <a href="{{ route('docs') }}" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                    <span>Docs</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+                <a href="https://wa.flustra.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                    <span>WA Gateway</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+                <a href="{{ route('status') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                    Status
+                </a>
+
+                <div class="border-t border-slate-100 pt-3 mt-3 space-y-2 px-1">
+                    @auth
+                        <a href="{{ route('dashboard.index') }}" class="block w-full text-center px-4 py-2.5 text-sm font-semibold text-slate-800 bg-slate-100 rounded-lg">Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="block w-full text-left px-3 py-2 text-sm font-medium text-rose-600">Keluar</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="block text-center py-2.5 text-sm font-bold text-white bg-black rounded-lg">Masuk</a>
+                        <div class="text-center pt-1">
+                            <a href="{{ route('register') }}" class="text-xs font-medium text-slate-500 hover:text-slate-800">Belum punya akun? Daftar</a>
+                        </div>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages (Auto-dismiss & Dismissible) -->
+    @if(session('success') || session('error') || $errors->any())
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
+            @if(session('success'))
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 4000)"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="border border-emerald-200 bg-emerald-50 px-4 py-3 rounded-lg text-sm text-emerald-800 mb-3 flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                    <button @click="show = false" class="text-emerald-500 hover:text-emerald-800 p-1 rounded transition-colors" title="Tutup">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 5000)"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="border border-rose-200 bg-rose-50 px-4 py-3 rounded-lg text-sm text-rose-800 mb-3 flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                    <button @click="show = false" class="text-rose-500 hover:text-rose-800 p-1 rounded transition-colors" title="Tutup">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     class="border border-rose-200 bg-rose-50 px-4 py-3 rounded-lg text-sm text-rose-800 mb-3 shadow-xs">
+                    <div class="flex items-center justify-between mb-1">
+                        <p class="font-semibold">Harap periksa kesalahan berikut:</p>
+                        <button @click="show = false" class="text-rose-500 hover:text-rose-800 p-1 rounded transition-colors" title="Tutup">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <ul class="list-disc list-inside text-sm space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        </div>
+    @endif
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        @yield('content')
+    </main>
+
+    <!-- Enterprise 4-Column Footer -->
+    @unless(request()->routeIs('checkout'))
+    <footer class="bg-slate-900 text-slate-400 pt-16 pb-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+
+                <!-- Column 1: Brand & Identity -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-9 w-auto object-contain">
+                        <span class="text-xl font-bold tracking-tight text-white">Vexa<span class="text-[#6588BC]">Host</span></span>
+                    </div>
+                    <p class="text-sm leading-relaxed text-slate-400 max-w-sm">
+                        Platform cloud VPS KVM berkinerja tinggi di Indonesia. Menyediakan compute terisolasi, storage NVMe RAID-10 cepat, dan kemudahan 1-click control panel.
+                    </p>
+                    <div class="space-y-1 text-xs text-slate-400">
+                        <p class="font-medium text-slate-300">Created by <span class="text-white font-semibold">RZ Digital Creative</span></p>
+                        <p>Infrastruktur: Tier-3 Datacenter Singapore &amp; Cyber Building Jakarta</p>
+                    </div>
+                </div>
+
+                <!-- Column 2: PRODUK -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Produk Cloud</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Cloud VPS KVM</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Student Basic (Rp 80rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Mahasiswa Basic (Rp 90rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Standard Production</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">AI &amp; Automation Stack</a></li>
+                        <li><span class="text-slate-500">Managed VPS (Segera)</span></li>
+                        <li><span class="text-slate-500">Bare Metal Server (Segera)</span></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: DUKUNGAN & DOKUMENTASI -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Dukungan</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Dokumentasi Hub</a></li>
+                        <li><a href="{{ route('status') }}" class="hover:text-white transition-colors flex items-center gap-1.5">
+                            <span>Status Sistem</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        </a></li>
+                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Panduan SSH &amp; Security</a></li>
+                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="hover:text-white transition-colors">Pertanyaan Umum (FAQ)</a></li>
+                        <li><a href="{{ route('home') }}#kontak" class="hover:text-white transition-colors">Kontak Dukungan</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: LEGAL & KEBIJAKAN -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Legal &amp; Kebijakan</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="{{ route('terms') }}" class="hover:text-white transition-colors">Ketentuan Layanan (ToS)</a></li>
+                        <li><a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="{{ route('sla') }}" class="hover:text-white transition-colors">SLA 99.9% Uptime</a></li>
+                        <li><a href="{{ route('refund') }}" class="hover:text-white transition-colors">Kebijakan Refund</a></li>
+                        <li><a href="{{ route('terms') }}#aup" class="hover:text-white transition-colors">Acceptable Use (AUP)</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Payment Methods Banner -->
+            <div class="pt-8 pb-8 border-t border-slate-800">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-300">Metode Pembayaran Resmi</p>
+                        <p class="text-[11px] text-slate-500">Mendukung otomatisasi instan QRIS, Virtual Account Bank, &amp; Toko Shopee</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                        @php
+                            $footerPayments = [
+                                ['label' => 'QRIS', 'file' => 'qris.svg'],
+                                ['label' => 'BCA', 'file' => 'bca.svg'],
+                                ['label' => 'Mandiri', 'file' => 'mandiri.svg'],
+                                ['label' => 'BNI', 'file' => 'bni.svg'],
+                                ['label' => 'BRI', 'file' => 'bri.svg'],
+                                ['label' => 'GoPay', 'file' => 'gopay.svg'],
+                                ['label' => 'OVO', 'file' => 'ovo.svg'],
+                                ['label' => 'DANA', 'file' => 'dana.svg'],
+                                ['label' => 'ShopeePay', 'file' => 'shopeepay.svg'],
+                                ['label' => 'LinkAja', 'file' => 'linkaja.svg'],
+                            ];
+                        @endphp
+                        @foreach ($footerPayments as $pay)
+                            <div class="flex h-7 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-white px-2 shadow-2xs"
+                                 title="{{ $pay['label'] }}">
+                                <img src="{{ asset('images/payments/' . $pay['file']) }}"
+                                     alt="{{ $pay['label'] }}"
+                                     loading="lazy"
+                                     class="h-3.5 w-auto max-w-[50px] object-contain">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-6 border-t border-slate-800/80 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by <span class="text-slate-400 font-semibold">RZ Digital Creative</span>.</p>
+                <div class="flex items-center space-x-5 text-[11px]">
+                    <a href="{{ route('terms') }}" class="hover:text-slate-300 transition-colors">Terms of Service</a>
+                    <span>&bull;</span>
+                    <a href="{{ route('privacy') }}" class="hover:text-slate-300 transition-colors">Privacy Policy</a>
+                    <span>&bull;</span>
+                    <a href="{{ route('sla') }}" class="hover:text-slate-300 transition-colors">SLA 99.9%</a>
+                    <span>&bull;</span>
+                    <a href="{{ route('refund') }}" class="hover:text-slate-300 transition-colors">Refund Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    @endunless
+
+    <!-- Floating Live Chat / WhatsApp Widget -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <a href="https://wa.me/{{ config('vexahost.whatsapp', '6285774410978') }}?text=Halo%20VexaHost,%20saya%20butuh%20bantuan%20seputar%20server%20VPS"
+           target="_blank"
+           rel="noopener"
+           title="Chat WhatsApp CS (085774410978)"
+           class="group flex items-center gap-2.5 px-4 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+            </span>
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            <span class="hidden sm:inline text-xs font-bold tracking-wide">Tanya CS</span>
+        </a>
+    </div>
+
+</body>
+</html>

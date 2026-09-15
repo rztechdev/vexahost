@@ -1,0 +1,109 @@
+
+  GET|HEAD   / .............................................................................. home › routes/web.php:15
+  GET|HEAD   admin ............................................................... admin.index › AdminController@index
+  GET|HEAD   admin/customers ............................................. admin.customers › AdminController@customers
+  GET|HEAD   admin/instances ............................................. admin.instances › AdminController@instances
+  POST       admin/instances/{id}/status ............... admin.instances.status › AdminController@updateInstanceStatus
+  POST       admin/instances/{id}/suspend .................. admin.instances.suspend › AdminController@suspendInstance
+  POST       admin/instances/{id}/terminate ............ admin.instances.terminate › AdminController@terminateInstance
+  POST       admin/instances/{id}/unsuspend ............ admin.instances.unsuspend › AdminController@unsuspendInstance
+  GET|HEAD   admin/monitoring .......................................... admin.monitoring › AdminController@monitoring
+  GET|HEAD   admin/orders ...................................................... admin.orders › AdminController@orders
+  POST       admin/orders/{id}/cancel .............................. admin.orders.cancel › AdminController@cancelOrder
+  GET|HEAD   admin/orders/{id}/history ........................... admin.orders.history › AdminController@orderHistory
+  POST       admin/orders/{id}/mark-paid ...................... admin.orders.mark-paid › AdminController@markOrderPaid
+  POST       admin/orders/{id}/provision .......................... admin.orders.provision › AdminController@provision
+  POST       admin/orders/{id}/retry-provision ......... admin.orders.retry-provision › AdminController@retryProvision
+  GET|HEAD   admin/reports ................................................... admin.reports › AdminController@reports
+  GET|HEAD   admin/reports/export ................................ admin.reports.export › AdminController@exportReport
+  GET|HEAD   admin/shopee .............................................. admin.shopee › AdminController@showShopeeForm
+  POST       admin/shopee/process .......................... admin.shopee.process › AdminController@processShopeeOrder
+  GET|HEAD   admin/tickets ................................................... admin.tickets › AdminController@tickets
+  GET|HEAD   admin/tickets/{id} ...................................... admin.tickets.show › AdminController@showTicket
+  POST       admin/tickets/{id}/assign ........................... admin.tickets.assign › AdminController@assignTicket
+  POST       admin/tickets/{id}/reply .............................. admin.tickets.reply › AdminController@replyTicket
+  POST       api/admin/shopee/process-order ..... api.admin.shopee.process › Api\AdminApiController@processShopeeOrder
+  POST       api/admin/vps/provision ...................... api.admin.vps.provision › Api\AdminApiController@provision
+  GET|HEAD   api/admin/vps/{id}/status ....................... api.admin.vps.status › Api\AdminApiController@vpsStatus
+  POST       api/webhooks/payment ......................... api.webhooks.payment › Api\PaymentWebhookController@handle
+  POST       checkout/quick-login .................................. checkout.quick-login › OrderController@quickLogin
+  GET|HEAD   checkout/{spec_id?} ................................................. checkout › OrderController@checkout
+  GET|HEAD   dashboard ................................................... dashboard.index › DashboardController@index
+  GET|HEAD   dashboard/billing ....................................... dashboard.billing › DashboardController@billing
+  GET|HEAD   dashboard/invoices/{id}/print ................ dashboard.invoice.print › DashboardController@printInvoice
+  GET|HEAD   dashboard/settings .................................... dashboard.settings › DashboardController@settings
+  POST       dashboard/settings/password ............ dashboard.settings.password › DashboardController@updatePassword
+  POST       dashboard/settings/profile ............... dashboard.settings.profile › DashboardController@updateProfile
+  POST       dashboard/subscriptions/{id}/auto-renew dashboard.subscriptions.auto-renew › DashboardController@toggleA…
+  POST       dashboard/subscriptions/{id}/cancel dashboard.subscriptions.cancel › DashboardController@cancelSubscript…
+  POST       dashboard/subscriptions/{id}/resume dashboard.subscriptions.resume › DashboardController@resumeSubscript…
+  GET|HEAD   dashboard/support ....................................... dashboard.support › DashboardController@support
+  POST       dashboard/support ............................. dashboard.support.store › DashboardController@storeTicket
+  GET|HEAD   dashboard/support/{id} .......................... dashboard.support.show › DashboardController@showTicket
+  POST       dashboard/support/{id}/reply .................. dashboard.support.reply › DashboardController@replyTicket
+  GET|HEAD   dashboard/vps/{id} ........................................ dashboard.vps.show › DashboardController@show
+  POST       dashboard/vps/{id}/force-reboot ............ dashboard.vps.force-reboot › DashboardController@forceReboot
+  GET|HEAD   dashboard/vps/{id}/provisioning-status.json dashboard.vps.provisioning-status › DashboardController@prov…
+  POST       dashboard/vps/{id}/reboot ............................. dashboard.vps.reboot › DashboardController@reboot
+  POST       dashboard/vps/{id}/reinstall .................... dashboard.vps.reinstall › DashboardController@reinstall
+  POST       dashboard/vps/{id}/reveal-password ... dashboard.vps.reveal-password › DashboardController@revealPassword
+  POST       dashboard/vps/{id}/start ................................ dashboard.vps.start › DashboardController@start
+  POST       dashboard/vps/{id}/stop ................................... dashboard.vps.stop › DashboardController@stop
+  GET|HEAD   docs ............................................................................................... docs
+  POST       email/verification-notification ................... verification.send › AuthController@resendVerification
+  GET|HEAD   email/verify ................................ verification.notice › AuthController@showVerificationNotice
+  GET|HEAD   email/verify/{id}/{hash} ............................... verification.verify › AuthController@verifyEmail
+  GET|HEAD   forgot-password .................................... password.request › AuthController@showForgotPassword
+  POST       forgot-password ........................................... password.email › AuthController@sendResetLink
+  GET|HEAD   invitations/{token} ........................................ invitations.show › InvitationController@show
+  POST       invitations/{token}/accept ............................. invitations.accept › InvitationController@accept
+  ANY        kontak ................................................ contact › Illuminate\Routing › RedirectController
+  GET|HEAD   login .................................................................. login › AuthController@showLogin
+  POST       login .............................................................................. AuthController@login
+  POST       logout ................................................................... logout › AuthController@logout
+  POST       order ............................................................... order.store › OrderController@store
+  GET|HEAD   order/payment/{id} .............................................. order.payment › OrderController@payment
+  POST       order/payment/{id}/dev-simulate ......... order.payment.dev-simulate › OrderController@devSimulatePayment
+  GET|HEAD   order/payment/{id}/status .......................... order.payment.status › OrderController@paymentStatus
+  GET|HEAD   order/payment/{id}/status.json ............ order.payment.status.json › OrderController@paymentStatusJson
+  GET|HEAD   order/success/{id} .............................................. order.success › OrderController@success
+  GET|HEAD   order/{spec_id?} .................................................. order.create › OrderController@create
+  GET|HEAD   organizations ........................................ organizations.index › OrganizationController@index
+  POST       organizations ........................................ organizations.store › OrganizationController@store
+  GET|HEAD   organizations/create ............................... organizations.create › OrganizationController@create
+  POST       organizations/invitations/{id}/revoke .... organizations.invitations.revoke › InvitationController@revoke
+  GET|HEAD   organizations/{id} ..................................... organizations.show › OrganizationController@show
+  POST       organizations/{id}/billing ................. organizations.billing › OrganizationController@updateBilling
+  POST       organizations/{id}/invite .......................... organizations.invite › OrganizationController@invite
+  POST       organizations/{id}/members/{memberId}/remove organizations.members.remove › OrganizationController@remov…
+  POST       organizations/{id}/members/{memberId}/role organizations.members.role › OrganizationController@updateMem…
+  POST       organizations/{id}/switch .......................... organizations.switch › OrganizationController@switch
+  GET|HEAD   privacy ......................................................................................... privacy
+  GET|HEAD   refund ........................................................................................... refund
+  GET|HEAD   register ......................................................... register › AuthController@showRegister
+  POST       register ........................................................................ AuthController@register
+  POST       reset-password ........................................... password.update › AuthController@resetPassword
+  GET|HEAD   reset-password/{token} ................................ password.reset › AuthController@showResetPassword
+  GET|HEAD   security ................................................... security.settings › SecurityController@index
+  POST       security/api-keys ............................ security.api-keys.create › SecurityController@createApiKey
+  POST       security/api-keys/{id}/revoke ................ security.api-keys.revoke › SecurityController@revokeApiKey
+  POST       security/api-keys/{id}/rotate ................ security.api-keys.rotate › SecurityController@rotateApiKey
+  GET|HEAD   security/login-activity ...................... security.login-activity › SecurityController@loginActivity
+  GET|HEAD   security/sessions ....................................... security.sessions › SecurityController@sessions
+  POST       security/sessions/revoke-all ... security.sessions.revoke-all › SecurityController@revokeAllOtherSessions
+  POST       security/sessions/{sessionId}/revoke ........ security.sessions.revoke › SecurityController@revokeSession
+  POST       security/ssh-keys ............................ security.ssh-keys.create › SecurityController@createSshKey
+  DELETE     security/ssh-keys/{id} ....................... security.ssh-keys.delete › SecurityController@deleteSshKey
+  POST       security/two-factor/disable ................... security.two-factor.disable › TwoFactorController@disable
+  GET|HEAD   security/two-factor/enable .................. security.two-factor.enable › TwoFactorController@showEnable
+  POST       security/two-factor/enable ..................... security.two-factor.confirm › TwoFactorController@enable
+  GET|HEAD   security/two-factor/recovery-codes ...... security.recovery-codes › TwoFactorController@showRecoveryCodes
+  POST       security/two-factor/recovery-codes/regenerate security.recovery-codes.regenerate › TwoFactorController@r…
+  GET|HEAD   sla ................................................................................................. sla
+  GET|HEAD   status ........................................................................................... status
+  GET|HEAD   terms ............................................................................................. terms
+  GET|HEAD   two-factor/challenge ........................... two-factor.challenge › TwoFactorController@showChallenge
+  POST       two-factor/challenge ............................ two-factor.verify › TwoFactorController@verifyChallenge
+
+                                                                                                  Showing [105] routes
+

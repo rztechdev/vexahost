@@ -1,0 +1,75 @@
+<div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs">
+    <div class="flex items-center gap-3 mb-2">
+        <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-semibold flex items-center justify-center" x-text="isDirectCheckout ? '2' : '3'"></span>
+        <h2 class="font-bold text-slate-900 text-lg">Pilih Metode Pembayaran</h2>
+    </div>
+
+    <p class="text-sm text-slate-600 mb-6">
+        Pilih salah satu metode pembayaran yang tersedia. Anda dapat memeriksa rincian tagihan lengkap di langkah berikutnya.
+    </p>
+
+    {{-- Payment Selection Grid --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        @foreach([
+            'qris' => ['QRIS', 'qris.svg', 'Semua e-wallet & mobile banking', 'Instan QR'],
+            'bca_va' => ['BCA VA', 'va_bca.svg', 'Virtual Account otomatis', 'Virtual Account'],
+            'mandiri_va' => ['Mandiri VA', 'va_mandiri.svg', 'Virtual Account otomatis', 'Virtual Account'],
+            'bni_va' => ['BNI VA', 'va_bni.svg', 'Virtual Account otomatis', 'Virtual Account'],
+            'bri_va' => ['BRI VA', 'va_bri.svg', 'Virtual Account otomatis', 'Virtual Account'],
+            'gopay' => ['GoPay', 'gopay.svg', 'Aplikasi GoPay & Gojek', 'E-Wallet'],
+            'ovo' => ['OVO', 'ewallet_ovo.svg', 'Aplikasi OVO', 'E-Wallet'],
+            'dana' => ['DANA', 'dana.svg', 'Aplikasi DANA', 'E-Wallet'],
+            'shopeepay' => ['ShopeePay', 'ewallet_shopeepay.svg', 'Scan & saldo ShopeePay', 'E-Wallet'],
+        ] as $method => $details)
+            <label class="p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between relative text-left select-none"
+                   :class="paymentMethod === '{{ $method }}' ? 'border-black bg-slate-50 ring-2 ring-black shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'"
+                   @click="selectPayment('{{ $method }}')">
+                <input type="radio" name="payment_method" value="{{ $method }}" x-model="paymentMethod" class="sr-only">
+                
+                {{-- Active Indicator / Badge --}}
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+                          :class="paymentMethod === '{{ $method }}' ? 'bg-black text-white' : 'bg-slate-100 text-slate-600'">
+                        {{ $details[3] }}
+                    </span>
+                    <div class="w-4 h-4 rounded-full border flex items-center justify-center transition-all"
+                         :class="paymentMethod === '{{ $method }}' ? 'border-black bg-black text-white' : 'border-slate-300 bg-white'">
+                        <svg x-show="paymentMethod === '{{ $method }}'" class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                {{-- Logo Container --}}
+                <div class="w-full h-12 mb-3 flex items-center justify-center bg-white border border-slate-100 rounded-lg p-2">
+                    <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-8 max-w-full object-contain">
+                </div>
+
+                {{-- Name & Description --}}
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">{{ $details[0] }}</h3>
+                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
+                </div>
+            </label>
+        @endforeach
+    </div>
+
+    {{-- Selection Feedback Banner --}}
+    <div x-show="paymentMethod" x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+         class="flex items-center gap-3 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs">
+        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>
+            Metode pembayaran terpilih: <strong class="font-bold" x-text="paymentMethods[paymentMethod]?.name"></strong>. Klik tombol <strong>Lanjut ke Konfirmasi Pembayaran</strong> di bawah untuk memeriksa rincian tagihan.
+        </span>
+    </div>
+
+    <div x-show="!paymentMethod" class="flex items-center gap-2 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 text-xs">
+        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Pilih salah satu metode pembayaran di atas untuk melanjutkan ke tahap konfirmasi.</span>
+    </div>
+</div>
