@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Payment Webhook (public - tapi di-verify dengan signature)
 Route::post('/webhooks/payment', [PaymentWebhookController::class, 'handle'])->name('api.webhooks.payment');
-Route::post('/webhooks/lynk', [LynkWebhookController::class, 'handle'])->name('api.webhooks.lynk');
+Route::match(['get', 'post'], '/webhooks/lynk', [LynkWebhookController::class, 'handle'])->name('api.webhooks.lynk');
 
 // Admin API Endpoints - PROTECTED with admin.api middleware (ApiKey or Admin Session)
 Route::prefix('admin')->middleware('admin.api')->group(function () {

@@ -30,11 +30,26 @@ class LynkWebhookController extends Controller
      */
     public function handle(Request $request)
     {
-        $payload = $request->all();
-        $event = $payload['event'] ?? '';
+        // 1. Handle HTTP GET / HEAD ping check
+        if ($request->isMethod('get') || $request->isMethod('head')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lynk webhook endpoint is active.',
+            ], 200);
+        }
 
-        // Handle Test Ping dari Dashboard Lynk.id
-        if ($event === 'test_event' || $event === 'ping') {
+        $payload = $request->all();
+        $event = strtolower(trim((string) ($payload['event'] ?? $payload['action'] ?? $payload['type'] ?? '')));
+
+        // 2. Handle Test Ping / Test Event dari Dashboard Lynk.id
+        if (
+            empty($payload) ||
+            in_array($event, ['test_event', 'ping', 'test', 'test_webhook', 'test_notification', 'webhook.test', 'webhook_test'], true) ||
+            str_contains($event, 'test') ||
+            str_contains($event, 'ping') ||
+            $request->query('test') == '1' ||
+            (($request->header('User-Agent') && str_contains(strtolower($request->header('User-Agent')), 'lynk')) && empty($payload['data']))
+        ) {
             Log::info('Lynk test webhook received successfully', [
                 'ip' => $request->ip(),
                 'payload' => $payload,
