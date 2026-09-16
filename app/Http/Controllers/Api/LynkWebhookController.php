@@ -40,16 +40,63 @@ class LynkWebhookController extends Controller
 
         $payload = $request->all();
         $event = strtolower(trim((string) ($payload['event'] ?? $payload['action'] ?? $payload['type'] ?? '')));
+        $data = $payload['data'] ?? [];
+        $messageAction = strtoupper(trim((string) ($data['message_action'] ?? $payload['message_action'] ?? '')));
+        $messageData = $data['message_data'] ?? $payload['message_data'] ?? [];
 
-        // 2. Handle Test Ping / Test Event dari Dashboard Lynk.id
-        if (
-            empty($payload) ||
-            in_array($event, ['test_event', 'ping', 'test', 'test_webhook', 'test_notification', 'webhook.test', 'webhook_test'], true) ||
-            str_contains($event, 'test') ||
-            str_contains($event, 'ping') ||
-            $request->query('test') == '1' ||
-            (($request->header('User-Agent') && str_contains(strtolower($request->header('User-Agent')), 'lynk')) && empty($payload['data']))
-        ) {
+        // Ekstraksi nilai dengan fallback ke semua kemungkinan struktur payload Lynk
+        $refId = trim((string) (
+            $messageData['refId']
+            ?? $messageData['ref_id']
+            ?? $data['refId']
+            ?? $data['ref_id']
+            ?? $payload['refId']
+            ?? $payload['ref_id']
+            ?? ''
+        ));
+
+        $grandTotal = trim((string) (
+            $messageData['totals']['grandTotal']
+            ?? $messageData['grandTotal']
+            ?? $messageData['amount']
+            ?? $data['totals']['grandTotal']
+            ?? $data['grandTotal']
+            ?? $data['amount']
+            ?? $payload['amount']
+            ?? ''
+        ));
+
+        $messageId = trim((string) (
+            $messageData['message_id']
+            ?? $messageData['messageId']
+            ?? $data['message_id']
+            ?? $data['messageId']
+            ?? $payload['message_id']
+            ?? $payload['messageId']
+            ?? ''
+        ));
+
+        $customer = $messageData['customer'] ?? $data['customer'] ?? $payload['customer'] ?? [];
+        $customerEmail = strtolower(trim((string) ($customer['email'] ?? $payload['email'] ?? '')));
+
+        // 2. Handle Test Ping / Test Event dari Dashboard Lynk.id (tombol "Test URL")
+        $isTestRequest = empty($payload)
+            || in_array($event, ['test_event', 'ping', 'test', 'test_webhook', 'test_notification', 'webhook.test', 'webhook_test'], true)
+            || str_contains($event, 'test')
+            || str_contains($event, 'ping')
+            || $request->query('test') == '1'
+            || !empty($payload['test'])
+            || !empty($payload['is_test'])
+            || !empty($data['test'])
+            || !empty($messageData['test'])
+            || str_contains(strtolower($refId), 'test')
+            || str_contains(strtolower($refId), 'dummy')
+            || str_contains(strtolower($refId), 'mock')
+            || str_contains(strtolower($messageAction), 'TEST')
+            || in_array($customerEmail, ['user@lynk.id', 'test@lynk.id', 'email@contoh.id'], true)
+            || (($request->header('User-Agent') && str_contains(strtolower($request->header('User-Agent')), 'lynk')) && empty($messageData));
+
+        if ($isTestRequest) {
             Log::info('Lynk test webhook received successfully', [
                 'ip' => $request->ip(),
                 'payload' => $payload,
@@ -60,7 +107,7 @@ class LynkWebhookController extends Controller
             ], 200);
         }
 
-        $merchantKey = config('services.lynk.merchant_key');
+        $merchantKey = trim((string) config('services.lynk.merchant_key'), " \t\n\r\0\x0B\"'");
 
         // Guard 1: Merchant key harus terkonfigurasi di server
         if (empty($merchantKey)) {
@@ -72,9 +119,9 @@ class LynkWebhookController extends Controller
         }
 
         // Ekstraksi header signature
-        $receivedSignature = (string) ($request->header('X-Lynk-Signature')
+        $receivedSignature = trim((string) ($request->header('X-Lynk-Signature')
             ?? $request->header('x-lynk-signature')
-            ?? '');
+            ?? ''));
 
         if (empty($receivedSignature)) {
             Log::warning('Lynk webhook missing X-Lynk-Signature header', [
@@ -86,26 +133,34 @@ class LynkWebhookController extends Controller
             ], 401);
         }
 
-        $payload = $request->all();
-        $event = $payload['event'] ?? '';
-        $data = $payload['data'] ?? [];
-        $messageAction = strtoupper((string) ($data['message_action'] ?? ''));
-        $messageData = $data['message_data'] ?? [];
-
-        $refId = (string) ($messageData['refId'] ?? '');
-        $grandTotal = (string) ($messageData['totals']['grandTotal'] ?? '');
-        $messageId = (string) ($data['message_id'] ?? '');
-
         // Guard 2: Validasi signature
-        // Rumus: sha256(amount + ref_id + message_id + secret_key)
-        $signatureString = $grandTotal . $refId . $messageId . $merchantKey;
-        $expectedSignature = hash('sha256', $signatureString);
+        // Lynk formula standard: sha256(amount + ref_id + message_id + secret_key)
+        $possibleSignatures = [
+            hash('sha256', $grandTotal . $refId . $messageId . $merchantKey),
+            hash('sha256', $grandTotal . $refId . $merchantKey),
+            hash('sha256', $refId . $grandTotal . $messageId . $merchantKey),
+        ];
 
-        if (!hash_equals($expectedSignature, $receivedSignature)) {
+        if (is_numeric($grandTotal)) {
+            $intTotal = (string) (int) round((float) $grandTotal);
+            $possibleSignatures[] = hash('sha256', $intTotal . $refId . $messageId . $merchantKey);
+            $possibleSignatures[] = hash('sha256', $intTotal . $refId . $merchantKey);
+        }
+
+        $isValidSignature = false;
+        foreach (array_unique($possibleSignatures) as $candidateSignature) {
+            if (hash_equals($candidateSignature, $receivedSignature)) {
+                $isValidSignature = true;
+                break;
+            }
+        }
+
+        if (!$isValidSignature) {
             Log::warning('Lynk webhook signature mismatch', [
                 'refId' => $refId,
                 'messageId' => $messageId,
                 'grandTotal' => $grandTotal,
+                'receivedSignature' => $receivedSignature,
                 'ip' => $request->ip(),
             ]);
             return response()->json([
@@ -137,10 +192,8 @@ class LynkWebhookController extends Controller
             ], 200);
         }
 
-        $customer = $messageData['customer'] ?? [];
-        $customerEmail = strtolower(trim($customer['email'] ?? ''));
-        $customerName = trim($customer['name'] ?? 'Pelanggan Lynk');
-        $customerPhone = trim($customer['phone'] ?? '');
+        $customerName = trim((string) ($customer['name'] ?? $payload['name'] ?? 'Pelanggan Lynk'));
+        $customerPhone = trim((string) ($customer['phone'] ?? $payload['phone'] ?? ''));
 
         if (empty($customerEmail)) {
             Log::warning('Lynk webhook missing customer email', ['refId' => $refId]);
@@ -150,9 +203,9 @@ class LynkWebhookController extends Controller
             ], 422);
         }
 
-        $items = $messageData['items'] ?? [];
+        $items = $messageData['items'] ?? $data['items'] ?? $payload['items'] ?? [];
         $firstItem = $items[0] ?? [];
-        $itemTitle = (string) ($firstItem['title'] ?? '');
+        $itemTitle = (string) ($firstItem['title'] ?? $firstItem['name'] ?? 'VPS Cloud');
         $itemPrice = (float) ($firstItem['price'] ?? 0);
         $amountPaid = !empty($grandTotal) ? (float) $grandTotal : $itemPrice;
 

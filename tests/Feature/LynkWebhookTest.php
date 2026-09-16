@@ -217,4 +217,137 @@ class LynkWebhookTest extends TestCase
         // Verifikasi hanya 1 order yang dibuat
         $this->assertEquals(1, Order::where('payment_method', 'lynk')->count());
     }
+
+    public function test_lynk_dashboard_test_url_event_returns_200(): void
+    {
+        // 1. Test URL dengan refId dummy 'test'
+        $response = $this->postJson(route('api.webhooks.lynk'), [
+            'event' => 'payment.received',
+            'data' => [
+                'message_action' => 'SUCCESS',
+                'message_data' => [
+                    'refId' => 'TEST_REF_12345',
+                    'customer' => ['email' => 'user@lynk.id'],
+                ],
+            ],
+        ], [
+            'X-Lynk-Signature' => 'dummy_test_signature',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Lynk test webhook received successfully.',
+        ]);
+
+        // 2. Test ping event
+        $responsePing = $this->postJson(route('api.webhooks.lynk'), [
+            'event' => 'test_event',
+        ]);
+        $responsePing->assertStatus(200);
+        $responsePing->assertJson([
+            'success' => true,
+            'message' => 'Lynk test webhook received successfully.',
+        ]);
+    }
+
+    public function test_processes_valid_payment_when_message_id_is_inside_message_data(): void
+    {
+        $refId = 'lynk_nested_id_7788';
+        $grandTotal = 110000;
+        $messageId = 'API_CALL_NESTED_991122';
+        $customerEmail = 'nested_msg_id@example.com';
+        $customerName = 'Rian Nested';
+
+        $signatureString = (string)$grandTotal . $refId . $messageId . $this->secretKey;
+        $signature = hash('sha256', $signatureString);
+
+        // message_id ada di DALAM message_data (format Lynk aktual)
+        $payload = [
+            'event' => 'payment.received',
+            'data' => [
+                'message_action' => 'SUCCESS',
+                'message_code' => '0',
+                'message_data' => [
+                    'message_id' => $messageId,
+                    'createdAt' => '2026-09-16T10:00:00',
+                    'customer' => [
+                        'email' => $customerEmail,
+                        'name' => $customerName,
+                        'phone' => '081234567890',
+                    ],
+                    'items' => [
+                        [
+                            'title' => 'VexaHost VPS - Standard (2C / 4GB)',
+                            'price' => 110000,
+                            'qty' => 1,
+                        ],
+                    ],
+                    'refId' => $refId,
+                    'totals' => [
+                        'grandTotal' => $grandTotal,
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->postJson(route('api.webhooks.lynk'), $payload, [
+            'X-Lynk-Signature' => $signature,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Lynk payment processed successfully.',
+        ]);
+    }
+
+    public function test_handles_secret_key_with_quotes_or_whitespace(): void
+    {
+        // Simulasi jika di Coolify .env diset dengan tanda petik: "test_lynk_secret_merchant_key_12345"
+        Config::set('services.lynk.merchant_key', '  "' . $this->secretKey . '"  ');
+
+        $refId = 'lynk_quoted_key_1122';
+        $grandTotal = 110000;
+        $messageId = 'API_CALL_QUOTED_KEY';
+        $customerEmail = 'quoted_key@example.com';
+
+        $signatureString = (string)$grandTotal . $refId . $messageId . $this->secretKey;
+        $signature = hash('sha256', $signatureString);
+
+        $payload = [
+            'event' => 'payment.received',
+            'data' => [
+                'message_action' => 'SUCCESS',
+                'message_id' => $messageId,
+                'message_data' => [
+                    'customer' => [
+                        'email' => $customerEmail,
+                        'name' => 'Quoted User',
+                    ],
+                    'items' => [
+                        [
+                            'title' => 'VexaHost VPS - Standard (2C / 4GB)',
+                            'price' => 110000,
+                            'qty' => 1,
+                        ],
+                    ],
+                    'refId' => $refId,
+                    'totals' => [
+                        'grandTotal' => $grandTotal,
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->postJson(route('api.webhooks.lynk'), $payload, [
+            'X-Lynk-Signature' => $signature,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Lynk payment processed successfully.',
+        ]);
+    }
 }
