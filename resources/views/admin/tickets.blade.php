@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Tiket Bantuan Pelanggan', 'headerTitle' => 'Helpdesk & Tiket Dukungan'])
+@extends('layouts.admin', ['title' => 'Tiket Bantuan Pelanggan', 'headerTitle' => 'Helpdesk & Tiket Dukungan', 'backUrl' => route('admin.index'), 'backLabel' => 'Kembali ke Dashboard Admin'])
 
 @section('content')
 <div class="space-y-6">

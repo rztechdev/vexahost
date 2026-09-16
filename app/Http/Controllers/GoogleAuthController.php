@@ -19,7 +19,7 @@ class GoogleAuthController extends Controller
     protected function configureRedirectUri(): void
     {
         $host = request()->getHost();
-        if (in_array($host, ['127.0.0.1', 'localhost'])) {
+        if (in_array($host, ['127.0.0.1', 'localhost']) || str_contains($host, 'ngrok')) {
             config(['services.google.redirect' => route('auth.google.callback')]);
         }
     }
@@ -27,8 +27,11 @@ class GoogleAuthController extends Controller
     /**
      * Redirect user to Google OAuth provider.
      */
-    public function redirect()
+    public function redirect(Request $request)
     {
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->query('redirect')]);
+        }
         $this->configureRedirectUri();
         return Socialite::driver('google')->redirect();
     }

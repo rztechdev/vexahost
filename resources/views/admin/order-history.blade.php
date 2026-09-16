@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Riwayat Status Order #' . $order->id, 'headerTitle' => 'Riwayat Status Order #' . $order->id])
+@extends('layouts.admin', ['title' => 'Riwayat Status Order #' . $order->id, 'headerTitle' => 'Riwayat Status Order #' . $order->id, 'backUrl' => route('admin.orders'), 'backLabel' => 'Kembali ke Daftar Order'])
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-6">
@@ -95,12 +95,6 @@
                 @endforeach
             </div>
         @endif
-    </div>
-
-    <div class="text-center">
-        <a href="{{ route('admin.orders') }}" class="text-sm text-slate-500 hover:text-slate-700">
-            ← Kembali ke daftar order
-        </a>
     </div>
 </div>
 @endsection

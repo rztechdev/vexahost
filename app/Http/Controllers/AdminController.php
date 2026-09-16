@@ -64,7 +64,11 @@ class AdminController extends Controller
         $query = Order::with(['customer', 'vpsSpec', 'invoice'])->orderBy('created_at', 'desc');
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            if ($request->status === 'needs_provision') {
+                $query->whereIn('status', ['paid', 'provisioning'])->whereDoesntHave('vpsInstance');
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         if ($request->filled('channel')) {
@@ -74,7 +78,210 @@ class AdminController extends Controller
         $orders = $query->paginate(15)->withQueryString();
         $specs = VpsSpec::all();
 
-        return view('admin.orders', compact('orders', 'specs'));
+        $needsProvisionCount = Order::whereIn('status', ['paid', 'provisioning'])
+            ->whereDoesntHave('vpsInstance')
+            ->count();
+
+        return view('admin.orders', compact('orders', 'specs', 'needsProvisionCount'));
+    }
+
+    /**
+     * Menu Verifikasi Pembayaran (Cek Mutasi DANA Bisnis DESTINARA).
+     */
+    public function payments(Request $request)
+    {
+        $status = $request->query('status', 'pending');
+        $query = Order::with(['customer', 'vpsSpec', 'invoice', 'statusHistories'])
+            ->where('channel', 'website');
+
+        if ($status === 'all') {
+            // All statuses
+        } elseif (in_array($status, ['pending', 'paid', 'cancelled'], true)) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', 'pending');
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                    ->orWhere('hostname', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($cq) use ($search) {
+                        $cq->where('full_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invoice', function ($iq) use ($search) {
+                        $iq->where('invoice_number', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        $pendingCount = Order::where('channel', 'website')->where('status', 'pending')->count();
+
+        return view('admin.payments', compact('orders', 'pendingCount', 'status'));
+    }
+
+    /**
+     * Setujui Pembayaran (Admin telah mencocokkan mutasi DANA Bisnis DESTINARA).
+     */
+    public function approvePayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'reference' => 'nullable|string|max:100',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+        $order = Order::with('invoice')->findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return back()->with('error', "Order #{$order->id} berstatus {$order->status}, hanya order pending yang dapat disetujui.");
+        }
+
+        try {
+            DB::transaction(function () use ($order, $validated) {
+                $tx = PaymentTransaction::create([
+                    'order_id' => $order->id,
+                    'invoice_id' => $order->invoice?->id,
+                    'provider' => 'qris_manual',
+                    'provider_transaction_id' => 'DANA-MUTASI-' . Str::upper(Str::random(10)),
+                    'provider_order_ref' => 'ORDER-' . $order->id,
+                    'payment_method' => $order->payment_method ?? 'qris',
+                    'amount' => $order->amount,
+                    'currency' => 'IDR',
+                    'status' => 'settled',
+                    'settled_at' => now(),
+                    'raw_payload' => [
+                        'account_name' => 'DESTINARA',
+                        'reference' => $validated['reference'] ?? null,
+                        'note' => $validated['note'] ?? 'Mutasi DANA Bisnis diverifikasi oleh admin',
+                        'admin_user_id' => Auth::id(),
+                    ],
+                ]);
+
+                $this->orderStateMachine->transition(
+                    $order,
+                    'paid',
+                    [
+                        'reason' => 'Admin verifikasi pembayaran: mutasi DANA Bisnis DESTINARA cocok. ' . ($validated['note'] ?? ''),
+                        'actor_type' => 'admin',
+                        'metadata' => [
+                            'reference' => $validated['reference'] ?? null,
+                            'transaction_id' => $tx->id,
+                        ],
+                        'onLocked' => function (Order $locked) use ($tx) {
+                            $locked->paid_at = now();
+                            $locked->save();
+
+                            if ($locked->invoice) {
+                                $locked->invoice->update([
+                                    'status' => 'paid',
+                                    'paid_at' => now(),
+                                    'paid_via_transaction_id' => $tx->id,
+                                ]);
+                            }
+                        },
+                    ]
+                );
+            });
+
+            // Kirim email konfirmasi pembayaran lunas ke customer (sesuai template resmi)
+            try {
+                $order->loadMissing(['customer', 'vpsSpec', 'invoice']);
+                if ($order->customer) {
+                    $order->customer->notify(new \App\Notifications\PaymentReceivedNotification($order, $order->invoice));
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('admin.approve_payment.notify_failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+        } catch (InvalidStateTransitionException $e) {
+            return back()->with('error', 'Gagal menyetujui pembayaran: ' . $e->getMessage());
+        }
+
+        return back()->with('success', "Pembayaran Order #{$order->id} (Invoice: {$order->invoice?->invoice_number}) berhasil disetujui. Email konfirmasi telah dikirim ke pelanggan.");
+    }
+
+    /**
+     * Tahan / Pending Catatan Mutasi (Admin masih menunggu mutasi muncul di DANA Bisnis).
+     */
+    public function holdPayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'note' => 'required|string|max:500',
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'from_status' => $order->status,
+            'to_status' => $order->status,
+            'reason' => 'Verifikasi ditunda: ' . $validated['note'],
+            'actor_user_id' => Auth::id(),
+            'actor_type' => 'admin',
+            'ip_address' => $request->ip(),
+            'metadata' => [
+                'admin_id' => Auth::id(),
+                'note' => $validated['note'],
+            ],
+            'created_at' => now(),
+        ]);
+
+        return back()->with('info', "Catatan penundaan untuk Order #{$order->id} berhasil disimpan.");
+    }
+
+    /**
+     * Tolak Pembayaran (Mutasi tidak masuk atau nominal tidak sesuai).
+     */
+    public function rejectPayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        $order = Order::with(['customer', 'invoice'])->findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return back()->with('error', "Order #{$order->id} berstatus {$order->status}, hanya order pending yang dapat ditolak.");
+        }
+
+        try {
+            DB::transaction(function () use ($order, $validated) {
+                $this->orderStateMachine->transition(
+                    $order,
+                    'cancelled',
+                    [
+                        'reason' => 'Pembayaran ditolak: ' . $validated['reason'],
+                        'actor_type' => 'admin',
+                        'metadata' => [
+                            'admin_id' => Auth::id(),
+                            'reject_reason' => $validated['reason'],
+                        ],
+                        'onLocked' => function (Order $locked) {
+                            if ($locked->invoice) {
+                                $locked->invoice->update([
+                                    'status' => 'cancelled',
+                                ]);
+                            }
+                        },
+                    ]
+                );
+            });
+
+            // Kirim email notifikasi penolakan ke customer (sesuai template resmi)
+            try {
+                if ($order->customer) {
+                    $order->customer->notify(new \App\Notifications\PaymentRejectedNotification($order, $order->invoice, $validated['reason']));
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('admin.reject_payment.notify_failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+        } catch (InvalidStateTransitionException $e) {
+            return back()->with('error', 'Gagal menolak pembayaran: ' . $e->getMessage());
+        }
+
+        return back()->with('success', "Pembayaran Order #{$order->id} telah ditolak & order dibatalkan. Notifikasi email telah dikirim ke pelanggan.");
     }
 
     /**
@@ -165,16 +372,6 @@ class AdminController extends Controller
      */
     public function provision(Request $request, $id)
     {
-        $validated = $request->validate([
-            'public_ip' => 'required|ip',
-            'private_ip' => 'nullable|ip',
-            'hostname' => 'required|string|max:100',
-            'os' => 'required|string',
-            'root_password' => 'nullable|string|min:8',
-            'ssh_port' => 'nullable|integer|min:1|max:65535',
-            'app_url' => 'nullable|string|max:255',
-        ]);
-
         $order = Order::with(['vpsSpec', 'invoice'])->findOrFail($id);
 
         // Guard: harus sudah paid.
@@ -188,8 +385,25 @@ class AdminController extends Controller
             return back()->with('error', "Order #{$order->id} sudah memiliki VpsInstance terkait.");
         }
 
+        $isDb = $order->isDatabasePackage();
+        $hasPanel = $order->control_panel !== 'none' && !($isDb && $order->db_manager === 'cli_only');
+
+        $rules = [
+            'public_ip' => 'required|ip',
+            'private_ip' => 'nullable|ip',
+            'ssh_port' => 'nullable|integer|min:1|max:65535',
+        ];
+
+        if ($hasPanel) {
+            $rules['app_url'] = 'required|string|max:255';
+        } else {
+            $rules['app_url'] = 'nullable|string|max:255';
+        }
+
+        $validated = $request->validate($rules);
+
         try {
-            $instance = DB::transaction(function () use ($order, $validated) {
+            $instance = DB::transaction(function () use ($order, $validated, $isDb, $hasPanel) {
                 // Step 1: paid → provisioning
                 $this->orderStateMachine->transition($order, 'provisioning', [
                     'reason' => 'Admin memulai provisioning.',
@@ -212,10 +426,12 @@ class AdminController extends Controller
                 };
                 $expiresAt = $startsAt->copy()->addMonths($months);
                 $graceEndsAt = $expiresAt->copy()->addDays(7);
-                $rootPassword = !empty($validated['root_password'])
-                    ? $validated['root_password']
-                    : Str::password(16, true, true, false, false);
-                $isDb = $order->isDatabasePackage();
+
+                // Parameter pesanan pelanggan yang terkunci (tidak diubah admin)
+                $hostname = $order->hostname ?: ('vps-' . $order->id);
+                $os = $order->os ?: 'Ubuntu 24.04 LTS';
+                $rootPassword = $order->root_password ?: Str::password(16, true, true, false, false);
+
                 $dbEngine = $order->db_engine ?: ($isDb ? 'postgres' : null);
                 $dbManager = $order->db_manager ?: ($isDb ? 'cloudbeaver' : null);
                 $dbPort = $order->db_port ?: ($isDb ? match($dbEngine) {
@@ -226,7 +442,7 @@ class AdminController extends Controller
                     default => 5432,
                 } : null);
                 $dbPassword = $isDb ? ($order->db_password ?: $rootPassword) : null;
-                $appUrl = $validated['app_url'] ?? (($isDb && $dbManager === 'cloudbeaver') ? "https://{$validated['public_ip']}:8080" : null);
+                $appUrl = $hasPanel ? ($validated['app_url'] ?? null) : null;
                 $appName = $order->isAiPackage() ? $order->vpsSpec?->name : (($isDb && $dbManager === 'cloudbeaver') ? 'CloudBeaver Web GUI' : null);
                 $appGuide = $order->isAiPackage() ? $order->vpsSpec?->solution : null;
 
@@ -234,12 +450,12 @@ class AdminController extends Controller
                     'customer_id' => $order->customer_id,
                     'order_id' => $order->id,
                     'organization_id' => $order->organization_id,
-                    'hostname' => $order->hostname ?? $validated['hostname'],
+                    'hostname' => $hostname,
                     'public_ip' => $validated['public_ip'],
                     'private_ip' => $validated['private_ip'] ?? null,
                     'ssh_port' => $validated['ssh_port'] ?? 22,
                     'initial_root_password' => $rootPassword,
-                    'os' => $order->os,
+                    'os' => $os,
                     'datacenter_location' => $order->datacenter_location ?? 'ID-CGK01',
                     'status' => 'provisioning',
                     'cpu' => $spec->cpu ?? 2,
@@ -344,7 +560,7 @@ class AdminController extends Controller
         }
 
         return back()->with('success',
-            "VPS {$validated['hostname']} (IP: {$validated['public_ip']}) berhasil di-provision. Status order diubah ke Active.");
+            "VPS {$instance->hostname} (IP: {$validated['public_ip']}) berhasil di-provision. Status order diubah ke Active.");
     }
 
     /**
@@ -559,6 +775,7 @@ class AdminController extends Controller
                     'db_port' => $dbPort,
                     'provider' => $provider,
                     'hostname' => $cleanHostname,
+                    'root_password' => $validated['root_password'] ?? Str::password(16, true, true, false, false),
                     'datacenter_location' => $datacenterLocation,
                     'os' => $validated['os'],
                     'billing_cycle' => 'monthly',
@@ -1253,6 +1470,16 @@ class AdminController extends Controller
      */
     public function storePackage(Request $request)
     {
+        if ($request->filled('payment_url')) {
+            $url = trim((string) $request->input('payment_url'));
+            if (!preg_match('~^https?://~i', $url)) {
+                $url = 'https://' . $url;
+            }
+            $request->merge(['payment_url' => $url]);
+        } elseif ($request->has('payment_url')) {
+            $request->merge(['payment_url' => null]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:vps_specs,name',
             'category' => 'nullable|string|in:vps,ai_combo,managed_db',
@@ -1264,6 +1491,7 @@ class AdminController extends Controller
             'bandwidth' => 'required|integer|min:1|max:10000',
             'cost_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
+            'payment_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -1282,6 +1510,16 @@ class AdminController extends Controller
     {
         $spec = VpsSpec::findOrFail($id);
 
+        if ($request->filled('payment_url')) {
+            $url = trim((string) $request->input('payment_url'));
+            if (!preg_match('~^https?://~i', $url)) {
+                $url = 'https://' . $url;
+            }
+            $request->merge(['payment_url' => $url]);
+        } elseif ($request->has('payment_url')) {
+            $request->merge(['payment_url' => null]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:vps_specs,name,' . $spec->id,
             'category' => 'nullable|string|in:vps,ai_combo,managed_db',
@@ -1293,6 +1531,7 @@ class AdminController extends Controller
             'bandwidth' => 'required|integer|min:1|max:10000',
             'cost_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
+            'payment_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
         ]);
 

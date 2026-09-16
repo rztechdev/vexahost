@@ -2,9 +2,120 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'VexaHost — Enterprise Cloud VPS Terjangkau untuk Pelajar & Developer' }}</title>
-    <meta name="description" content="Platform cloud VPS berkinerja tinggi dengan harga terjangkau di Indonesia. Didesain untuk pelajar, pengembang freelance, dan startup modern. Created by RZ Digital Creative.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    @php
+        $seoTitle = $title ?? 'VexaHost — Cloud VPS NVMe KVM Indonesia Mulai Rp 80rb/bln';
+        $seoDescription = $description ?? 'Platform Cloud VPS KVM berkinerja tinggi di Datacenter Jakarta. Spesifikasi 100% NVMe, latency rendah <10ms, Managed DB, & AI Stack siap pakai mulai Rp 80rb.';
+        $seoKeywords = $keywords ?? 'cloud vps indonesia, sewa vps murah, vps nvme jakarta, vps mahasiswa, vps kvm murah, managed database postgresql mysql, vps ai server, vexahost';
+        $seoImage = asset('images/promo-banner.webp');
+        $canonicalUrl = url()->current();
+        $googleSiteVerification = config('services.google.site_verification');
+    @endphp
+
+    <title>{{ $seoTitle }}</title>
+    <meta name="title" content="{{ $seoTitle }}">
+    <meta name="description" content="{{ $seoDescription }}">
+    <meta name="keywords" content="{{ $seoKeywords }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="VexaHost — RZ Digital Creative">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+
+    @if(!empty($googleSiteVerification))
+    <meta name="google-site-verification" content="{{ $googleSiteVerification }}">
+    @endif
+
+    <!-- Geo Targeting (Dominasi Pencarian Lokal Indonesia) -->
+    <meta name="geo.region" content="ID-JK">
+    <meta name="geo.placename" content="Jakarta, Indonesia">
+    <meta name="geo.position" content="-6.2088;106.8456">
+    <meta name="ICBM" content="-6.2088, 106.8456">
+
+    <!-- Open Graph / Facebook / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:site_name" content="VexaHost Cloud Indonesia">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+    <meta property="og:image:alt" content="VexaHost Cloud Infrastructure">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="id_ID">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ $canonicalUrl }}">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    @php
+        $schemaData = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'Organization',
+                    '@id' => url('/') . '#organization',
+                    'name' => 'VexaHost',
+                    'url' => url('/'),
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => asset('images/logo.png'),
+                        'caption' => 'VexaHost Logo',
+                    ],
+                    'description' => 'Penyedia infrastruktur Cloud VPS NVMe KVM, AI Hub, dan Managed Database berkinerja tinggi di Indonesia.',
+                    'contactPoint' => [
+                        '@type' => 'ContactPoint',
+                        'telephone' => '+6285774410978',
+                        'contactType' => 'customer service',
+                        'email' => 'support@vexahostcloud.my.id',
+                        'areaServed' => 'ID',
+                        'availableLanguage' => ['Indonesian', 'English'],
+                    ],
+                    'parentOrganization' => [
+                        '@type' => 'Organization',
+                        'name' => 'RZ Digital Creative',
+                    ],
+                ],
+                [
+                    '@type' => 'WebSite',
+                    '@id' => url('/') . '#website',
+                    'url' => url('/'),
+                    'name' => 'VexaHost',
+                    'description' => 'Infrastruktur Cloud VPS Cepat, Andal, & Transparan',
+                    'publisher' => [
+                        '@id' => url('/') . '#organization',
+                    ],
+                    'inLanguage' => 'id-ID',
+                ],
+                [
+                    '@type' => 'Product',
+                    'name' => 'VexaHost Cloud VPS KVM Indonesia',
+                    'image' => asset('images/logo.png'),
+                    'description' => 'Server Virtual Private Server (VPS) berbasis KVM dengan penyimpanan 100% NVMe dan Datacenter Jakarta.',
+                    'brand' => [
+                        '@type' => 'Brand',
+                        'name' => 'VexaHost',
+                    ],
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
+                        'priceCurrency' => 'IDR',
+                        'lowPrice' => '80000',
+                        'highPrice' => '350000',
+                        'offerCount' => '10',
+                        'priceValidUntil' => '2028-12-31',
+                        'availability' => 'https://schema.org/InStock',
+                        'url' => route('packages.vps'),
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">
+    {!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+    </script>
+
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +124,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-white text-slate-800 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
@@ -439,63 +551,98 @@
         </div>
     </header>
 
-    <!-- Flash Messages (Auto-dismiss & Dismissible) -->
-    @if(session('success') || session('error') || $errors->any())
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
-            @if(session('success'))
-                <div x-data="{ show: true }"
-                     x-show="show"
-                     x-init="setTimeout(() => show = false, 4000)"
-                     x-transition:leave="transition ease-in duration-300"
-                     x-transition:leave-start="opacity-100 translate-y-0"
-                     x-transition:leave-end="opacity-0 -translate-y-2"
-                     class="border border-emerald-200 bg-emerald-50 px-4 py-3 rounded-lg text-sm text-emerald-800 mb-3 flex items-center justify-between shadow-xs">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                    <button @click="show = false" class="text-emerald-500 hover:text-emerald-800 p-1 rounded transition-colors" title="Tutup">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-            @endif
+    <!-- Flash Messages via SweetAlert (Overlay alert, avoids pushing down Hero section) -->
+    @if(session('success'))
+        <script>
+            (function() {
+                function showSuccessAlert() {
+                    if (window.showSuccess) {
+                        window.showSuccess(@json(session('success')));
+                    } else if (window.Swal) {
+                        window.Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: @json(session('success')),
+                            confirmButtonColor: '#111827',
+                            confirmButtonText: 'Mengerti',
+                            timer: 3500,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'rounded-2xl',
+                                confirmButton: 'rounded-lg px-5 py-2.5 font-semibold',
+                            }
+                        });
+                    } else {
+                        setTimeout(showSuccessAlert, 50);
+                    }
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', showSuccessAlert);
+                } else {
+                    showSuccessAlert();
+                }
+            })();
+        </script>
+    @endif
 
-            @if(session('error'))
-                <div x-data="{ show: true }"
-                     x-show="show"
-                     x-init="setTimeout(() => show = false, 5000)"
-                     x-transition:leave="transition ease-in duration-300"
-                     x-transition:leave-start="opacity-100 translate-y-0"
-                     x-transition:leave-end="opacity-0 -translate-y-2"
-                     class="border border-rose-200 bg-rose-50 px-4 py-3 rounded-lg text-sm text-rose-800 mb-3 flex items-center justify-between shadow-xs">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                    <button @click="show = false" class="text-rose-500 hover:text-rose-800 p-1 rounded transition-colors" title="Tutup">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-            @endif
+    @if(session('error'))
+        <script>
+            (function() {
+                function showErrorAlert() {
+                    if (window.showError) {
+                        window.showError(@json(session('error')));
+                    } else if (window.Swal) {
+                        window.Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan',
+                            text: @json(session('error')),
+                            confirmButtonColor: '#111827',
+                            confirmButtonText: 'Mengerti',
+                            customClass: {
+                                popup: 'rounded-2xl',
+                                confirmButton: 'rounded-lg px-5 py-2.5 font-semibold',
+                            }
+                        });
+                    } else {
+                        setTimeout(showErrorAlert, 50);
+                    }
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', showErrorAlert);
+                } else {
+                    showErrorAlert();
+                }
+            })();
+        </script>
+    @endif
 
-            @if($errors->any())
-                <div x-data="{ show: true }"
-                     x-show="show"
-                     class="border border-rose-200 bg-rose-50 px-4 py-3 rounded-lg text-sm text-rose-800 mb-3 shadow-xs">
-                    <div class="flex items-center justify-between mb-1">
-                        <p class="font-semibold">Harap periksa kesalahan berikut:</p>
-                        <button @click="show = false" class="text-rose-500 hover:text-rose-800 p-1 rounded transition-colors" title="Tutup">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                    <ul class="list-disc list-inside text-sm space-y-0.5">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-        </div>
+    @if($errors->any())
+        <script>
+            (function() {
+                function showValidationErrors() {
+                    if (window.Swal) {
+                        window.Swal.fire({
+                            icon: 'error',
+                            title: 'Perhatian',
+                            html: `<ul class="text-left text-sm text-slate-600 list-disc list-inside space-y-1 mt-2">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>`,
+                            confirmButtonColor: '#111827',
+                            confirmButtonText: 'Mengerti',
+                            customClass: {
+                                popup: 'rounded-2xl',
+                                confirmButton: 'rounded-lg px-5 py-2.5 font-semibold',
+                            }
+                        });
+                    } else {
+                        setTimeout(showValidationErrors, 50);
+                    }
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', showValidationErrors);
+                } else {
+                    showValidationErrors();
+                }
+            })();
+        </script>
     @endif
 
     <!-- Main Content -->
@@ -505,7 +652,7 @@
 
     <!-- Enterprise 4-Column Footer -->
     @unless(request()->routeIs('checkout'))
-    <footer class="bg-slate-900 text-slate-400 pt-16 pb-12 border-t border-slate-800">
+    <footer class="bg-[#0B0F19] text-slate-400 pt-16 pb-12 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
 
@@ -519,7 +666,7 @@
                         Platform cloud VPS KVM berkinerja tinggi di Indonesia. Menyediakan compute terisolasi, storage NVMe RAID-10 cepat, dan kemudahan 1-click control panel.
                     </p>
                     <div class="space-y-1 text-xs text-slate-400">
-                        <p class="font-medium text-slate-300">Created by <span class="text-white font-semibold">RZ Digital Creative</span></p>
+                        <p class="text-slate-400 font-normal">Created by <span class="text-slate-300 font-normal">RZ Digital Creative</span></p>
                         <p>Infrastruktur: Tier-3 Datacenter Singapore &amp; Cyber Building Jakarta</p>
                     </div>
                 </div>
@@ -604,7 +751,7 @@
 
             <!-- Bottom Copyright -->
             <div class="pt-6 border-t border-slate-800/80 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by <span class="text-slate-400 font-semibold">RZ Digital Creative</span>.</p>
+                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by <span class="text-slate-400 font-normal">RZ Digital Creative</span>.</p>
                 <div class="flex items-center space-x-5 text-[11px]">
                     <a href="{{ route('terms') }}" class="hover:text-slate-300 transition-colors">Terms of Service</a>
                     <span>&bull;</span>
@@ -625,15 +772,27 @@
            target="_blank"
            rel="noopener"
            title="Chat WhatsApp CS (085774410978)"
-           class="group flex items-center gap-2.5 px-4 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
-            <span class="relative flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-            </span>
-            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-            <span class="hidden sm:inline text-xs font-bold tracking-wide">Tanya CS</span>
+           class="group flex items-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <svg class="w-5 h-5 fill-current animate-pulse" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            <span class="text-xs font-bold tracking-wide">CS</span>
         </a>
     </div>
 
+    @include('partials.invoice-modal')
+
+    @stack('scripts')
+    <script>
+        // Smooth and accurate scroll to hash on page load (e.g. from /dashboard or direct route)
+        window.addEventListener('load', function() {
+            if (window.location.hash) {
+                const target = document.querySelector(window.location.hash);
+                if (target) {
+                    setTimeout(function() {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

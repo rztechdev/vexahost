@@ -4,9 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Invoice;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class PaymentReceivedNotification extends Notification
 {
@@ -24,14 +26,42 @@ class PaymentReceivedNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $invNo = $this->invoice?->invoice_number ?? ('INV-' . $this->order->id);
+        $invoice = $this->invoice ?? $this->order->invoice ?? Invoice::where('order_id', $this->order->id)->first();
+        $invNo = $invoice?->invoice_number ?? ('INV-' . $this->order->id);
 
-        return (new MailMessage)
+        $mail = (new MailMessage)
             ->subject("Pembayaran diterima — {$invNo}")
             ->view('emails.payment-received', [
                 'order' => $this->order,
-                'invoice' => $this->invoice,
+                'invoice' => $invoice,
             ]);
+
+        if ($invoice) {
+            try {
+                $invoice->loadMissing(['order.customer', 'order.vpsSpec']);
+                $pdf = Pdf::loadView('dashboard.invoice-pdf', ['invoice' => $invoice])
+                    ->setPaper('a4', 'portrait')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'Helvetica',
+                    ]);
+
+                $mail->attachData(
+                    $pdf->output(),
+                    "Invoice-{$invNo}.pdf",
+                    ['mime' => 'application/pdf']
+                );
+            } catch (\Throwable $e) {
+                Log::error('notification.invoice_pdf_attach_failed', [
+                    'order_id' => $this->order->id,
+                    'invoice_id' => $invoice->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $mail;
     }
 
     public function toArray(object $notifiable): array

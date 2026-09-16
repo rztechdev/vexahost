@@ -20,6 +20,20 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Prevent double-tap zoom delay & accidental double-tap zoom */
+input, select, textarea, button, a {
+  touch-action: manipulation;
+}
+
+/* Prevent iOS Safari & mobile auto-zoom on input focus */
+@media screen and (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="hidden"]):not([type="file"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

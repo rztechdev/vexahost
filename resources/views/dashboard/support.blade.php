@@ -1,4 +1,4 @@
-@extends('layouts.dashboard', ['title' => 'Pusat Bantuan & Support', 'headerTitle' => 'Pusat Bantuan & Support'])
+@extends('layouts.dashboard', ['title' => 'Pusat Bantuan & Support', 'headerTitle' => 'Pusat Bantuan & Support', 'backUrl' => route('dashboard.index'), 'backLabel' => 'Kembali ke Dashboard'])
 
 @section('content')
 <div class="space-y-6" x-data="{ showCreateModal: false }">

@@ -8,6 +8,7 @@ use App\Models\OrderStatusHistory;
 use App\Models\PaymentTransaction;
 use App\Models\User;
 use App\Models\VpsSpec;
+use App\Models\WebhookEvent;
 use App\Services\OrderStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,8 +52,20 @@ class OrderController extends Controller
             ], 422);
         }
 
+        if ($user->hasTwoFactorEnabled()) {
+            $request->session()->put('2fa.pending_user_id', $user->id);
+            $request->session()->put('2fa.remember', true);
+            return response()->json([
+                'success' => false,
+                'requires_2fa' => true,
+                'redirect' => route('two-factor.challenge'),
+                'message' => 'Autentikasi dua faktor diperlukan.',
+            ], 200);
+        }
+
         Auth::login($user, true);
         $request->session()->regenerate();
+        $request->session()->put('2fa.passed', true);
 
         return response()->json([
             'success' => true,
@@ -60,8 +73,9 @@ class OrderController extends Controller
                 'id' => $user->id,
                 'full_name' => $user->full_name,
                 'email' => $user->email,
-                'phone' => $user->phone,
+                'phone' => $user->phone ?? '',
             ],
+            'csrf_token' => csrf_token(),
             'message' => 'Login berhasil.',
         ]);
     }
@@ -107,11 +121,13 @@ class OrderController extends Controller
             'os' => 'required|string',
             'billing_cycle' => 'nullable|string|in:monthly',
             'hostname' => ['required', 'string', 'max:63', 'regex:/^[A-Za-z0-9][A-Za-z0-9-]*$/'],
-            'payment_method' => 'required|string|in:midtrans_snap,qris,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,gopay,shopeepay,ovo,dana',
+            'root_password' => 'required|string|min:8|max:255',
+            'payment_method' => 'required|string|in:midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,gopay,shopeepay,ovo,dana',
             'db_engine' => 'nullable|string|in:postgres,mysql,redis,mongodb,vector',
             'db_manager' => 'nullable|string|in:cloudbeaver,cli_only',
             // Guest fields if not logged in
             'full_name' => 'nullable|string|max:255',
+            'username' => 'nullable|string|min:3|max:50|alpha_dash|unique:users,username',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:25',
             'password' => 'nullable|string|min:8',
@@ -141,6 +157,7 @@ class OrderController extends Controller
         if (!$user) {
             $request->validate([
                 'full_name' => 'required|string|max:255',
+                'username' => 'nullable|string|min:3|max:50|alpha_dash|unique:users,username',
                 'email' => 'required|email|max:255',
                 'phone' => 'nullable|string|max:25',
                 'password' => 'required|string|min:8',
@@ -149,15 +166,28 @@ class OrderController extends Controller
             $existingUser = User::where('email', $validated['email'])->first();
             if ($existingUser) {
                 if (!Hash::check($validated['password'], $existingUser->password)) {
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'message' => 'Email ini sudah terdaftar. Silakan pilih tab "Sudah Punya Akun" untuk login atau masukkan password yang sesuai.',
+                            'errors' => [
+                                'email' => ['Email ini sudah terdaftar. Silakan login atau gunakan password yang sesuai.']
+                            ]
+                        ], 422);
+                    }
                     return back()->withInput()->withErrors([
                         'email' => 'Email ini sudah terdaftar. Silakan login terlebih dahulu atau gunakan password yang benar.',
                     ]);
                 }
                 $user = $existingUser;
             } else {
-                $generatedUsername = 'vx_' . Str::lower(Str::random(7));
-                while (User::where('username', $generatedUsername)->exists()) {
+                $requestedUsername = $request->input('username');
+                if (!empty($requestedUsername)) {
+                    $generatedUsername = strtolower(trim($requestedUsername));
+                } else {
                     $generatedUsername = 'vx_' . Str::lower(Str::random(7));
+                    while (User::where('username', $generatedUsername)->exists()) {
+                        $generatedUsername = 'vx_' . Str::lower(Str::random(7));
+                    }
                 }
 
                 $user = User::create([
@@ -172,6 +202,7 @@ class OrderController extends Controller
 
             Auth::login($user);
             $request->session()->regenerate();
+            $request->session()->put('2fa.passed', true);
         } else {
             // Update phone if previously empty
             if (!empty($validated['phone']) && empty($user->phone)) {
@@ -208,7 +239,7 @@ class OrderController extends Controller
                 'db_manager' => $spec->isDatabasePackage() ? ($validated['db_manager'] ?? 'cloudbeaver') : null,
                 'db_name' => $spec->isDatabasePackage() ? 'vexadb_production' : null,
                 'db_user' => $spec->isDatabasePackage() ? 'admin_vexa' : null,
-                'db_password' => $spec->isDatabasePackage() ? Str::password(16, true, true, false, false) : null,
+                'db_password' => $spec->isDatabasePackage() ? ($validated['root_password'] ?? Str::password(16, true, true, false, false)) : null,
                 'db_port' => $spec->isDatabasePackage() ? match($validated['db_engine'] ?? 'postgres') {
                     'mysql' => 3306,
                     'redis' => 6379,
@@ -218,6 +249,7 @@ class OrderController extends Controller
                 } : null,
                 'provider' => $validated['provider'],
                 'hostname' => strtolower($validated['hostname']),
+                'root_password' => $validated['root_password'],
                 'datacenter_location' => $validated['datacenter_location'],
                 'os' => $validated['os'],
                 'billing_cycle' => $cycle,
@@ -264,13 +296,41 @@ class OrderController extends Controller
             return $order;
         });
 
+        // Simpan ID order aktif di session browser agar bisa dipulihkan saat kembali dari Lynk/gateway
+        session(['last_order_id' => $order->id]);
+
         // VPS Instance TIDAK dibuat di sini.
         // Instance hanya dibuat oleh Admin setelah payment terkonfirmasi via webhook.
 
+        $redirectUrl = ($order->payment_method === 'lynk' && !empty($spec->payment_url))
+            ? $spec->payment_url
+            : route('order.payment', $order->id);
+
         // If user explicitly chose to postpone payment and view dashboard (locked state)
         if ($request->filled('redirect_to_dashboard') && $request->input('redirect_to_dashboard') == '1') {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'order_id' => $order->id,
+                    'redirect_url' => route('dashboard.index'),
+                ]);
+            }
+
             return redirect()->route('dashboard.index')
                 ->with('warning', 'Pesanan VPS Anda telah tersimpan! Layanan saat ini TERKUNCI menunggu pembayaran. Silakan selesaikan pembayaran untuk mengaktifkan.');
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'order_id' => $order->id,
+                'redirect_url' => $redirectUrl,
+            ]);
+        }
+
+        // Jika metode pembayaran Lynk dan paket memiliki payment_url, langsung alihkan ke Lynk checkout
+        if ($order->payment_method === 'lynk' && !empty($spec->payment_url)) {
+            return redirect()->away($spec->payment_url);
         }
 
         return redirect()->route('order.payment', $order->id)
@@ -291,6 +351,7 @@ class OrderController extends Controller
         }
 
         $paymentMethodNames = [
+            'lynk' => 'Lynk.id Checkout',
             'qris' => 'QRIS',
             'bca_va' => 'BCA Virtual Account',
             'mandiri_va' => 'Mandiri Virtual Account',
@@ -303,13 +364,15 @@ class OrderController extends Controller
             'midtrans_snap' => 'Kartu Kredit/Debit',
         ];
 
-        $order->payment_method_name = $paymentMethodNames[$order->payment_method] ?? strtoupper($order->payment_method);
+        $devSimulateEnabled = config('app.env') === 'local' && (bool) env('APP_DEV_SIMULATE_PAYMENT', false);
 
-        // Flag: apakah tombol "Simulate Payment" boleh muncul (khusus dev environment).
-        $devSimulateEnabled = app()->environment('local')
-            && (bool) env('APP_DEV_SIMULATE_PAYMENT', false);
+        // Generate dynamic QRIS khusus nominal pesanan ini
+        $qrisService = app(\App\Services\QrisService::class);
+        $qrisDataUri = $qrisService->generateDataUri((float) $order->amount);
+        $qrisPayload = $qrisService->generatePayload((float) $order->amount);
+        $elapsedSeconds = (int) max(0, now()->diffInSeconds($order->created_at));
 
-        return view('order.payment-gateway', compact('order', 'devSimulateEnabled'));
+        return view('order.payment-gateway', compact('order', 'devSimulateEnabled', 'qrisDataUri', 'qrisPayload', 'elapsedSeconds'));
     }
 
     /**
@@ -320,6 +383,10 @@ class OrderController extends Controller
     public function paymentStatus($id)
     {
         $order = Order::with(['customer', 'vpsSpec', 'invoice'])->findOrFail($id);
+
+        if (!Auth::check() && session('last_order_id') == $order->id && $order->customer_id) {
+            Auth::loginUsingId($order->customer_id);
+        }
 
         if (!Auth::check() || ($order->customer_id !== Auth::id() && !Auth::user()->is_admin)) {
             abort(403);
@@ -339,6 +406,10 @@ class OrderController extends Controller
     public function paymentStatusJson($id)
     {
         $order = Order::with('invoice')->findOrFail($id);
+
+        if (!Auth::check() && session('last_order_id') == $order->id && $order->customer_id) {
+            Auth::loginUsingId($order->customer_id);
+        }
 
         if (!Auth::check() || ($order->customer_id !== Auth::id() && !Auth::user()->is_admin)) {
             abort(403);
@@ -473,10 +544,112 @@ class OrderController extends Controller
     {
         $order = Order::with(['customer', 'vpsSpec', 'invoice', 'vpsInstance'])->findOrFail($id);
 
+        if (!Auth::check() && session('last_order_id') == $order->id && $order->customer_id) {
+            Auth::loginUsingId($order->customer_id);
+        }
+
         if (!Auth::check() || ($order->customer_id !== Auth::id() && !Auth::user()->is_admin)) {
             abort(403);
         }
 
         return view('order.success', compact('order'));
+    }
+
+    /**
+     * Callback handler setelah pembayaran dari payment gateway (Lynk, Shopee, dsb).
+     */
+    public function paymentCallback(Request $request)
+    {
+        $orderId = $request->query('order_id')
+            ?? $request->query('refId')
+            ?? $request->query('ref_id')
+            ?? $request->query('reference')
+            ?? $request->query('transaction_id')
+            ?? $request->query('order_number')
+            ?? session('last_order_id');
+
+        $user = Auth::user();
+        $order = null;
+
+        if ($orderId) {
+            // 1. Cek numeric primary key (orders.id)
+            if (is_numeric($orderId)) {
+                $order = Order::find($orderId);
+            }
+
+            // 2. Cek Shopee order ID
+            if (!$order) {
+                $order = Order::where('shopee_order_id', $orderId)->first();
+            }
+
+            // 3. Cek via PaymentTransaction (misal refId Lynk)
+            if (!$order) {
+                $tx = PaymentTransaction::where('provider_transaction_id', $orderId)
+                    ->orWhere('provider_order_ref', $orderId)
+                    ->latest()
+                    ->first();
+                if ($tx && $tx->order_id) {
+                    $order = Order::find($tx->order_id);
+                }
+            }
+
+            // 4. Cek via WebhookEvent (misal event_id Lynk)
+            if (!$order) {
+                $evt = WebhookEvent::where('event_id', $orderId)
+                    ->whereNotNull('order_id')
+                    ->latest()
+                    ->first();
+                if ($evt && $evt->order_id) {
+                    $order = Order::find($evt->order_id);
+                }
+            }
+        }
+
+        // 5. Fallback pencarian order terbaru user yang sedang login atau session
+        if (!$order && $user) {
+            $order = Order::where('customer_id', $user->id)->latest()->first();
+        }
+
+        if (!$order && session('last_order_id')) {
+            $order = Order::find(session('last_order_id'));
+        }
+
+        // 6. Pemulihan Sesi Pengguna secara aman:
+        // Jika user belum login di browser ini tapi browser memiliki session order yang cocok,
+        // login-kan kembali agar user tidak terlempar ke form login kosong
+        if (!$user && $order && $order->customer_id) {
+            if (session('last_order_id') == $order->id) {
+                Auth::loginUsingId($order->customer_id);
+                $user = Auth::user();
+            }
+        }
+
+        // 7. Penanganan Redirect:
+        // A. Pesanan sudah lunas / diproses
+        if ($order && in_array($order->status, ['paid', 'provisioning', 'active'], true) && $order->paid_at) {
+            if ($user) {
+                return redirect()->route('dashboard.index', [
+                    'payment_success' => 1,
+                    'order_id' => $order->id,
+                ])->with('payment_success_order_id', $order->id);
+            }
+
+            return redirect()->route('order.success', $order->id);
+        }
+
+        // B. Pesanan masih pending (webhook sedang berjalan / menunggu pembayaran)
+        if ($order && $order->status === 'pending') {
+            return redirect()->route('order.payment.status', $order->id)
+                ->with('info', 'Pembayaran sedang diproses atau menunggu verifikasi sistem. Silakan pantau status pembayaran Anda.');
+        }
+
+        // C. User terotentikasi tapi order tidak spesifik
+        if ($user) {
+            return redirect()->route('dashboard.index')
+                ->with('info', 'Selamat datang di Dashboard. Pantau status pesanan dan layanan server Anda di sini.');
+        }
+
+        return redirect()->route('login')
+            ->with('info', 'Silakan masuk ke akun VexaHost Anda untuk memantau status pesanan.');
     }
 }

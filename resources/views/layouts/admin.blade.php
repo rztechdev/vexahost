@@ -2,7 +2,7 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ $title ?? 'Admin' }} — VexaHost</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,19 +12,20 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="h-full antialiased bg-white text-slate-900" x-data="{ sidebarOpen: false, userDropdown: false }">
-    <div class="min-h-full flex flex-col md:flex-row">
+    <div class="h-screen w-full flex flex-col md:flex-row overflow-hidden bg-white">
 
         <div x-show="sidebarOpen" class="fixed inset-0 z-40 bg-black/30 md:hidden" @click="sidebarOpen = false" style="display:none;"></div>
 
-        <!-- Sidebar (Wide w-80, Large Font text-base, No Category Headings) -->
+        <!-- Sidebar (Wide w-80, Stationary on Desktop, No Category Headings) -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-               class="fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 md:static md:translate-x-0">
+               class="fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 md:static md:inset-auto md:h-full md:shrink-0 md:translate-x-0">
 
             <!-- Logo (No border-b) -->
-            <div class="h-16 flex items-center justify-between px-6 pt-2">
+            <div class="h-16 flex items-center justify-between px-6 pt-2 shrink-0">
                 <a href="{{ route('admin.index') }}" class="flex items-center gap-3">
                     <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-10 w-auto object-contain shrink-0">
                     <span class="text-xl font-bold text-slate-900">VexaHost</span>
@@ -43,6 +44,20 @@
                     <span>Ringkasan</span>
                 </a>
 
+                <a href="{{ route('admin.payments') }}"
+                   class="flex items-center justify-between px-4 py-3 rounded-lg text-base transition-colors {{ request()->routeIs('admin.payments*') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50 font-medium' }}">
+                    <div class="flex items-center gap-3.5">
+                        <svg class="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>Verifikasi Pembayaran</span>
+                    </div>
+                    @php $pendingPaymentCount = \App\Models\Order::where('status', 'pending')->count(); @endphp
+                    @if($pendingPaymentCount > 0)
+                        <span class="text-xs font-bold bg-black text-white px-2 py-0.5 rounded">{{ $pendingPaymentCount }}</span>
+                    @endif
+                </a>
+
                 <a href="{{ route('admin.orders') }}"
                    class="flex items-center justify-between px-4 py-3 rounded-lg text-base transition-colors {{ request()->routeIs('admin.orders') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50 font-medium' }}">
                     <div class="flex items-center gap-3.5">
@@ -57,7 +72,10 @@
 
                 <a href="{{ route('admin.shopee') }}"
                    class="flex items-center gap-3.5 px-4 py-3 rounded-lg text-base transition-colors {{ request()->routeIs('admin.shopee') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50 font-medium' }}">
-                    <svg class="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 53 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M26.372522 5.4266937c4.902289 0 8.898217 4.6522033 9.085166 10.4757833H17.287569c.186949-5.82358 4.182877-10.4757833 9.084953-10.4757833M51.743379 16.997353c0-.604706-.487007-1.094876-1.087549-1.094876H38.87847c-.28896-7.6892751-5.777492-13.8205815-12.505948-13.8205815-6.728244 0-12.216776 6.1313064-12.505736 13.8205815l-11.7942195.000215c-.5913649.01075-1.0674873.496831-1.0674873 1.094661 0 .02858.00107.05695.0032.08488h-.008323l1.6812616 37.061399c.0002134.103148.00405.207156.011738.311809.00171.02364.00363.04706.00555.07048l.00363.07822.00405.0041c.2554543 2.578923 2.1270784 4.656071 4.6720177 4.751913l.00576.0056H44.796175c.01771.000215.03543.00043.05314.00043.01771 0 .03543-.000215.05314-.00043h.0796l.0017-.0015c2.589329-.0707 4.686743-2.176859 4.908265-4.787585l.0013-.0013.0017-.03503c.0021-.02751.0041-.0548.0058-.0823.0041-.06576.0068-.1313.0079-.196412l1.83449-37.207738h-.0013c.0011-.0187.0015-.03761.0015-.05652" fill="#EE4D2D" fill-rule="evenodd"/>
+                        <path d="M35.67174 44.953764c-.333349 2.751051-2.000311 4.954341-4.582384 6.057598-1.437971.614592-3.36871.946386-4.896954.842163-2.384027-.09111-4.623787-.670894-6.688335-1.730742-.737553-.378855-1.837052-1.135276-2.68131-1.843776-.213839-.179005-.239235-.293758-.09774-.494467.0764-.115182.217254-.322983.528622-.779199.45158-.661654.507921-.744602.558713-.822178.14448-.221769.379233-.241109.610785-.05888.02433.01891.02433.01891.04268.03331.03799.02944.03799.02944.12762.09907.0907.0707.14448.112389.166248.12872 2.226529 1.743851 4.819699 2.749547 7.437625 2.850117 3.642304-.04964 6.261511-1.687335 6.730804-4.202004.516031-2.767598-1.656504-5.158274-5.907033-6.490821-1.329344-.416676-4.689518-1.761687-5.309053-2.12507-2.909447-1.707104-4.269736-3.943058-4.076384-6.704854.296216-3.828306 3.850167-6.683579 8.340785-6.702705 2.008208-.0041 4.012147.413238 5.937338 1.224457.681638.28731 1.898727.949608 2.318936 1.263351.242009.177716.289813.384872.151095.60836-.07747.12958-.205515.335017-.475482.763298l-.003.0047c-.355331.564092-.366428.581714-.447952.713657-.140852.214463-.306459.234448-.56042.07328-2.060067-1.383907-4.34379-2.080157-6.855437-2.130442-3.126914.06189-5.470605 1.922856-5.624689 4.45794-.04097 2.289677 1.676352 3.961324 5.385881 5.23585 7.529819 2.419687 10.411309 5.25648 9.869029 9.729248" fill="#FFFFFF"/>
+                    </svg>
                     <span>Proses Shopee</span>
                 </a>
 
@@ -70,7 +88,7 @@
                 <a href="{{ route('admin.packages.index') }}"
                    class="flex items-center gap-3.5 px-4 py-3 rounded-lg text-base transition-colors {{ request()->routeIs('admin.packages*') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50 font-medium' }}">
                     <svg class="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    <span>Paket VPS</span>
+                    <span>Paket Produk</span>
                 </a>
 
                 <a href="{{ route('admin.monitoring') }}"
@@ -105,31 +123,43 @@
             </nav>
         </aside>
 
-        <!-- Main Content (No border-b lines under titles) -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <!-- Main Content (No border-b lines under titles, Independent Scroll) -->
+        <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
             <!-- Header (NO border-b) -->
-            <header class="h-16 bg-white flex items-center justify-between px-6 sm:px-10">
+            <header class="h-16 shrink-0 bg-white flex items-center justify-between px-6 sm:px-10">
                 <div class="flex items-center gap-3">
-                    <button @click="sidebarOpen = true" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    </button>
+                    @if(isset($backUrl))
+                        <a href="{{ $backUrl }}" class="p-1.5 -ml-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center" title="{{ $backLabel ?? 'Kembali' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        </a>
+                    @endif
                     <h1 class="text-base font-bold text-slate-900">{{ $headerTitle ?? 'Admin' }}</h1>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('dashboard.index') }}" class="hidden sm:inline text-sm font-medium text-slate-500 hover:text-slate-900">Client Portal</a>
-
+                <div class="flex items-center gap-3">
                     <div class="relative" @click.away="userDropdown = false">
-                        <button @click="userDropdown = !userDropdown" class="flex items-center gap-2 focus:outline-none">
-                            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">{{ strtoupper(substr(auth()->user()->full_name ?? auth()->user()->username ?? 'A', 0, 2)) }}</div>
-                            <span class="hidden sm:block text-sm font-semibold text-slate-800">{{ auth()->user()->full_name ?? auth()->user()->username }}</span>
+                        <button @click="userDropdown = !userDropdown" class="flex items-center gap-1.5 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none" title="{{ auth()->user()->full_name ?? auth()->user()->username }}">
+                            <div class="rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0"
+                                 style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 9999px; aspect-ratio: 1 / 1;">
+                                <svg class="text-slate-700 shrink-0" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
-                        <div x-show="userDropdown" x-transition class="absolute right-0 mt-2 w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-1.5 z-50 text-sm" style="display:none;">
-                            <div class="px-4 py-2 border-b border-slate-100">
-                                <p class="font-bold text-slate-900">{{ auth()->user()->full_name ?? auth()->user()->username }} (Admin)</p>
-                                <p class="text-xs text-slate-500 font-mono-code">{{ auth()->user()->email }}</p>
+                        <div x-show="userDropdown" x-transition class="absolute right-0 mt-2 w-60 bg-white border border-slate-200 rounded-lg shadow-lg py-1.5 z-50 text-sm" style="display:none;">
+                            <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+                                <div class="rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0"
+                                     style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 9999px; aspect-ratio: 1 / 1;">
+                                    <svg class="text-slate-700 shrink-0" style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-slate-900 truncate">{{ auth()->user()->full_name ?? auth()->user()->username }} (Admin)</p>
+                                    <p class="text-xs text-slate-500 font-mono-code truncate">{{ auth()->user()->email }}</p>
+                                </div>
                             </div>
                             <a href="{{ route('dashboard.index') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Client Portal</a>
                             <a href="{{ route('home') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Halaman Utama</a>
@@ -140,6 +170,11 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- Mobile Hamburger Button on the Right -->
+                    <button @click="sidebarOpen = true" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 -mr-1.5" aria-label="Buka Menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
                 </div>
             </header>
 
@@ -169,6 +204,16 @@
                         <button @click="show = false" class="text-rose-500 hover:text-rose-800 p-1 text-base leading-none">&times;</button>
                     </div>
                 @endif
+                @if($errors->any())
+                    <div class="border border-rose-200 bg-rose-50 p-4 rounded-lg text-sm text-rose-800 mb-4 shadow-xs">
+                        <div class="font-bold mb-1">Terjadi kesalahan input:</div>
+                        <ul class="list-disc pl-5 space-y-1 text-xs text-rose-700">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             </div>
 
             <!-- Main Page Body -->
@@ -177,10 +222,11 @@
             </main>
 
             <!-- Footer (No border-t) -->
-            <footer class="py-4 px-6 sm:px-10 text-xs text-slate-400">
+            <footer class="py-4 px-6 sm:px-10 text-xs text-slate-400 shrink-0">
                 &copy; 2026 VexaHost Admin
             </footer>
         </div>
     </div>
+    @include('partials.invoice-modal')
 </body>
 </html>

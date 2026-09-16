@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Monitoring Operasional', 'headerTitle' => 'Monitoring Operasional'])
+@extends('layouts.admin', ['title' => 'Monitoring Operasional', 'headerTitle' => 'Monitoring Operasional', 'backUrl' => route('admin.index'), 'backLabel' => 'Kembali ke Dashboard Admin'])
 
 @section('content')
 <div class="space-y-6">

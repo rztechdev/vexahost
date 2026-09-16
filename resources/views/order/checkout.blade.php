@@ -199,6 +199,61 @@
                             </div>
                         </template>
 
+                        {{-- Konfigurasi Hostname & Root Password (Khusus AI Combo & Managed Database) --}}
+                        <template x-if="isDirectCheckout">
+                            <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white space-y-4 shadow-xs mb-6">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-900">Nama Server &amp; Kredensial Root</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Tentukan hostname server dan password akses root/administrator Anda.</p>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">Wajib</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                                            Hostname / Server Name <span class="text-rose-600">*</span>
+                                        </label>
+                                        <input type="text" x-model="vpsName" required minlength="3" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9-]*" placeholder="misal: ai-runner-01" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
+                                        <p class="text-[11px] text-slate-400 mt-1">Gunakan huruf, angka, dan tanda hubung.</p>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                                                <span>Root Password Server</span>
+                                                <span class="text-rose-600">*</span>
+                                            </label>
+                                            <span class="text-[11px] text-slate-400 font-mono-code">Min. 8 char</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input :type="showRootPassword ? 'text' : 'password'" 
+                                                   x-model="rootPassword" 
+                                                   required 
+                                                   minlength="8" 
+                                                   placeholder="Ketik password root/admin" 
+                                                   class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black" 
+                                                   autocomplete="new-password">
+                                            <button type="button" 
+                                                    @click="showRootPassword = !showRootPassword" 
+                                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                                                    tabindex="-1">
+                                                <svg x-show="!showRootPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                <svg x-show="showRootPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <p class="text-[11px] text-slate-400 mt-1" x-text="isDatabasePackage ? 'Password ini juga menjadi password root user database Anda.' : 'Password untuk akses SSH user root ke node AI.'"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
                         @include('order.partials.slide-account')
                     </div>
 
@@ -272,7 +327,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : 'Bayar Sekarang'"></span>
+                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : (paymentMethod === 'lynk' ? 'Bayar Sekarang via Lynk.id' : 'Bayar Sekarang')"></span>
                         </button>
                     </div>
                 </div>
@@ -397,11 +452,12 @@
                         <p class="text-xs text-slate-500 mb-3 text-center">Metode Pembayaran Tersedia</p>
                         <div class="flex flex-wrap justify-center gap-3">
                             @foreach([
+                                'lynk' => 'Lynk.id',
+                                'qris' => 'QRIS',
                                 'va_bca' => 'BCA',
                                 'va_mandiri' => 'Mandiri', 
                                 'va_bri' => 'BRI',
                                 'va_bni' => 'BNI',
-                                'qris' => 'QRIS',
                                 'gopay' => 'GoPay',
                                 'ewallet_ovo' => 'OVO',
                                 'dana' => 'DANA',
@@ -480,6 +536,8 @@ function checkoutState() {
         billingCycle: 'monthly',
         provider: 'tencent',
         vpsName: '',
+        rootPassword: '',
+        showRootPassword: false,
         stackType: 'none',
         controlPanel: 'none',
         datacenter: 'singapore',
@@ -493,10 +551,11 @@ function checkoutState() {
             },
             cloudeka: { ubuntu2404: 'Ubuntu Server 24.04 LTS 64bit', ubuntu2204: 'Ubuntu Server 22.04 LTS 64bit' }
         },
-        paymentMethod: null,
-        selectedPaymentImage: null,
+        paymentMethod: 'qris',
+        selectedPaymentImage: 'qris.svg',
         paymentMethods: {
-            qris: { name: 'QRIS', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
+            lynk: { name: 'Lynk.id Checkout', image: 'lynk.svg', description: 'QRIS, VA, E-Wallet, Kartu via Lynk.id' },
+            qris: { name: 'QRIS VexaHost', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
             bca_va: { name: 'BCA Virtual Account', image: 'va_bca.svg', description: 'Transfer otomatis 24 jam' },
             mandiri_va: { name: 'Mandiri Virtual Account', image: 'va_mandiri.svg', description: 'Transfer otomatis 24 jam' },
             bni_va: { name: 'BNI Virtual Account', image: 'va_bni.svg', description: 'Transfer otomatis 24 jam' },
@@ -505,6 +564,43 @@ function checkoutState() {
             ovo: { name: 'OVO', image: 'ewallet_ovo.svg', description: 'Aplikasi E-Wallet OVO' },
             dana: { name: 'DANA', image: 'dana.svg', description: 'Aplikasi E-Wallet DANA' },
             shopeepay: { name: 'ShopeePay', image: 'ewallet_shopeepay.svg', description: 'Scan & Saldo ShopeePay' }
+        },
+        qrisSvgDataUri: '{{ app(\App\Services\QrisService::class)->generateDataUri($selectedSpec ? $selectedSpec->sell_price : 80000) }}',
+
+        // Auth & User State
+        isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
+        currentUser: {
+            id: {{ auth()->id() ?? 'null' }},
+            full_name: '{{ addslashes(auth()->user()?->full_name ?? '') }}',
+            email: '{{ addslashes(auth()->user()?->email ?? '') }}',
+            phone: '{{ addslashes(auth()->user()?->phone ?? '') }}'
+        },
+        authTab: 'register',
+        registerFullName: '',
+        registerUsername: '',
+        registerEmail: '',
+        registerPhone: '',
+        registerPassword: '',
+        registerPasswordConfirmation: '',
+        showRegisterPassword: false,
+        showRegisterConfirmPassword: false,
+        loginIdentifier: '',
+        loginPassword: '',
+        showLoginPassword: false,
+        isLoggingIn: false,
+        loginError: '',
+        csrfToken: '{{ csrf_token() }}',
+
+        async refreshQris() {
+            try {
+                const res = await fetch('/qris/render?amount=' + this.totalPrice);
+                const data = await res.json();
+                if (data.svg_data_uri) {
+                    this.qrisSvgDataUri = data.svg_data_uri;
+                }
+            } catch (e) {
+                console.error('Error refreshing QRIS:', e);
+            }
         },
 
         // Computed properties
@@ -628,11 +724,14 @@ function checkoutState() {
         
         // Methods
         init() {
+            // Restore draft dari localStorage jika ada
+            this.restoreDraft();
+
             if (!this.selectedSpec && Object.keys(this.specs).length > 0) {
                 this.selectedSpec = parseInt(Object.keys(this.specs)[0]);
             }
             if (this.isDirectCheckout) {
-                this.currentSlide = 1;
+                if (this.currentSlide === 0) this.currentSlide = 1;
                 if (this.isDatabasePackage) {
                     this.applyDatabaseDefaults();
                 } else {
@@ -643,6 +742,7 @@ function checkoutState() {
             }
 
             this.$watch('selectedSpec', () => {
+                this.refreshQris();
                 if (this.isDirectCheckout) {
                     if (this.currentSlide === 0) this.currentSlide = 1;
                     if (this.isDatabasePackage) {
@@ -653,7 +753,148 @@ function checkoutState() {
                 } else {
                     this.syncProviderWithSpec();
                 }
+                this.saveDraft();
             });
+
+            // Watchers untuk auto-save draft ke localStorage
+            this.$watch('vpsName', () => this.saveDraft());
+            this.$watch('rootPassword', () => this.saveDraft());
+            this.$watch('provider', () => this.saveDraft());
+            this.$watch('datacenter', () => this.saveDraft());
+            this.$watch('os', () => this.saveDraft());
+            this.$watch('controlPanel', () => this.saveDraft());
+            this.$watch('dbEngine', () => this.saveDraft());
+            this.$watch('dbManager', () => this.saveDraft());
+            this.$watch('billingCycle', () => this.saveDraft());
+            this.$watch('paymentMethod', () => this.saveDraft());
+            this.$watch('registerFullName', () => this.saveDraft());
+            this.$watch('registerUsername', () => this.saveDraft());
+            this.$watch('registerEmail', () => this.saveDraft());
+            this.$watch('registerPhone', () => this.saveDraft());
+        },
+
+        saveDraft() {
+            try {
+                const draft = {
+                    selectedSpec: this.selectedSpec,
+                    billingCycle: this.billingCycle,
+                    provider: this.provider,
+                    vpsName: this.vpsName,
+                    rootPassword: this.rootPassword,
+                    controlPanel: this.controlPanel,
+                    datacenter: this.datacenter,
+                    os: this.os,
+                    dbEngine: this.dbEngine,
+                    dbManager: this.dbManager,
+                    paymentMethod: this.paymentMethod,
+                    registerFullName: this.registerFullName,
+                    registerUsername: this.registerUsername,
+                    registerEmail: this.registerEmail,
+                    registerPhone: this.registerPhone,
+                };
+                localStorage.setItem('vx_checkout_draft', JSON.stringify(draft));
+            } catch (e) {
+                // ignore storage error
+            }
+        },
+
+        restoreDraft() {
+            try {
+                const raw = localStorage.getItem('vx_checkout_draft');
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                if (draft.selectedSpec && this.specs[draft.selectedSpec]) {
+                    this.selectedSpec = draft.selectedSpec;
+                }
+                if (draft.billingCycle) this.billingCycle = draft.billingCycle;
+                if (draft.provider && this.canUseProvider(draft.provider)) this.provider = draft.provider;
+                if (draft.vpsName) this.vpsName = draft.vpsName;
+                if (draft.rootPassword) this.rootPassword = draft.rootPassword;
+                if (draft.controlPanel) this.controlPanel = draft.controlPanel;
+                if (draft.datacenter) this.datacenter = draft.datacenter;
+                if (draft.os) this.os = draft.os;
+                if (draft.dbEngine) this.dbEngine = draft.dbEngine;
+                if (draft.dbManager) this.dbManager = draft.dbManager;
+                if (draft.paymentMethod) this.paymentMethod = draft.paymentMethod;
+                if (!this.isLoggedIn) {
+                    if (draft.registerFullName) this.registerFullName = draft.registerFullName;
+                    if (draft.registerUsername) this.registerUsername = draft.registerUsername;
+                    if (draft.registerEmail) this.registerEmail = draft.registerEmail;
+                    if (draft.registerPhone) this.registerPhone = draft.registerPhone;
+                }
+            } catch (e) {
+                console.warn('Could not restore draft:', e);
+            }
+        },
+
+        clearDraft() {
+            try {
+                localStorage.removeItem('vx_checkout_draft');
+            } catch (e) {}
+        },
+
+        async performQuickLogin() {
+            this.loginError = '';
+            if (!this.loginIdentifier || !this.loginPassword) {
+                this.loginError = 'Harap isi email/username dan password akun Anda.';
+                showAlert(this.loginError, { icon: 'warning', title: 'Data Login Belum Lengkap' });
+                return false;
+            }
+
+            this.isLoggingIn = true;
+            try {
+                const res = await fetch('/checkout/quick-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken
+                    },
+                    body: JSON.stringify({
+                        login: this.loginIdentifier,
+                        password: this.loginPassword
+                    })
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    this.loginError = data?.message || 'Login gagal. Silakan periksa kembali email/username dan password.';
+                    showAlert(this.loginError, { icon: 'error', title: 'Login Gagal' });
+                    this.isLoggingIn = false;
+                    return false;
+                }
+
+                if (data?.requires_2fa) {
+                    this.saveDraft();
+                    window.location.href = data.redirect || '{{ route('two-factor.challenge') }}';
+                    return false;
+                }
+
+                if (data?.success && data?.user) {
+                    this.currentUser = data.user;
+                    this.isLoggedIn = true;
+                    if (data.csrf_token) {
+                        this.csrfToken = data.csrf_token;
+                        document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', data.csrf_token);
+                    }
+                    this.loginPassword = '';
+                    this.saveDraft();
+                    showAlert('Berhasil masuk sebagai ' + (this.currentUser.full_name || this.currentUser.email), {
+                        icon: 'success',
+                        title: 'Login Berhasil'
+                    });
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error('Quick login error:', err);
+                this.loginError = 'Terjadi kesalahan jaringan saat mencoba masuk. Silakan coba lagi.';
+                showAlert(this.loginError, { icon: 'error', title: 'Login Gagal' });
+                return false;
+            } finally {
+                this.isLoggingIn = false;
+            }
         },
 
         selectStack(type) {
@@ -697,10 +938,20 @@ function checkoutState() {
             }
         },
         
-        nextSlide() {
+        async nextSlide() {
             if (this.isDirectCheckout) {
-                if (this.currentSlide === 1 && !this.validateAccount()) {
-                    return;
+                if (this.currentSlide === 1) {
+                    if (!this.vpsName || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(this.vpsName)) {
+                        showAlert('Hostname / Nama Server wajib diisi (gunakan huruf, angka, dan tanda hubung).');
+                        return;
+                    }
+                    if (!this.rootPassword || this.rootPassword.length < 8) {
+                        showAlert('Root Password Server wajib diisi (minimal 8 karakter).');
+                        return;
+                    }
+                    if (!await this.validateAccount()) {
+                        return;
+                    }
                 }
                 if (this.currentSlide === 2) {
                     if (!this.paymentMethod) {
@@ -718,7 +969,7 @@ function checkoutState() {
                 if (this.currentSlide === 0 && !this.validateConfiguration()) {
                     return;
                 }
-                if (this.currentSlide === 1 && !this.validateAccount()) {
+                if (this.currentSlide === 1 && !await this.validateAccount()) {
                     return;
                 }
                 if (this.currentSlide === 2) {
@@ -736,6 +987,10 @@ function checkoutState() {
                 showAlert('VPS Name wajib diisi dengan huruf, angka, atau tanda hubung.');
                 return false;
             }
+            if (!this.rootPassword || this.rootPassword.length < 8) {
+                showAlert('Root Password Server wajib diisi (minimal 8 karakter).');
+                return false;
+            }
             if (!this.selectedSpec) {
                 showAlert('Silakan pilih paket VPS terlebih dahulu');
                 return false;
@@ -749,28 +1004,50 @@ function checkoutState() {
             return true;
         },
         
-        validateAccount() {
-            @guest
-            const fullName = document.querySelector('input[name="full_name"]')?.value;
-            const email = document.querySelector('input[name="email"]')?.value;
-            const password = document.querySelector('input[name="password"]')?.value;
-            
-            if (!fullName || !email || !password) {
-                showAlert('Silakan lengkapi informasi akun terlebih dahulu');
+        async validateAccount() {
+            if (this.isLoggedIn) {
+                return true;
+            }
+
+            if (this.authTab === 'login') {
+                if (!this.loginIdentifier || !this.loginPassword) {
+                    showAlert('Silakan lengkapi Email/Username dan Password akun Anda untuk melanjutkan.');
+                    return false;
+                }
+                // Eksekusi quick login secara otomatis di latar belakang
+                const loginSuccess = await this.performQuickLogin();
+                return Boolean(loginSuccess);
+            }
+
+            if (!this.registerFullName || !this.registerEmail || !this.registerPassword) {
+                showAlert('Silakan lengkapi Nama Lengkap, Email, dan Password pendaftaran terlebih dahulu.');
                 return false;
             }
-            
-            if (password.length < 8) {
-                showAlert('Password minimal 8 karakter');
+
+            if (this.registerPassword.length < 8) {
+                showAlert('Password pendaftaran minimal 8 karakter.');
                 return false;
             }
-            @endguest
+
+            if (this.registerPasswordConfirmation && this.registerPassword !== this.registerPasswordConfirmation) {
+                showAlert('Konfirmasi password tidak cocok dengan password yang Anda masukkan.');
+                return false;
+            }
+
             return true;
         },
         
-        selectPayment(method) {
+        selectPayment(method, isActive = true) {
+            if (!isActive || (method !== 'qris' && method !== 'lynk')) {
+                const methodName = this.paymentMethods[method]?.name || method;
+                showAlert('Metode pembayaran ' + methodName + ' sedang tidak aktif. Saat ini transaksi dapat menggunakan QRIS atau Lynk.id Checkout.', {
+                    icon: 'info',
+                    title: 'Metode Pembayaran Nonaktif'
+                });
+                return;
+            }
             this.paymentMethod = method;
-            this.selectedPaymentImage = this.paymentMethods[method]?.image || null;
+            this.selectedPaymentImage = this.paymentMethods[method]?.image || 'qris.svg';
         },
         
         async submitCheckout() {
@@ -788,17 +1065,8 @@ function checkoutState() {
             this.isSubmitting = true;
             
             try {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("order.store") }}';
-                
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = '{{ csrf_token() }}';
-                form.appendChild(csrfInput);
-                
                 const formData = {
+                    _token: this.csrfToken,
                     vps_spec_id: this.selectedSpec,
                     billing_cycle: this.billingCycle,
                     provider: this.provider,
@@ -808,31 +1076,63 @@ function checkoutState() {
                     payment_method: this.paymentMethod,
                     db_engine: this.isDatabasePackage ? this.dbEngine : null,
                     db_manager: this.isDatabasePackage ? this.dbManager : null,
-                    @guest
-                    full_name: document.querySelector('input[name="full_name"]')?.value,
-                    email: document.querySelector('input[name="email"]')?.value,
-                    phone: document.querySelector('input[name="phone"]')?.value || '',
-                    password: document.querySelector('input[name="password"]')?.value,
-                    @endguest
-                    hostname: this.vpsName
+                    hostname: this.vpsName,
+                    root_password: this.rootPassword,
+                    phone: this.isLoggedIn 
+                        ? (this.currentUser?.phone || '') 
+                        : (this.registerPhone || ''),
                 };
-                
-                for (const [key, value] of Object.entries(formData)) {
-                    if (value !== null && value !== undefined) {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = value;
-                        form.appendChild(input);
-                    }
+
+                if (!this.isLoggedIn) {
+                    formData.full_name = this.registerFullName;
+                    formData.username = this.registerUsername ? this.registerUsername.trim() : null;
+                    formData.email = this.registerEmail;
+                    formData.password = this.registerPassword;
                 }
-                
-                document.body.appendChild(form);
-                form.submit();
-                
+
+                const response = await fetch('/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    let errorMsg = 'Terjadi kesalahan saat memproses pesanan.';
+                    if (data) {
+                        if (data.message) {
+                            errorMsg = data.message;
+                        }
+                        if (data.errors) {
+                            errorMsg = Object.values(data.errors).flat().join('\n');
+                        }
+                    }
+                    showAlert(errorMsg, {
+                        icon: 'error',
+                        title: 'Checkout Gagal',
+                    });
+                    this.isSubmitting = false;
+                    return;
+                }
+
+                // Hapus draft saat checkout berhasil disubmit
+                this.clearDraft();
+
+                if (data && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else if (data && data.order_id) {
+                    window.location.href = '/order/payment/' + data.order_id;
+                } else {
+                    window.location.href = '/dashboard';
+                }
             } catch (error) {
                 console.error('Checkout error:', error);
-                showAlert('Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.', {
+                showAlert('Terjadi kesalahan jaringan atau koneksi terputus. Silakan coba lagi.', {
                     icon: 'error',
                     title: 'Checkout gagal',
                 });

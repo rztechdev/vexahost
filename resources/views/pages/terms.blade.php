@@ -1,76 +1,437 @@
 @extends('layouts.app', ['title' => 'Ketentuan Layanan (Terms of Service) — VexaHost'])
 
 @section('content')
-<section class="bg-[#0B0F19] text-white pt-16 pb-12 border-b border-slate-800">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav class="flex items-center space-x-2 text-xs text-slate-400 mb-6 font-mono-code">
-            <a href="{{ route('home') }}" class="hover:text-white transition-colors">Beranda</a>
-            <span>/</span>
-            <span class="text-[#6588BC]">Ketentuan Layanan</span>
-        </nav>
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-3">
-            Ketentuan Layanan (Terms of Service)
-        </h1>
-        <p class="text-xs text-slate-400 font-mono-code">
-            Terakhir diperbarui: 13 September 2026 &bull; Diterbitkan oleh RZ Digital Creative
-        </p>
-    </div>
-</section>
+<div x-data="{
+    activeSection: 'pasal-1',
+    scrollTo(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+            this.activeSection = id;
+        }
+    }
+}" class="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-900 selection:text-white">
 
-<section class="py-14 bg-white border-b border-slate-200">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate max-w-none text-sm leading-relaxed text-slate-600 space-y-8">
-        <div>
-            <h2 class="text-lg font-bold text-slate-900 mb-3">1. Pendahuluan</h2>
-            <p>
-                Selamat datang di VexaHost (selanjutnya disebut "Layanan", "Kami", atau "Platform"), yang dimiliki dan dioperasikan oleh <strong>RZ Digital Creative</strong>. Dengan mendaftar, memesan, atau menggunakan layanan VPS cloud kami, Anda ("Pengguna" atau "Pelanggan") menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam perjanjian ini.
-            </p>
-        </div>
+    <!-- Top Sub-Header Bar (Legal Documentation Hub) -->
+    <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-3 overflow-x-auto no-scrollbar py-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Portal Legal</span>
+                <span class="text-slate-300">/</span>
+                <nav class="flex items-center space-x-1 sm:space-x-2 text-xs">
+                    <a href="{{ route('terms') }}" class="px-2.5 py-1 rounded-md font-bold bg-slate-900 text-white whitespace-nowrap">
+                        Terms of Service
+                    </a>
+                    <a href="{{ route('privacy') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
+                        Privacy Policy
+                    </a>
+                    <a href="{{ route('sla') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
+                        SLA 99.9%
+                    </a>
+                    <a href="{{ route('refund') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
+                        Refund Policy
+                    </a>
+                </nav>
+            </div>
 
-        <div>
-            <h2 class="text-lg font-bold text-slate-900 mb-3">2. Penyediaan Layanan &amp; Akses Server</h2>
-            <p>
-                VexaHost menyediakan layanan Virtual Private Server (VPS) berbasis teknologi virtualisasi KVM dengan akses root SSH penuh. Pengguna bertanggung jawab penuh atas segala bentuk konfigurasi sistem operasi, software, script, dan data yang dijalankan pada server masing-masing.
-            </p>
-        </div>
-
-        <div id="aup">
-            <h2 class="text-lg font-bold text-slate-900 mb-3">3. Kebijakan Penggunaan yang Diizinkan (Acceptable Use Policy - AUP)</h2>
-            <p class="mb-3">
-                Pengguna dilarang keras menggunakan infrastruktur VexaHost untuk aktivitas ilegal, merusak, atau melanggar peraturan perundang-undangan Republik Indonesia dan hukum internasional, termasuk namun tidak terbatas pada:
-            </p>
-            <ul class="list-disc list-inside space-y-1.5 pl-2 text-slate-700">
-                <li>Melakukan serangan Denial of Service (DDoS/DoS) atau bertindak sebagai sumber traffic serangan siber.</li>
-                <li>Pengiriman email massal yang tidak diminta (SPAM / Email Phishing).</li>
-                <li>Penambangan mata uang kripto (Crypto Mining) tanpa izin khusus yang membebani utilitas CPU 100% konstan.</li>
-                <li>Penyebaran malware, ransomware, botnet controller, virus, atau alat hacking.</li>
-                <li>Penyebaran konten perjudian online, pornografi, ujaran kebencian, atau materi yang melanggar hak cipta (DMCA).</li>
-                <li>Aktivitas pemindaian port publik (Port Scanning) secara agresif terhadap host eksternal.</li>
-            </ul>
-            <p class="mt-3 text-xs text-rose-700 bg-rose-50 border border-rose-200 p-3 rounded-lg">
-                <strong>Peringatan Tegas:</strong> Pelanggaran terhadap poin AUP di atas akan mengakibatkan pemutusan instan (suspension/termination) layanan tanpa pengembalian dana (no refund) dan pelaporan data kepada pihak penegak hukum yang berwenang.
-            </p>
-        </div>
-
-        <div>
-            <h2 class="text-lg font-bold text-slate-900 mb-3">4. Pembayaran, Faktur, &amp; Perpanjangan</h2>
-            <p>
-                Semua biaya sewa server dibayarkan di muka (prepaid) sesuai siklus penagihan bulanan yang dipilih. Faktur tagihan perpanjangan akan diterbitkan 7 (tujuh) hari kalender sebelum masa aktif berakhir. Layanan yang tidak diperpanjang hingga melewati tanggal jatuh tempo akan dihentikan sementara (suspend) dan data akan dihapus permanen 3 (tiga) hari setelah tanggal jatuh tempo.
-            </p>
-        </div>
-
-        <div>
-            <h2 class="text-lg font-bold text-slate-900 mb-3">5. Pencadangan Data (Backup) &amp; Tanggung Jawab</h2>
-            <p>
-                Meskipun VexaHost menggunakan arsitektur storage NVMe RAID-10 dengan proteksi redundansi perangkat keras, Pelanggan bertanggung jawab penuh untuk melakukan pencadangan data (backup) aplikasi secara teratur ke lokasi penyimpanan eksternal. VexaHost tidak bertanggung jawab atas kehilangan data yang diakibatkan oleh kelalaian konfigurasi Pengguna atau eksploitasi keamanan pada aplikasi Pelanggan.
-            </p>
-        </div>
-
-        <div>
-            <h2 class="text-lg font-bold text-slate-900 mb-3">6. Perubahan Ketentuan</h2>
-            <p>
-                RZ Digital Creative berhak merevisi isi Ketentuan Layanan ini sewaktu-waktu demi meningkatkan kualitas dan kepatuhan hukum platform. Perubahan akan diumumkan melalui situs resmi atau komunikasi email.
-            </p>
+            <div class="hidden sm:flex items-center space-x-3 shrink-0">
+                <button onclick="window.print()" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>Cetak Dokumen</span>
+                </button>
+            </div>
         </div>
     </div>
-</section>
+
+    <!-- Header Hero Banner -->
+    <header class="bg-white border-b border-slate-200 py-10 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                        Dokumen Hukum Resmi
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Status: Berlaku Efektif
+                    </span>
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900">
+                    Ketentuan Layanan (Terms of Service)
+                </h1>
+                <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                    Perjanjian hukum mengikat antara pengguna dan VexaHost Cloud Indonesia terkait penyediaan, pemanfaatan, serta batas tanggung jawab layanan infrastruktur Cloud VPS, Dedicated Database, dan runtime AI Agent.
+                </p>
+
+                <!-- Metadata Grid -->
+                <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                    <div>
+                        <span class="text-slate-400 block font-medium">Entitas Penyedia</span>
+                        <span class="font-normal text-slate-800 mt-0.5 block">VexaHost Cloud Indonesia</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Revisi Terakhir</span>
+                        <span class="font-semibold text-slate-800 mt-0.5 block">16 September 2026</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Yurisdiksi Hukum</span>
+                        <span class="font-semibold text-slate-800 mt-0.5 block">Republik Indonesia</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Identifikasi Versi</span>
+                        <span class="font-mono-code font-semibold text-slate-800 mt-0.5 block">TOS-2026-V2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout (Sidebar + Content Body) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+            <!-- Left Sticky Sidebar Table of Contents -->
+            <aside class="w-full lg:w-72 shrink-0">
+                <div class="sticky top-36 space-y-6">
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 px-2">
+                            Daftar Klausul Perjanjian
+                        </h2>
+                        <nav class="space-y-1 text-xs">
+                            <button @click="scrollTo('pasal-1')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                1. Definisi &amp; Ruang Lingkup
+                            </button>
+                            <button @click="scrollTo('pasal-2')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                2. Akun &amp; Kredensial Root SSH
+                            </button>
+                            <button @click="scrollTo('pasal-3')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                3. Tanggung Jawab Operasional
+                            </button>
+                            <button @click="scrollTo('pasal-4')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                4. Acceptable Use Policy (AUP)
+                            </button>
+                            <button @click="scrollTo('pasal-5')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                5. Penagihan &amp; Siklus Terminasi
+                            </button>
+                            <button @click="scrollTo('pasal-6')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                6. Kebijakan Pencadangan (Backup)
+                            </button>
+                            <button @click="scrollTo('pasal-7')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                7. Hak Cipta &amp; Pelaporan DMCA
+                            </button>
+                            <button @click="scrollTo('pasal-8')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                8. Batasan Tanggung Jawab
+                            </button>
+                            <button @click="scrollTo('pasal-9')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                9. Hukum &amp; Yurisdiksi Sengketa
+                            </button>
+                            <button @click="scrollTo('pasal-10')" class="w-full text-left px-2.5 py-2 rounded-lg font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50 block">
+                                10. Amandemen &amp; Komunikasi
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Compliance Contact Card -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 text-xs space-y-2.5 shadow-2xs">
+                        <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>Kontak Bagian Hukum &amp; AUP</span>
+                        </div>
+                        <p class="text-slate-500 leading-relaxed">
+                            Laporan pelanggaran siber, abuse, atau sengketa hak cipta dapat diajukan ke:
+                        </p>
+                        <div class="space-y-1 font-mono-code text-[11px]">
+                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">abuse@vexahostcloud.my.id</p>
+                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">legal@vexahostcloud.my.id</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Legal Article Body -->
+            <main class="flex-1 min-w-0 space-y-12">
+
+                <!-- Pasal 1 -->
+                <section id="pasal-1" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 1
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Definisi dan Ruang Lingkup Layanan
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            Perjanjian Ketentuan Layanan ini ("Perjanjian") mengatur seluruh ketentuan antara <span class="font-normal">VexaHost Cloud Indonesia</span> ("Penyedia", "VexaHost", "Kami") dan pihak perseorangan, perusahaan, atau organisasi ("Pelanggan", "Pengguna", "Anda") yang melakukan registrasi, pemesanan, atau menggunakan infrastruktur teknologi yang disediakan oleh VexaHost.
+                        </p>
+                        <p>
+                            Dalam Perjanjian ini, istilah-istilah di bawah ini memiliki definisi teknis sebagai berikut:
+                        </p>
+                        <ul class="space-y-2.5 pl-4 border-l-2 border-slate-200 text-xs">
+                            <li>
+                                <strong class="text-slate-900">Virtual Private Server (VPS):</strong> Unit komputasi terisolasi yang dialokasikan di atas hypervisor Kernel-based Virtual Machine (KVM) dengan kuota prosesor (vCPU), RAM, dan media penyimpanan NVMe SSD terdedikasi.
+                            </li>
+                            <li>
+                                <strong class="text-slate-900">Managed Database:</strong> Layanan database terisolasi siap pakai (PostgreSQL, MySQL, Redis, MongoDB, Qdrant Vector) dengan konfigurasi performa teroptimasi.
+                            </li>
+                            <li>
+                                <strong class="text-slate-900">AI Agent Runtime:</strong> Lingkungan eksekusi khusus untuk aplikasi otonom berbasis container (Docker, Coolify, Dokploy, OpenClaw, Hermes Agent).
+                            </li>
+                            <li>
+                                <strong class="text-slate-900">Kredensial Root:</strong> Hak akses tertinggi pada sistem operasi tamu (guest OS) melalui protokol Secure Shell (SSH) port 22.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Pasal 2 -->
+                <section id="pasal-2" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 2
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Registrasi Akun &amp; Keamanan Kredensial Root
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            2.1. Pelanggan wajib memberikan informasi identitas yang akurat, valid, dan dapat dipertanggungjawabkan saat melakukan registrasi melalui website resmi atau saluran otentikasi Google OAuth.
+                        </p>
+                        <p>
+                            2.2. Pelanggan bertanggung jawab mutlak dalam menjaga kerahasiaan kata sandi akun, token sesi login, private SSH key, dan root password yang diterbitkan oleh sistem saat provisioning selesai.
+                        </p>
+                        <p>
+                            2.3. Segala instruksi, perintah komputasi, dan perubahan konfigurasi yang dieksekusi menggunakan kredensial root server Pelanggan dianggap sah sebagai tindakan Pelanggan sendiri. VexaHost sangat menyarankan penerapan autentikasi dua faktor (2FA TOTP), penonaktifan password login SSH, dan penggunaan public key authentication.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 3 -->
+                <section id="pasal-3" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 3
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Batasan Tanggung Jawab Operasional &amp; Zero-Access Policy
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            3.1. Layanan VexaHost merupakan layanan <strong>Unmanaged Cloud VPS</strong>. Tanggung jawab teknis Penyedia terbatas secara eksklusif pada pemeliharaan ketersediaan perangkat keras fisik host node, stabilitas hypervisor KVM, ketersediaan jaringan transit (uplink), serta pasokan daya datacenter.
+                        </p>
+                        <p>
+                            3.2. Seluruh instalasi aplikasi pihak ketiga, dependensi pustaka kode, konfigurasi reverse proxy (Nginx, Traefik, Caddy), sertifikat SSL/TLS, database internal, serta keamanan firewall tamu (UFW/iptables) berada sepenuhnya di bawah kendali dan tanggung jawab Pelanggan.
+                        </p>
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
+                            <strong class="text-slate-900 block mb-1 font-semibold">Kebijakan Zero-Access Server</strong>
+                            VexaHost menghormati kedaulatan data Pelanggan. Staf teknis kami tidak memiliki akses pintu belakang (backdoor) ke dalam file sistem operasi Pelanggan dan dilarang mengakses lingkungan server tanpa izin eksplisit melalui tiket dukungan teknis resmi.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pasal 4 -->
+                <section id="pasal-4" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 4
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Kebijakan Penggunaan yang Diizinkan (Acceptable Use Policy - AUP)
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            Infrastruktur VexaHost dilindungi oleh sistem mitigasi lalu lintas data otomatis. Pelanggan dilarang keras memanfaatkan sumber daya server untuk aktivitas yang bertentangan dengan hukum Republik Indonesia (termasuk UU ITE), regulasi internasional, serta ketertiban siber publik.
+                        </p>
+
+                        <!-- AUP Structured Table -->
+                        <div class="overflow-x-auto my-4">
+                            <table class="w-full text-left border-collapse border border-slate-200 text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-900">
+                                        <th class="p-3 border border-slate-200 font-bold w-1/3">Kategori Pelanggaran</th>
+                                        <th class="p-3 border border-slate-200 font-bold w-1/2">Deskripsi Tindakan Terlarang</th>
+                                        <th class="p-3 border border-slate-200 font-bold">Tindakan Disipliner</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Serangan Siber &amp; DDoS</td>
+                                        <td class="p-3 border border-slate-200">Menjalankan Distributed Denial of Service, botnet C2, amplification attack, atau spoofing IP.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Terminasi Instan</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Spamming &amp; Email Phishing</td>
+                                        <td class="p-3 border border-slate-200">Mengirimkan surat elektronik massal tanpa izin, pemalsuan header email, atau hosting halaman phishing bank.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Suspensi 1 Jam</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Penambangan Kripto (Mining)</td>
+                                        <td class="p-3 border border-slate-200">Eksploitasi konsumsi CPU 100% secara persisten tanpa henti untuk algoritma proof-of-work (XMRig, dsb).</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-amber-700 font-semibold">Throttling / Suspend</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Konten Ilegal &amp; Judi Online</td>
+                                        <td class="p-3 border border-slate-200">Hosting platform perjudian online, materi pornografi, pornografi anak, atau penjualan zat terlarang.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Terminasi &amp; Lapor Aparat</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Pemindaian Port Agresif</td>
+                                        <td class="p-3 border border-slate-200">Menjalankan masscan, zmap, atau vulnerability scanner terhadap jaringan publik tanpa otorisasi tertulis.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-amber-700 font-semibold">Suspensi Jaringan</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 leading-relaxed">
+                            <strong class="block mb-1 font-bold">Ketentuan Nol Toleransi (Zero Tolerance Enforcement)</strong>
+                            Pelanggaran berat terhadap Pasal 4 akan membatalkan hak jaminan uang kembali (no refund), mengakibatkan pemutusan instan seluruh instance terkait, dan data log trafik dapat diserahkan kepada pihak penegak hukum yang berwenang sesuai permintaan resmi.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pasal 5 -->
+                <section id="pasal-5" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 5
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Penagihan, Pembayaran, Masa Tenggang, dan Terminasi
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            5.1. <strong>Sistem Pembayaran Prabayar (Prepaid):</strong> Seluruh paket sewa server ditagihkan di awal periode pemakaian berdasarkan siklus langganan yang dipilih (bulanan).
+                        </p>
+                        <p>
+                            5.2. <strong>Penerbitan Faktur Perpanjangan:</strong> Faktur perpanjangan (invoice) diterbitkan otomatis oleh sistem 7 (tujuh) hari kalender sebelum tanggal jatuh tempo masa aktif server berakhir.
+                        </p>
+                        <p>
+                            5.3. <strong>Suspensi Layanan (Auto-Suspension):</strong> Apabila pembayaran perpanjangan belum diselesaikan hingga pukul 23:59 WIB pada tanggal jatuh tempo, jaringan server akan dialihkan ke status suspend secara otomatis.
+                        </p>
+                        <p>
+                            5.4. <strong>Masa Tenggang &amp; Terminasi Permanen:</strong> VexaHost memberikan masa tenggang (grace period) penyimpanan data selama 3 (tiga) hari kalender setelah tanggal jatuh tempo. Jika dalam jangka waktu tersebut tidak ada pembayaran yang dikonfirmasi, container/disk virtual server akan dihapus secara permanen dari node fisik tanpa kemungkinan pemulihan data (irreversible deletion).
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 6 -->
+                <section id="pasal-6" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 6
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Kebijakan Pencadangan Data (Backup Policy)
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            6.1. Meskipun storage host node VexaHost dilengkapi konfigurasi perangkat keras redundan Enterprise NVMe SSD RAID-10 untuk memitigasi kegagalan media drive fisik, Pelanggan memegang kewajiban utama untuk membuat cadangan data (off-site backup) secara berkala ke lokasi penyimpanan independen.
+                        </p>
+                        <p>
+                            6.2. VexaHost tidak bertanggung jawab atas kerusakan, kehilangan, atau korupsi file yang timbul akibat kesalahan operator Pelanggan, infeksi malware pada guest OS, kegagalan software database aplikasi, atau penghapusan data akibat terminasi tagihan yang terlambat.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 7 -->
+                <section id="pasal-7" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 7
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Hak Cipta &amp; Prosedur Pelaporan DMCA
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            7.1. Pelanggan dilarang mengunggah, mendistribusikan, atau menyiarkan materi berhak cipta tanpa izin sah dari pemegang hak cipta yang bersangkutan.
+                        </p>
+                        <p>
+                            7.2. Apabila VexaHost menerima pemberitahuan resmi mengenai dugaan pelanggaran hak cipta (DMCA Notice) yang valid dari pemilik karya cipta atau kuasa hukumnya, Pelanggan akan diberikan waktu 24 jam untuk memberikan tanggapan balik atau menghapus konten terkait. Kegagalan merespons akan mengakibatkan penonaktifan sementara server.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 8 -->
+                <section id="pasal-8" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 8
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Batasan Tanggung Jawab (Limitation of Liability)
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            8.1. Sepanjang diizinkan oleh hukum yang berlaku, total nilai pertanggungjawaban VexaHost Cloud Indonesia terhadap klaim ganti rugi apa pun yang timbul dari penyediaan layanan ini dibatasi maksimal sebesar jumlah biaya berlangganan yang telah dibayarkan oleh Pelanggan pada 1 (satu) bulan terakhir untuk unit server yang bersangkutan.
+                        </p>
+                        <p>
+                            8.2. Dalam keadaan apa pun, Penyedia tidak bertanggung jawab atas kerugian tidak langsung, kerugian insidental, hilangnya potensi keuntungan bisnis (lost profit), gangguan operasional usaha pihak ketiga, atau hilangnya reputasi dagang Pelanggan.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 9 -->
+                <section id="pasal-9" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 9
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Hukum yang Mengatur &amp; Penyelesaian Sengketa
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            9.1. Perjanjian ini ditafsirkan, diatur, dan tunduk sepenuhnya pada peraturan perundang-undangan Negara Republik Indonesia.
+                        </p>
+                        <p>
+                            9.2. Apabila timbul perselisihan atau perbedaan penafsiran seputar pelaksanaan Perjanjian ini, para pihak sepakat untuk mengutamakan musyawarah untuk mufakat dalam waktu 30 (tiga puluh) hari kerja. Jika mufakat tidak tercapai, para pihak sepakat untuk menyelesaikan perselisihan melalui domisili hukum Pengadilan Negeri setempat.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Pasal 10 -->
+                <section id="pasal-10" class="scroll-mt-36 bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2.5 py-1 rounded text-xs font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                            PASAL 10
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            Amandemen Ketentuan &amp; Saluran Komunikasi
+                        </h2>
+                    </div>
+                    <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            10.1. VexaHost berhak merevisi atau memperbarui ketentuan dalam Perjanjian ini sewaktu-waktu guna menyelaraskan dengan perkembangan regulasi siber atau pembaruan arsitektur sistem. Pembaruan akan dipublikasikan pada halaman ini dengan tanggal revisi terbaru.
+                        </p>
+                        <p>
+                            10.2. Pelanggan yang terus menggunakan layanan VexaHost setelah berlakunya perubahan dianggap menyetujui seluruh ketentuan baru tersebut tanpa syarat.
+                        </p>
+                    </div>
+
+                    <!-- Sign-off block -->
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-slate-500">
+                        <div>
+                            <p class="font-normal text-slate-900">VexaHost Cloud Indonesia</p>
+                            <p class="text-slate-500 mt-0.5">Departemen Hukum, Tata Kelola &amp; Kepatuhan Infrastruktur Cloud</p>
+                            <p class="text-[11px] text-slate-400 mt-2">Platform created by RZ Digital Creative.</p>
+                        </div>
+                        <div class="font-mono-code text-[11px] text-slate-400">
+                            Dokumen Resmi: TOS-2026-V2
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</div>
 @endsection

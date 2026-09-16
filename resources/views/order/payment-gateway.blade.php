@@ -36,18 +36,227 @@
 
                     {{-- Payment Content --}}
                     <div class="p-6">
-                        {{-- QRIS Payment --}}
-                        @if(in_array($order->payment_method, ['qris']))
-                        <div class="text-center mb-8">
-                            <div class="w-64 h-64 mx-auto mb-6 bg-white border-2 border-slate-300 rounded-lg flex items-center justify-center p-4">
-                                <img src="{{ asset('image/qris.jpeg') }}" alt="QRIS Payment" class="max-w-full max-h-full object-contain">
+                        {{-- Lynk.id Payment --}}
+                        @if($order->payment_method === 'lynk')
+                        <div class="text-center mb-8 flex flex-col items-center justify-center">
+                            {{-- Lynk Logo Container --}}
+                            <div class="w-48 h-20 mx-auto flex items-center justify-center p-3 bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
+                                <img src="{{ asset('images/payments/lynk.svg') }}" alt="Lynk.id Checkout" class="max-h-12 max-w-full object-contain">
                             </div>
-                            <div class="space-y-3">
-                                <p class="text-sm text-slate-600">Scan QR code di atas menggunakan aplikasi e-wallet atau mobile banking Anda</p>
-                                <div class="flex items-center justify-center gap-3">
-                                    @foreach(['gopay' => 'gopay', 'ovo' => 'ewallet_ovo', 'dana' => 'dana', 'shopeepay' => 'ewallet_shopeepay', 'bca' => 'va_bca', 'mandiri' => 'va_mandiri', 'bri' => 'va_bri', 'bni' => 'va_bni'] as $app => $file)
-                                        <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center p-2">
-                                            <img src="{{ asset('images/payments/' . $file . '.svg') }}" alt="{{ strtoupper($app) }}" class="h-6">
+
+                            <h2 class="text-lg font-bold text-slate-900 mb-1">Bayar via Lynk.id Gateway</h2>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto mb-4">
+                                Selesaikan transaksi Anda dengan mudah melalui sistem pembayaran resmi Lynk.id (mendukung QRIS, VA Bank, GoPay, OVO, DANA, ShopeePay, dan Kartu Debit/Kredit).
+                            </p>
+
+                            {{-- Nominal Tagihan Sesuai Order --}}
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 max-w-sm w-full mx-auto text-center space-y-1 mb-5">
+                                <span class="text-xs text-slate-500 block">Total Nominal Tagihan:</span>
+                                <div class="text-2xl font-black font-mono-code text-slate-900">
+                                    Rp {{ number_format($order->amount, 0, ',', '.') }}
+                                </div>
+                            </div>
+
+                            {{-- Direct Lynk Button --}}
+                            @php
+                                $lynkCheckoutUrl = !empty($order->vpsSpec->payment_url) ? $order->vpsSpec->payment_url : null;
+                            @endphp
+
+                            @if($lynkCheckoutUrl)
+                                <div class="w-full max-w-sm mx-auto mb-4">
+                                    <a href="{{ $lynkCheckoutUrl }}" target="_blank"
+                                       class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-bold shadow-sm transition-all">
+                                        <span>Buka Halaman Checkout Lynk.id</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    </a>
+                                    <p class="text-[11px] text-slate-400 mt-1.5">Tautan aman checkout Lynk.id akan terbuka di tab baru</p>
+                                </div>
+                            @endif
+
+                            {{-- Section Cek Status Pembayaran --}}
+                            <div class="w-full max-w-sm mx-auto">
+                                <div class="p-4 rounded-xl border transition-all text-center"
+                                     :class="{
+                                         'bg-slate-50 border-slate-200': checkStatus === 'idle',
+                                         'bg-amber-50 border-amber-300 text-amber-900': checkStatus === 'pending',
+                                         'bg-emerald-50 border-emerald-300 text-emerald-900': checkStatus === 'success'
+                                     }">
+                                    
+                                    {{-- Tombol Cek Status --}}
+                                    <button type="button" 
+                                            @click="handleCheckStatus()" 
+                                            :disabled="isChecking"
+                                            class="w-full px-5 py-3 rounded-lg font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                                            :class="checkStatus === 'success' ? 'bg-black hover:bg-neutral-800' : 'bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60'">
+                                        <svg x-show="isChecking" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg x-show="!isChecking && checkStatus !== 'success'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <svg x-show="checkStatus === 'success'" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span x-text="buttonText"></span>
+                                    </button>
+
+                                    {{-- Info Text di bawah tombol --}}
+                                    <div class="mt-3 text-xs">
+                                        <template x-if="checkStatus === 'idle'">
+                                            <p class="text-slate-500">
+                                                Setelah Anda menyelesaikan pembayaran di Lynk.id, klik tombol di atas untuk sinkronisasi status server.
+                                            </p>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'pending'">
+                                            <div class="space-y-1.5 text-left bg-amber-100/80 p-3 rounded-lg border border-amber-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <span>Status: Menunggu Pembayaran (Pending)</span>
+                                                </div>
+                                                <p class="text-[11px] text-amber-800 leading-relaxed">
+                                                    Webhook dari Lynk.id belum diterima. Silakan selesaikan pembayaran di halaman Lynk.id.
+                                                </p>
+                                                <div class="text-[11px] text-amber-900 font-semibold pt-0.5 border-t border-amber-200">
+                                                    Verifikasi otomatis: <span class="font-mono-code text-amber-950" x-text="countdownText"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'success'">
+                                            <div class="space-y-1 text-left bg-emerald-100/80 p-3 rounded-lg border border-emerald-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-emerald-900 text-xs">
+                                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span>Status: Pembayaran Berhasil Diterima!</span>
+                                                </div>
+                                                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                                                    Transaksi Lynk.id Anda telah terverifikasi. Mengalihkan ke dashboard...
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- QRIS Payment (Centered & Prominent) --}}
+                        @if(in_array($order->payment_method, ['qris']))
+                        <div class="text-center mb-8 flex flex-col items-center justify-center">
+                            {{-- QR Code Image (Tanpa Garis Frame) --}}
+                            <div class="w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center p-2 bg-white rounded-lg">
+                                <img src="{{ $qrisDataUri }}" alt="QRIS Payment VexaHost" class="max-w-full max-h-full object-contain">
+                            </div>
+
+                            {{-- Nominal Tagihan Sesuai Order (Centered) --}}
+                            <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 max-w-sm w-full mx-auto text-center space-y-1">
+                                <span class="text-xs text-slate-500 block">Total Pembayaran Sesuai Tagihan:</span>
+                                <div class="text-2xl font-black font-mono-code text-slate-900">
+                                    Rp {{ number_format($order->amount, 0, ',', '.') }}
+                                </div>
+                                <button type="button" 
+                                        @click="navigator.clipboard.writeText('{{ $order->amount }}'); showAlert('Nominal tagihan disalin: Rp {{ number_format($order->amount, 0, ',', '.') }}', { icon: 'success' })" 
+                                        class="text-xs text-[#4A6FA5] hover:text-black font-semibold inline-flex items-center gap-1.5 pt-1 transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>Salin Nominal Tagihan</span>
+                                </button>
+                            </div>
+
+                            {{-- Button Unduh / Buka QRIS Full --}}
+                            <div class="mt-3 flex items-center justify-center gap-2">
+                                <a href="{{ $qrisDataUri }}" target="_blank" download="qris-vexahost-order-{{ $order->id }}.svg"
+                                   class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    <span>Unduh / Buka QRIS</span>
+                                </a>
+                            </div>
+
+                            {{-- Section Cek Status Pembayaran (Tepat di Bawah QRIS) --}}
+                            <div class="mt-6 w-full max-w-sm mx-auto">
+                                <div class="p-4 rounded-xl border transition-all text-center"
+                                     :class="{
+                                         'bg-slate-50 border-slate-200': checkStatus === 'idle',
+                                         'bg-amber-50 border-amber-300 text-amber-900': checkStatus === 'pending',
+                                         'bg-emerald-50 border-emerald-300 text-emerald-900': checkStatus === 'success'
+                                     }">
+                                    
+                                    {{-- Tombol Cek Status --}}
+                                    <button type="button" 
+                                            @click="handleCheckStatus()" 
+                                            :disabled="isChecking"
+                                            class="w-full px-5 py-3 rounded-lg font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                                            :class="checkStatus === 'success' ? 'bg-black hover:bg-neutral-800' : 'bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60'">
+                                        <svg x-show="isChecking" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg x-show="!isChecking && checkStatus !== 'success'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <svg x-show="checkStatus === 'success'" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span x-text="buttonText"></span>
+                                    </button>
+
+                                    {{-- Info Text di bawah tombol --}}
+                                    <div class="mt-3 text-xs">
+                                        <template x-if="checkStatus === 'idle'">
+                                            <p class="text-slate-500">
+                                                Klik tombol di atas setelah Anda menyelesaikan pembayaran melalui aplikasi e-wallet / mobile banking.
+                                            </p>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'pending'">
+                                            <div class="space-y-1.5 text-left bg-amber-100/80 p-3 rounded-lg border border-amber-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <span>Status: Menunggu Pembayaran (Pending)</span>
+                                                </div>
+                                                <p class="text-[11px] text-amber-800 leading-relaxed">
+                                                    Pembayaran belum terdeteksi pada sistem mutasi. Silakan selesaikan proses scan & bayar di aplikasi e-wallet Anda.
+                                                </p>
+                                                <div class="text-[11px] text-amber-900 font-semibold pt-0.5 border-t border-amber-200">
+                                                    Verifikasi otomatis: <span class="font-mono-code text-amber-950" x-text="countdownText"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'success'">
+                                            <div class="space-y-1 text-left bg-emerald-100/80 p-3 rounded-lg border border-emerald-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-emerald-900 text-xs">
+                                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span>Status: Pembayaran Berhasil Diterima!</span>
+                                                </div>
+                                                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                                                    Transaksi QRIS Anda telah diterima dan masuk antrean aktivasi server. Mengalihkan ke halaman status...
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Supported Apps Logos (Centered) --}}
+                            <div class="space-y-2 mt-5 text-center">
+                                <p class="text-xs text-slate-500">Mendukung semua aplikasi mobile banking &amp; e-wallet:</p>
+                                <div class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto">
+                                    @foreach(['va_bca' => 'BCA', 'va_mandiri' => 'Mandiri', 'va_bri' => 'BRI', 'va_bni' => 'BNI', 'gopay' => 'GoPay', 'ewallet_ovo' => 'OVO', 'dana' => 'DANA', 'ewallet_shopeepay' => 'ShopeePay'] as $file => $app)
+                                        <div class="w-11 h-7 bg-white border border-slate-200 rounded-md flex items-center justify-center p-1 shadow-2xs" title="{{ $app }}">
+                                            <img src="{{ asset('images/payments/' . $file . '.svg') }}" alt="{{ $app }}" class="max-h-4 max-w-full object-contain">
                                         </div>
                                     @endforeach
                                 </div>
@@ -122,6 +331,8 @@
                                         <p class="text-xs text-slate-600">
                                             @if($order->payment_method === 'qris')
                                                 Scan QR code menggunakan aplikasi e-wallet atau mobile banking
+                                            @elseif($order->payment_method === 'lynk')
+                                                Buka tautan checkout Lynk.id dan selesaikan pembayaran via QRIS, Virtual Account, E-Wallet, atau Kartu
                                             @elseif(str_contains($order->payment_method, '_va'))
                                                 Transfer ke nomor Virtual Account yang ditampilkan
                                             @else
@@ -245,7 +456,7 @@
                             </div>
                             <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                                 <p class="font-bold text-red-700 text-sm">
-                                    {{ $order->invoice->due_at ? $order->invoice->due_at->format('d M Y, H:i') : now()->addDay()->format('d M Y, H:i') }} WIB
+                                    {{ ($order->invoice && $order->invoice->due_at) ? $order->invoice->due_at->format('d M Y, H:i') : now()->addDay()->format('d M Y, H:i') }} WIB
                                 </p>
                                 <p class="text-xs text-red-600 mt-1">Pesanan akan dibatalkan otomatis setelah batas waktu</p>
                             </div>
@@ -331,6 +542,83 @@ function paymentGateway() {
         isProcessing: false,
         showSuccessModal: false,
         virtualAccountNumber: this.generateVirtualAccount(),
+        elapsedSeconds: {{ $elapsedSeconds }},
+        checkStatus: 'idle', // 'idle' | 'pending' | 'success'
+        isChecking: false,
+        timer: null,
+        pollTimer: null,
+
+        init() {
+            this.timer = setInterval(() => {
+                this.elapsedSeconds++;
+            }, 1000);
+
+            // Background polling: otomatis periksa jika webhook masuk atau admin approve
+            this.pollTimer = setInterval(() => {
+                fetch('{{ route("order.payment.status.json", $order->id) }}', {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.paid_at || ['paid', 'provisioning', 'active'].includes(data.status)) {
+                        clearInterval(this.pollTimer);
+                        this.checkStatus = 'success';
+                        window.location.href = '{{ route("dashboard.index", ["payment_success" => 1, "order_id" => $order->id]) }}';
+                    }
+                })
+                .catch(() => {});
+            }, 4000);
+        },
+
+        get countdownText() {
+            const rem = Math.max(0, 60 - this.elapsedSeconds);
+            if (rem > 0) {
+                return rem + ' detik lagi';
+            }
+            return 'Siap diverifikasi';
+        },
+
+        get buttonText() {
+            if (this.isChecking) return 'Memeriksa Mutasi...';
+            if (this.checkStatus === 'success') return 'Buka Status Pesanan →';
+            if (this.checkStatus === 'pending') return 'Cek Ulang Status Pembayaran';
+            return 'Cek Status Pembayaran';
+        },
+
+        handleCheckStatus() {
+            if (this.checkStatus === 'success') {
+                window.location.href = '{{ route("dashboard.index", ["payment_success" => 1, "order_id" => $order->id]) }}';
+                return;
+            }
+
+            this.isChecking = true;
+
+            fetch('{{ route("order.payment.status.json", $order->id) }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.isChecking = false;
+                if (data.paid_at || ['paid', 'provisioning', 'active'].includes(data.status)) {
+                    this.checkStatus = 'success';
+                    if (this.pollTimer) clearInterval(this.pollTimer);
+                    showAlert('Pembayaran berhasil dikonfirmasi! Mengalihkan ke dashboard...', { icon: 'success', title: 'Berhasil' });
+                    setTimeout(() => {
+                        window.location.href = '{{ route("dashboard.index", ["payment_success" => 1, "order_id" => $order->id]) }}';
+                    }, 1000);
+                } else {
+                    this.checkStatus = 'pending';
+                    showAlert('Pembayaran belum terkonfirmasi oleh sistem atau admin. Silakan selesaikan pembayaran atau tunggu mutasi diverifikasi.', { icon: 'info', title: 'Menunggu Pembayaran' });
+                }
+            })
+            .catch(err => {
+                this.isChecking = false;
+                showAlert('Gagal memeriksa status pembayaran. Silakan coba beberapa saat lagi.', { icon: 'error', title: 'Terjadi Kesalahan' });
+            });
+        },
         
         generateVirtualAccount() {
             const prefix = {
@@ -343,12 +631,6 @@ function paymentGateway() {
             const random = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
             return prefix + random;
         },
-        
-        // NOTE: fungsi completePayment() sudah dihapus (P0 security fix).
-        // Konfirmasi pembayaran WAJIB via webhook payment gateway
-        // (POST /api/webhooks/payment) dengan signature yang diverifikasi.
-        // Untuk testing lokal: gunakan tombol "[DEV] Simulate Payment Settlement"
-        // yang muncul kalau APP_ENV=local + APP_DEV_SIMULATE_PAYMENT=true.
     };
 }
 </script>

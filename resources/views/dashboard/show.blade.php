@@ -1,4 +1,4 @@
-@extends('layouts.dashboard', ['title' => 'Detail VPS ' . ($vps->hostname ?? $vps->id), 'headerTitle' => 'Kelola Instance VPS'])
+@extends('layouts.dashboard', ['title' => 'Detail VPS ' . ($vps->hostname ?? $vps->id), 'headerTitle' => 'Kelola Instance VPS', 'backUrl' => route('dashboard.index'), 'backLabel' => 'Kembali ke Daftar VPS'])
 
 @section('content')
 <div class="space-y-6" x-data="{
@@ -54,7 +54,6 @@
             this.passwordLoading = false;
         }
     }
-}">
     <!-- Lifecycle & Status Warning Alerts -->
     @if($vps->status === 'suspended')
         <div class="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 flex items-start gap-3">

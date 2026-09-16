@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
+use App\Rules\Turnstile;
 
 class AuthController extends Controller
 {
@@ -22,17 +23,29 @@ class AuthController extends Controller
 
     public function showLogin(Request $request)
     {
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->query('redirect')]);
+        } elseif ($request->has('redirect_to')) {
+            session(['url.intended' => $request->query('redirect_to')]);
+        }
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'username' => 'required|string',
             'password' => 'required|string',
             'terms' => 'sometimes|accepted',
-        ], [
+        ];
+
+        if (config('services.turnstile.secret') && (!app()->runningUnitTests() || config('services.turnstile.testing_active', false))) {
+            $rules['cf-turnstile-response'] = ['required', new Turnstile()];
+        }
+
+        $validated = $request->validate($rules, [
             'terms.accepted' => 'Anda wajib menyetujui Ketentuan Layanan dan Kebijakan Privasi untuk melanjutkan.',
+            'cf-turnstile-response.required' => 'Verifikasi keamanan Cloudflare Turnstile wajib dicentang.',
         ]);
 
         $throttleKey = Str::transliterate(Str::lower($validated['username']) . '|' . $request->ip());

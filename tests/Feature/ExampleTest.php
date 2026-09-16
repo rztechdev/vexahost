@@ -128,6 +128,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'singapore',
             'os' => 'ubuntu2404',
             'hostname' => 'my-new-guest-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Calon Pelanggan Baru',
             'email' => 'pelangganbaru@student.id',
@@ -215,8 +216,13 @@ class ExampleTest extends TestCase
 
         $printResponse = $this->actingAs($user)->get('/dashboard/invoices/' . $invoice->id . '/print');
         $printResponse->assertStatus(200);
-        $printResponse->assertSee($invoice->invoice_number);
-        $printResponse->assertSee('FAKTUR / INVOICE');
+        $printResponse->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF-', $printResponse->getContent());
+
+        $htmlResponse = $this->actingAs($user)->get('/dashboard/invoices/' . $invoice->id . '/print?format=html');
+        $htmlResponse->assertStatus(200);
+        $htmlResponse->assertSee($invoice->invoice_number);
+        $htmlResponse->assertSee('FAKTUR / INVOICE');
     }
 
     public function test_customer_can_create_support_ticket_and_reply(): void
@@ -308,8 +314,7 @@ class ExampleTest extends TestCase
 
         $response = $this->actingAs($admin)->post('/admin/orders/' . $pendingOrder->id . '/provision', [
             'public_ip' => '139.180.222.111',
-            'hostname' => 'vps-new-provisioned',
-            'os' => 'Ubuntu 24.04 LTS',
+            'app_url' => 'https://139.180.222.111:8000',
         ]);
 
         $response->assertSessionHas('success');
@@ -474,6 +479,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'startup-test-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Startup Customer Fail',
             'email' => 'startup.fail@customer.id',
@@ -495,6 +501,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'business-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Business Customer Success',
             'email' => 'biz.success@customer.id',
@@ -521,6 +528,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'student-fail-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Student Fail',
             'email' => 'student.fail@customer.id',
@@ -542,6 +550,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'student-ok-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Student OK',
             'email' => 'student.ok@customer.id',
@@ -567,6 +576,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'mhs-fail-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Mahasiswa Fail',
             'email' => 'mhs.fail@customer.id',
@@ -588,6 +598,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'singapore',
             'os' => 'ubuntu2404',
             'hostname' => 'mhs-ok-server',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Mahasiswa OK',
             'email' => 'mhs.ok@customer.id',
@@ -614,6 +625,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'std-fail',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Std Fail',
             'email' => 'std.fail@test.com',
@@ -629,6 +641,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'prem-fail',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Prem Fail',
             'email' => 'prem.fail@test.com',
@@ -649,6 +662,7 @@ class ExampleTest extends TestCase
             'datacenter_location' => 'singapore',
             'os' => 'ubuntu2404',
             'hostname' => 'prem-ok',
+            'root_password' => 'SecurePass@123',
             'payment_method' => 'qris',
             'full_name' => 'Prem OK',
             'email' => 'prem.ok@test.com',

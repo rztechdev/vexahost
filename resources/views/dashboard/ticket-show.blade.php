@@ -1,17 +1,7 @@
-@extends('layouts.dashboard', ['title' => 'Tiket #' . $ticket->id, 'headerTitle' => 'Diskusi Tiket Support'])
+@extends('layouts.dashboard', ['title' => 'Tiket #' . $ticket->id, 'headerTitle' => 'Diskusi Tiket Support', 'backUrl' => route('dashboard.support'), 'backLabel' => 'Kembali ke Daftar Tiket'])
 
 @section('content')
 <div class="space-y-6 max-w-3xl">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <a href="{{ route('dashboard.support') }}" class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-black transition-colors">
-            &larr; Kembali ke Daftar Tiket
-        </a>
-        <span class="px-2.5 py-0.5 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
-            {{ str_replace('_', ' ', $ticket->status) }}
-        </span>
-    </div>
-
     <!-- Ticket Summary Card (No line under title) -->
     <div class="bg-white rounded-lg border border-slate-200 p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
@@ -19,7 +9,12 @@
                 <span class="font-mono-code text-xs text-slate-400 font-semibold">#TK-{{ str_pad($ticket->id, 4, '0', STR_PAD_LEFT) }}</span>
                 <h1 class="text-base font-bold text-slate-900 mt-0.5">{{ $ticket->subject }}</h1>
             </div>
-            <span class="text-xs text-slate-400">{{ $ticket->created_at->format('d M Y, H:i') }} WIB</span>
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
+                    {{ str_replace('_', ' ', $ticket->status) }}
+                </span>
+                <span class="text-xs text-slate-400">{{ $ticket->created_at->format('d M Y, H:i') }} WIB</span>
+            </div>
         </div>
 
         <div class="grid grid-cols-3 gap-4 pt-3 text-xs text-slate-600 border-t border-slate-100">

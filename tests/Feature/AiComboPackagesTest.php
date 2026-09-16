@@ -61,6 +61,7 @@ class AiComboPackagesTest extends TestCase
             'email' => 'budi.ai@example.com',
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
+            'root_password' => 'SecureRootPass123!',
         ];
 
         $response = $this->post('/checkout', $payload);

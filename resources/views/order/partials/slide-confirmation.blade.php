@@ -27,26 +27,88 @@
         </div>
 
         <template x-if="selectedPaymentMethod">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-12 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 shrink-0">
-                        <img :src="'/images/payments/' + selectedPaymentMethod.image"
-                             :alt="selectedPaymentMethod.name"
-                             class="max-w-full max-h-full object-contain">
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h4 class="text-base font-bold text-slate-900" x-text="selectedPaymentMethod.name"></h4>
-                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">Verifikasi Otomatis</span>
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-12 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 shrink-0">
+                            <img :src="'/images/payments/' + selectedPaymentMethod.image"
+                                 :alt="selectedPaymentMethod.name"
+                                 class="max-w-full max-h-full object-contain">
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5" x-text="selectedPaymentMethod.description"></p>
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h4 class="text-base font-bold text-slate-900" x-text="selectedPaymentMethod.name"></h4>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5" x-text="selectedPaymentMethod.description"></p>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-slate-500 sm:text-right shrink-0">
+                        <span class="block text-slate-400">Batas Waktu Bayar:</span>
+                        <span class="font-bold text-slate-800">24 Jam setelah checkout</span>
                     </div>
                 </div>
 
-                <div class="text-xs text-slate-500 sm:text-right shrink-0">
-                    <span class="block text-slate-400">Batas Waktu Bayar:</span>
-                    <span class="font-bold text-slate-800">24 Jam setelah checkout</span>
-                </div>
+                {{-- QRIS Barcode Display (Centered in Slide Konfirmasi) --}}
+                <template x-if="paymentMethod === 'qris'">
+                    <div class="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            {{-- QR Code Image (Tanpa Garis Disekelilingnya) --}}
+                            <div class="w-64 h-64 sm:w-72 sm:h-72 mx-auto flex items-center justify-center p-2 bg-white rounded-lg">
+                                <img :src="qrisSvgDataUri || '{{ asset('images/qris.jpeg') }}'" alt="QRIS VexaHost" class="max-w-full max-h-full object-contain">
+                            </div>
+
+                            {{-- Nominal Tagihan --}}
+                            <div class="mt-4">
+                                <span class="text-xs text-slate-500 block">Total Nominal yang Harus Dibayar:</span>
+                                <span class="text-2xl font-black font-mono-code text-slate-900" x-text="formatRupiah(totalPrice)"></span>
+                            </div>
+
+                            {{-- Unduh / Buka QRIS Button --}}
+                            <div class="mt-2.5">
+                                <a :href="qrisSvgDataUri || '{{ asset('images/qris.jpeg') }}'" target="_blank" download="qris-vexahost.svg"
+                                   class="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 shadow-2xs transition-colors">
+                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    <span>Buka / Unduh Gambar QRIS</span>
+                                </a>
+                            </div>
+
+                            <p class="text-xs text-slate-500 max-w-md mx-auto mt-3">
+                                Scan QR code di atas menggunakan BCA, Mandiri, BRI, BNI, GoPay, OVO, DANA, ShopeePay, atau aplikasi mobile banking lainnya.
+                            </p>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Lynk.id Payment Notice in Slide Konfirmasi --}}
+                <template x-if="paymentMethod === 'lynk'">
+                    <div class="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="w-24 h-12 mb-3 flex items-center justify-center bg-white border border-slate-200 rounded-xl p-2 shadow-2xs">
+                                <img src="{{ asset('images/payments/lynk.svg') }}" alt="Lynk.id" class="max-h-8 max-w-full object-contain">
+                            </div>
+
+                            <h4 class="text-base font-bold text-slate-900">Pembayaran Instan via Lynk.id</h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4 leading-relaxed">
+                                Mendukung pembayaran lengkap: <strong>QRIS, Virtual Account (BCA, Mandiri, BNI, BRI), E-Wallet (GoPay, OVO, DANA, ShopeePay)</strong>, dan Kartu Debit/Kredit.
+                            </p>
+
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 inline-block min-w-[240px] text-center shadow-2xs">
+                                <span class="text-xs text-slate-500 block">Total Nominal yang Harus Dibayar:</span>
+                                <span class="text-2xl font-black font-mono-code text-slate-900" x-text="formatRupiah(totalPrice)"></span>
+                            </div>
+
+                            <div class="mt-4 flex items-center gap-2 text-xs text-slate-600 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-lg max-w-md mx-auto text-left">
+                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Saat menekan tombol <strong>Bayar Sekarang</strong> di bawah, Anda akan otomatis dialihkan ke link checkout Lynk.id untuk menyelesaikan pembayaran.</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
 
@@ -140,7 +202,7 @@
             <span>Transaksi Aman &amp; Terverifikasi Otomatis</span>
         </div>
         <ul class="space-y-1.5 pl-6 list-disc text-slate-500">
-            <li>Instruksi lengkap (QR Code / Nomor Virtual Account) akan langsung tampil di halaman berikutnya setelah Anda menekan tombol <strong>Bayar Sekarang</strong>.</li>
+            <li>Anda dapat langsung melakukan scan QR Code QRIS di atas atau di halaman instruksi pembayaran setelah menekan tombol <strong>Bayar Sekarang</strong>.</li>
             <li>Invoice resmi dan konfirmasi pembayaran akan otomatis dikirimkan ke alamat email Anda.</li>
             <li>Server langsung disiapkan secara otomatis oleh sistem kami segera setelah pembayaran berhasil diverifikasi.</li>
         </ul>

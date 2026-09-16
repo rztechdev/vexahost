@@ -136,6 +136,16 @@ class OrderStateMachine
             $locked->last_status_change_at = now();
             $locked->save();
 
+            // Pastikan jika order mencapai status berbayar, invoice status selalu sinkron ke 'paid'
+            if (in_array($to, ['paid', 'provisioning', 'active'], true)) {
+                if ($locked->invoice && $locked->invoice->status !== 'paid') {
+                    $locked->invoice->update([
+                        'status' => 'paid',
+                        'paid_at' => $locked->paid_at ?? now(),
+                    ]);
+                }
+            }
+
             OrderStatusHistory::create([
                 'order_id' => $locked->id,
                 'from_status' => $from,

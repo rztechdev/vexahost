@@ -68,6 +68,7 @@ class ManagedDatabasePackagesTest extends TestCase
             'email' => 'client.db@example.com',
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
+            'root_password' => 'SecureRootPass123!',
         ];
 
         $response = $this->post('/checkout', $payload);
@@ -180,6 +181,7 @@ class ManagedDatabasePackagesTest extends TestCase
             'email' => 'client2.db@example.com',
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
+            'root_password' => 'SecureRootPass123!',
             'db_engine' => 'postgres',
             'db_manager' => 'cloudbeaver',
         ];

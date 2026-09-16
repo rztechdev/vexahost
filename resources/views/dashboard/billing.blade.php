@@ -1,4 +1,4 @@
-@extends('layouts.dashboard', ['title' => 'Tagihan & Invoice', 'headerTitle' => 'Tagihan & Invoice'])
+@extends('layouts.dashboard', ['title' => 'Tagihan & Invoice', 'headerTitle' => 'Tagihan & Invoice', 'backUrl' => route('dashboard.index'), 'backLabel' => 'Kembali ke Dashboard'])
 
 @section('content')
 <div class="space-y-6">
@@ -97,8 +97,9 @@
                                 </span>
                             </td>
                             <td class="px-5 py-3.5 text-right">
-                                <a href="{{ route('dashboard.invoice.print', $invoice->id) }}" target="_blank" 
-                                   class="inline-flex items-center gap-1 px-3 py-1 rounded bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-colors">
+                                <a href="{{ route('dashboard.invoice.print', $invoice->id) }}"
+                                   @click.prevent="$dispatch('open-invoice-modal', { url: '{{ route('dashboard.invoice.print', $invoice->id) }}' })"
+                                   class="inline-flex items-center gap-1 px-3 py-1 rounded bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-colors cursor-pointer">
                                     Cetak
                                 </a>
                             </td>

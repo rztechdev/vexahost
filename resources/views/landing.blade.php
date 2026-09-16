@@ -1,6 +1,72 @@
-@extends('layouts.app', ['title' => 'VexaHost — Enterprise Cloud VPS Terjangkau untuk Pelajar & Developer'])
+@extends('layouts.app', ['title' => 'VexaHost — Cloud VPS NVMe KVM Indonesia Mulai Rp 80rb/bln'])
 
 @section('content')
+<!-- Promo Ad Popup Banner Modal (Center, Closable) -->
+<div x-data="{
+        showPromo: false,
+        init() {
+            setTimeout(() => { this.showPromo = true; }, 500);
+        },
+        closePromo() {
+            this.showPromo = false;
+        }
+     }"
+     x-show="showPromo"
+     x-cloak
+     @keydown.escape.window="closePromo()"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+     style="display: none;">
+
+    <!-- Dark Backdrop with Blur -->
+    <div x-show="showPromo"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+         @click="closePromo()"></div>
+
+    <!-- Modal Card (Pure Image Banner) -->
+    <div x-show="showPromo"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         class="relative w-full max-w-2xl bg-[#0B0F19] rounded-xl shadow-2xl overflow-hidden z-10 border border-slate-700/60">
+
+        <!-- Close 'X' Button -->
+        <button type="button"
+                @click="closePromo()"
+                class="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-black/60 hover:bg-black/90 text-white/90 hover:text-white flex items-center justify-center transition-colors shadow-md backdrop-blur-xs cursor-pointer"
+                aria-label="Tutup Iklan">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- Pure Image Banner (Click to explore VPS pricing) -->
+        <a href="#pricing"
+           @click="closePromo()"
+           class="block relative w-full aspect-[800/560] overflow-hidden cursor-pointer"
+           title="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost">
+            <picture>
+                <source srcset="{{ asset('images/promo-banner.webp') }}" type="image/webp">
+                <img src="{{ asset('images/promo-banner.jpg') }}"
+                     alt="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost"
+                     width="800"
+                     height="560"
+                     loading="eager"
+                     decoding="async"
+                     class="w-full h-full object-cover">
+            </picture>
+        </a>
+    </div>
+</div>
+
 <!-- Hero Section (Hostinger Enterprise VPS Style) -->
 <section class="bg-[#0B0F19] text-white pt-20 pb-16 border-b border-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -50,15 +116,7 @@
 <!-- RUNNING STACK & ECOSYSTEM TICKER (Hero Section) -->
 <section aria-label="Ekosistem Cloud & Stack Teknologi yang Didukung"
          class="relative overflow-hidden border-b border-slate-800 bg-[#0B0F19] py-3.5 sm:py-4">
-    <div class="w-full flex items-center gap-3 px-4 sm:gap-5 sm:px-6 lg:px-8">
-        <!-- Label Tetap -->
-        <div class="flex shrink-0 items-center gap-2 pr-2.5 sm:pr-5 border-r border-slate-800" title="Stack &amp; Ekosistem">
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="hidden sm:inline text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 select-none whitespace-nowrap">
-                Stack &amp; Ekosistem
-            </span>
-        </div>
-
+    <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
         <!-- Track Marquee -->
         <div class="flustra-stack-marquee relative flex-1 overflow-hidden">
             <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
@@ -119,7 +177,7 @@
 </section>
 
 <!-- Pricing Section (3 cards prominent + 4th card peeking with side slide buttons) -->
-<section id="pricing" class="pt-16 pb-3 bg-slate-50" x-data="{
+<section id="pricing" class="scroll-mt-16 sm:scroll-mt-20 pt-16 pb-3 bg-slate-50" x-data="{
     scrollLeft() {
         const c = this.$refs.slider;
         const card = c.querySelector('.pricing-card');
@@ -276,7 +334,7 @@
 </section>
 
 <!-- VEXAHOST AI COMBO PACKAGES SECTION -->
-<section id="ai-packages" class="pt-3 pb-3 bg-slate-50" x-data="{
+<section id="ai-packages" class="scroll-mt-16 sm:scroll-mt-20 pt-8 pb-3 bg-slate-50" x-data="{
     scrollAiLeft() {
         const c = this.$refs.aiSlider;
         const card = c.querySelector('.pricing-card');
@@ -433,7 +491,7 @@
 </section>
 
 <!-- PAKET MANAGED DATABASE (Dedicated DB VPS) SECTION -->
-<section id="database-packages" class="pt-3 pb-16 bg-slate-50 border-b border-slate-200">
+<section id="database-packages" class="scroll-mt-16 sm:scroll-mt-20 pt-8 pb-16 bg-slate-50 border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Centered Header -->
         <div class="text-center max-w-2xl mx-auto mb-8">
@@ -578,15 +636,7 @@
 <!-- RUNNING PAYMENT METHOD TICKER (Pindah ke Bawah Database Pricing) -->
 <section aria-label="Metode Pembayaran yang Didukung"
          class="relative overflow-hidden border-y border-slate-800 bg-[#0B0F19] py-3.5 sm:py-4">
-    <div class="w-full flex items-center gap-3 px-4 sm:gap-5 sm:px-6 lg:px-8">
-        <!-- Label Tetap -->
-        <div class="flex shrink-0 items-center gap-2 pr-2.5 sm:pr-5 border-r border-slate-800" title="Pembayaran Instan">
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="hidden sm:inline text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 select-none whitespace-nowrap">
-                Pembayaran Instan
-            </span>
-        </div>
-
+    <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
         <!-- Track Marquee -->
         <div class="flustra-pay-marquee relative flex-1 overflow-hidden">
             <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
@@ -1201,13 +1251,13 @@
                 </p>
             </div>
 
-            <!-- Pillar 4: RZ Digital Creative -->
+            <!-- Pillar 4: Tim Engineer VexaHost -->
             <div class="space-y-2 border-l-2 border-[#4A6FA5] pl-4">
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">100% ENGINEER ID</span>
                     <span class="text-[11px] text-slate-500 font-semibold">Lokal Indonesia</span>
                 </div>
-                <h4 class="text-sm font-bold text-slate-900">Dikelola RZ Digital Creative</h4>
+                <h4 class="text-sm font-semibold text-slate-900">Dukungan <span class="font-normal">Tim Teknis VexaHost</span></h4>
                 <p class="text-xs text-slate-600 leading-relaxed">
                     Dukungan teknis responsif langsung dari tim developer dan system administrator berpengalaman di Indonesia tanpa perantara chatbot.
                 </p>
@@ -1374,7 +1424,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-2xl sm:text-3xl font-bold mb-3">Siap Meluncurkan Server Cloud Anda?</h2>
         <p class="text-sm text-slate-400 max-w-lg mx-auto mb-8">
-            Dapatkan performa server cloud andal dengan harga bersahabat. Tanpa setup fee, tanpa kontrak mengikat. Dikelola oleh RZ Digital Creative.
+            Dapatkan performa server cloud andal dengan harga bersahabat. Tanpa setup fee, tanpa kontrak mengikat. Didukung penuh oleh tim VexaHost Cloud.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="{{ route('checkout') }}" class="w-full sm:w-auto px-7 py-3 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-semibold rounded-lg transition-colors">
@@ -1473,7 +1523,7 @@
                         </div>
                         <h3 class="text-xl font-bold text-slate-900">Pesan Anda Berhasil Terkirim!</h3>
                         <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-                            Terima kasih telah menghubungi kami. Tim support VexaHost (RZ Digital Creative) akan segera membalas pertanyaan Anda ke alamat email <span class="font-bold text-slate-800" x-text="email"></span>.
+                            Terima kasih telah menghubungi kami. Tim support VexaHost akan segera membalas pertanyaan Anda ke alamat email <span class="font-bold text-slate-800" x-text="email"></span>.
                         </p>
                         <div class="pt-4">
                             <button @click="submitted = false; name=''; email=''; message=''" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
@@ -1490,7 +1540,7 @@
                 <div class="bg-[#128C7E]/10 border border-[#128C7E]/30 rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-slate-900">Chat WhatsApp Customer Service</h3>
@@ -1515,7 +1565,7 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs text-xs">
                     <div>
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Resmi</span>
-                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">support@vexahost.com</p>
+                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">support@vexahostcloud.my.id</p>
                         <p class="text-slate-500 mt-0.5">Untuk pertanyaan umum, pengajuan tiket &amp; kerjasama</p>
                     </div>
 
@@ -1534,7 +1584,7 @@
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 text-slate-500">
-                        Dikelola dan dioperasikan secara profesional oleh <strong class="text-slate-800">RZ Digital Creative</strong>.
+                        Dioperasikan dan dikelola secara profesional oleh <span class="text-slate-700 font-normal">VexaHost Cloud Indonesia</span>.
                     </div>
                 </div>
             </div>

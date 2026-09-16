@@ -18,6 +18,7 @@ class VpsSpec extends Model
         'bandwidth',
         'cost_price',
         'sell_price',
+        'payment_url',
         'is_active',
         'tagline',
         'target_audience',

@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Cloud Instances', 'headerTitle' => 'Manajemen Server & Cloud Instances'])
+@extends('layouts.admin', ['title' => 'Cloud Instances', 'headerTitle' => 'Manajemen Server & Cloud Instances', 'backUrl' => route('admin.index'), 'backLabel' => 'Kembali ke Dashboard Admin'])
 
 @section('content')
 <div class="space-y-6">

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\InvalidStateTransitionException;
 use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\SupportTicket;
 use App\Models\Subscription;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Models\VpsInstance;
 use App\Services\VpsStateMachine;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -28,7 +30,7 @@ class DashboardController extends Controller
         return (int) Auth::user()->current_organization_id;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $organizationId = $this->organizationId();
@@ -39,19 +41,68 @@ class DashboardController extends Controller
             ->count();
 
         // Unpaid orders (Layanan terkunci menunggu pembayaran)
-        $unpaidOrders = \App\Models\Order::where('organization_id', $organizationId)
+        $unpaidOrders = Order::where(function ($q) use ($organizationId, $user) {
+                $q->where('organization_id', $organizationId)
+                  ->orWhere('customer_id', $user->id);
+            })
             ->whereNull('paid_at')
             ->with(['vpsSpec', 'invoice'])
             ->latest()
             ->get();
 
-        // Pending orders (sudah bayar tapi belum di-provision)
-        $pendingOrdersCount = \App\Models\Order::where('organization_id', $organizationId)
+        // Orders yang sudah dibayar dan sedang dalam antrean/proses setup server oleh admin VexaHost
+        $provisioningOrders = Order::where(function ($q) use ($organizationId, $user) {
+                $q->where('organization_id', $organizationId)
+                  ->orWhere('customer_id', $user->id);
+            })
             ->whereNotNull('paid_at')
-            ->where('status', 'pending')
-            ->count();
+            ->whereIn('status', ['paid', 'provisioning'])
+            ->whereDoesntHave('vpsInstance')
+            ->with(['vpsSpec', 'invoice', 'latestProvisioningTask'])
+            ->latest()
+            ->get();
 
-        return view('dashboard.index', compact('vps', 'invoicesCount', 'openTicketsCount', 'pendingOrdersCount', 'unpaidOrders'));
+        $pendingOrdersCount = $provisioningOrders->count();
+
+        // Deteksi apakah ada order sukses dibayar yang harus dimunculkan alert konfirmasi suksesnya
+        $paymentSuccessOrder = null;
+        $shownSuccessOrders = session('shown_payment_success_orders', []);
+
+        // Skenario 1: Callback dari URL dengan parameter payment_success=1 & order_id=X
+        if ($request->filled('payment_success') && $request->filled('order_id')) {
+            $reqOrderId = $request->query('order_id');
+            $candidate = Order::where('id', $reqOrderId)
+                ->where(function ($q) use ($organizationId, $user) {
+                    $q->where('organization_id', $organizationId)
+                      ->orWhere('customer_id', $user->id);
+                })
+                ->whereNotNull('paid_at')
+                ->whereIn('status', ['paid', 'provisioning', 'active'])
+                ->with(['vpsSpec', 'invoice'])
+                ->first();
+
+            if ($candidate) {
+                $paymentSuccessOrder = $candidate;
+                if (!in_array($candidate->id, $shownSuccessOrders, true)) {
+                    $shownSuccessOrders[] = $candidate->id;
+                    session(['shown_payment_success_orders' => $shownSuccessOrders]);
+                }
+            }
+        }
+
+        // Skenario 2: User langsung buka Dashboard (misal baru di-ACC admin di QRIS) tanpa klik link email
+        if (!$paymentSuccessOrder && $provisioningOrders->isNotEmpty()) {
+            foreach ($provisioningOrders as $pOrder) {
+                if (!in_array($pOrder->id, $shownSuccessOrders, true)) {
+                    $paymentSuccessOrder = $pOrder;
+                    $shownSuccessOrders[] = $pOrder->id;
+                    session(['shown_payment_success_orders' => $shownSuccessOrders]);
+                    break;
+                }
+            }
+        }
+
+        return view('dashboard.index', compact('vps', 'invoicesCount', 'openTicketsCount', 'pendingOrdersCount', 'unpaidOrders', 'provisioningOrders', 'paymentSuccessOrder'));
     }
 
     /**
@@ -395,7 +446,33 @@ class DashboardController extends Controller
             abort(403);
         }
 
-        return view('dashboard.invoice-print', compact('invoice'));
+        // Auto-sinkron status invoice jika order sudah lunas
+        if ($invoice->order && ($invoice->order->paid_at || in_array($invoice->order->status, ['paid', 'provisioning', 'active'], true))) {
+            if ($invoice->status !== 'paid') {
+                $invoice->update([
+                    'status' => 'paid',
+                    'paid_at' => $invoice->order->paid_at ?? now(),
+                ]);
+                $invoice->refresh();
+            }
+        }
+
+        if (request()->query('format') === 'html') {
+            return view('dashboard.invoice-print', compact('invoice'));
+        }
+
+        $pdf = Pdf::loadView('dashboard.invoice-pdf', compact('invoice'))
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'Helvetica',
+            ]);
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="Invoice-' . $invoice->invoice_number . '.pdf"',
+        ]);
     }
 
     public function support()

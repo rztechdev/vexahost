@@ -277,7 +277,7 @@ class ReportExportService
         $cBrand = $headerTable->addCell(6500);
         $cBrand->addText('VEXAHOST INDONESIA', ['name' => 'Arial', 'size' => 13, 'bold' => true, 'color' => '0F172A']);
         $cBrand->addText('Cloud Infrastructure, Autonomous AI & Managed Database Platform', ['name' => 'Arial', 'size' => 8, 'bold' => true, 'color' => '475569']);
-        $cBrand->addText('Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta Selatan • support@vexahost.com • vexahost.com', ['name' => 'Arial', 'size' => 7.5, 'color' => '64748B']);
+        $cBrand->addText('Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta Selatan • support@vexahostcloud.my.id • vexahostcloud.my.id', ['name' => 'Arial', 'size' => 7.5, 'color' => '64748B']);
 
         $section->addTextBreak(1);
 

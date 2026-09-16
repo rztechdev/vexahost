@@ -1,6 +1,9 @@
 @extends('layouts.app', ['title' => 'Pesanan Berhasil — VexaHost'])
 
 @section('content')
+@php
+    $isPaid = (bool) ($order->paid_at || in_array($order->status, ['paid', 'provisioning', 'active'], true) || ($order->invoice && $order->invoice->status === 'paid'));
+@endphp
 <div class="py-16 bg-slate-50 min-h-screen">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-lg border border-slate-200 p-8 sm:p-10 text-center">
@@ -23,10 +26,10 @@
 
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Pesanan Anda Sedang Diproses</h1>
                 <p class="text-sm text-slate-600 mb-8 max-w-md mx-auto">
-                    @if($order->paid_at)
-                        Pembayaran telah dikonfirmasi. Tim teknis kami sedang melakukan setup server Anda. Proses ini membutuhkan waktu 1-2 jam kerja.
+                    @if($isPaid)
+                        Pembayaran telah dikonfirmasi lunas. Tim teknis kami sedang melakukan setup server Anda. Kredensial server akan dikirimkan ke email Anda.
                     @else
-                        Silakan selesaikan pembayaran Anda. Setelah pembayaran terkonfirmasi, tim teknis kami akan segera melakukan setup server Anda.
+                        Pembayaran Anda telah kami terima dan masuk dalam antrean verifikasi mutasi tim teknis. Tim kami akan segera memverifikasi dan menyiapkan server VPS Anda.
                     @endif
                 </p>
 
@@ -36,15 +39,15 @@
                         <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold">1</span>
                         <span class="font-semibold text-slate-900">Pesanan Dibuat</span>
                     </div>
-                    <div class="w-8 h-px {{ $order->paid_at ? 'bg-black' : 'bg-slate-300' }}"></div>
+                    <div class="w-8 h-px bg-black"></div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full {{ $order->paid_at ? 'bg-black text-white' : 'bg-slate-200 text-slate-500' }} flex items-center justify-center text-[10px] font-bold">2</span>
-                        <span class="font-semibold {{ $order->paid_at ? 'text-slate-900' : 'text-slate-400' }}">Pembayaran</span>
+                        <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                        <span class="font-semibold text-slate-900">Pembayaran Diterima</span>
                     </div>
-                    <div class="w-8 h-px bg-slate-300"></div>
+                    <div class="w-8 h-px {{ $isPaid ? 'bg-black' : 'bg-slate-300' }}"></div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold">3</span>
-                        <span class="font-semibold text-slate-400">Setup Server</span>
+                        <span class="w-5 h-5 rounded-full {{ $isPaid ? 'bg-black text-white' : 'bg-slate-200 text-slate-500' }} flex items-center justify-center text-[10px] font-bold">3</span>
+                        <span class="font-semibold {{ $isPaid ? 'text-slate-900' : 'text-slate-400' }}">Setup Server</span>
                     </div>
                     <div class="w-8 h-px bg-slate-300"></div>
                     <div class="flex items-center gap-1.5">
@@ -62,13 +65,13 @@
                         <span class="font-mono-code font-bold text-slate-900 text-sm">{{ $order->invoice->invoice_number ?? 'INV-' . $order->id }}</span>
                     </div>
                     <span class="px-2.5 py-0.5 rounded font-bold uppercase border text-xs
-                        @if($order->paid_at)
+                        @if($isPaid)
                             border-emerald-300 bg-emerald-50 text-emerald-700
                         @else
-                            border-amber-300 bg-amber-50 text-amber-700
+                            border-slate-300 bg-slate-100 text-slate-800
                         @endif
                     ">
-                        {{ $order->paid_at ? 'LUNAS' : 'MENUNGGU BAYAR' }}
+                        {{ $isPaid ? 'LUNAS' : 'DIPROSES (VERIFIKASI)' }}
                     </span>
                 </div>
 
@@ -184,12 +187,12 @@
                             <span class="font-semibold">Catatan:</span> Password root dapat dilihat melalui menu detail VPS di Dashboard dengan verifikasi password akun Anda.
                         </div>
                     </div>
-                @elseif($order->status === 'pending' && $order->paid_at)
+                @elseif($isPaid)
                     {{-- Sudah bayar tapi belum di-provision --}}
                     <div class="pt-4 bg-cyan-50 p-5 rounded-lg border border-cyan-200 text-center">
                         <svg class="w-8 h-8 text-cyan-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         <p class="text-sm font-semibold text-cyan-800">Server Sedang Di-Setup</p>
-                        <p class="text-xs text-cyan-700 mt-1">Tim teknis kami sedang mempersiapkan VPS Anda. Kredensial akses server akan tersedia di Dashboard setelah proses setup selesai (estimasi 1-2 jam kerja).</p>
+                        <p class="text-xs text-cyan-700 mt-1">Pembayaran telah dikonfirmasi lunas. Tim teknis kami sedang mempersiapkan VPS Anda. Kredensial akses server akan tersedia di Dashboard setelah proses setup selesai (estimasi 1-2 jam kerja).</p>
                     </div>
                 @else
                     {{-- Belum bayar --}}
@@ -206,11 +209,13 @@
 
             {{-- Action Buttons --}}
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="{{ route('dashboard.index') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-sm font-bold transition-colors">
+                <a href="{{ route('dashboard.index', $isPaid ? ['payment_success' => 1, 'order_id' => $order->id] : []) }}" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-sm font-bold transition-colors">
                     Buka Dashboard
                 </a>
                 @if($order->invoice)
-                    <a href="{{ route('dashboard.invoice.print', $order->invoice->id) }}" target="_blank" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 text-sm font-semibold transition-colors">
+                    <a href="{{ route('dashboard.invoice.print', $order->invoice->id) }}"
+                       @click.prevent="$dispatch('open-invoice-modal', { url: '{{ route('dashboard.invoice.print', $order->invoice->id) }}' })"
+                       class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 text-sm font-semibold transition-colors cursor-pointer">
                         Cetak Invoice
                     </a>
                 @endif

@@ -53,6 +53,17 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
+        'site_verification' => env('GOOGLE_SITE_VERIFICATION'),
+    ],
+
+    'lynk' => [
+        'merchant_key' => env('LYNK_MERCHANT_KEY'),
+    ],
+
+    'turnstile' => [
+        'key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
     ],
 
 ];
+

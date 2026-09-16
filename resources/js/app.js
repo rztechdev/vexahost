@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
 window.Alpine = Alpine;
+window.Swal = Swal;
 
 const defaultSwalOptions = {
     confirmButtonColor: '#111827',
@@ -21,6 +22,34 @@ window.showAlert = (message, options = {}) => Swal.fire({
     icon: 'warning',
     title: 'Perhatian',
     text: String(message),
+    ...options,
+});
+
+window.showSuccess = (message, options = {}) => Swal.fire({
+    ...defaultSwalOptions,
+    icon: 'success',
+    title: 'Berhasil',
+    text: String(message),
+    timer: 3500,
+    timerProgressBar: true,
+    ...options,
+});
+
+window.showError = (message, options = {}) => Swal.fire({
+    ...defaultSwalOptions,
+    icon: 'error',
+    title: 'Terjadi Kesalahan',
+    text: String(message),
+    ...options,
+});
+
+window.showInfo = (message, options = {}) => Swal.fire({
+    ...defaultSwalOptions,
+    icon: 'info',
+    title: 'Informasi',
+    text: String(message),
+    timer: 4000,
+    timerProgressBar: true,
     ...options,
 });
 

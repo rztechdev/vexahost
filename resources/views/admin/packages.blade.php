@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Manajemen Paket VPS', 'headerTitle' => 'Katalog Paket VPS Cloud'])
+@extends('layouts.admin', ['title' => 'Manajemen Paket VPS', 'headerTitle' => 'Katalog Paket VPS Cloud', 'backUrl' => route('admin.index'), 'backLabel' => 'Kembali ke Dashboard Admin'])
 
 @section('content')
 <div class="space-y-6" x-data="{
@@ -16,6 +16,7 @@
         bandwidth: 1000,
         cost_price: 0,
         sell_price: 0,
+        payment_url: '',
         is_active: true
     },
     deleteData: {
@@ -34,6 +35,7 @@
             bandwidth: spec.bandwidth,
             cost_price: spec.cost_price,
             sell_price: spec.sell_price,
+            payment_url: spec.payment_url || '',
             is_active: Boolean(spec.is_active)
         };
         this.editModalOpen = true;
@@ -157,7 +159,15 @@
                                 @if($spec->tagline)
                                     <span class="text-[11px] text-slate-500 italic block">{{ $spec->tagline }}</span>
                                 @endif
-                                <span class="text-[11px] text-slate-400 font-mono-code">ID: #SPEC-{{ str_pad($spec->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[11px] text-slate-400 font-mono-code">ID: #SPEC-{{ str_pad($spec->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                    @if(!empty($spec->payment_url))
+                                        <a href="{{ $spec->payment_url }}" target="_blank" class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" title="Buka tautan Lynk.id">
+                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            Lynk
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
 
                             <!-- Spesifikasi Hardware -->
@@ -295,7 +305,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('admin.packages.store') }}" method="POST" class="p-6 space-y-4">
+            <form action="/admin/packages" method="POST" class="p-6 space-y-4">
                 @csrf
 
                 <div class="grid grid-cols-2 gap-3">
@@ -353,6 +363,15 @@
                     </div>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Link Checkout Lynk.id (Opsional)
+                    </label>
+                    <input type="url" name="payment_url" placeholder="https://lynk.id/vexahost/..."
+                           class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-black">
+                    <p class="text-[11px] text-slate-500 mt-1">Jika diisi, pengunjung yang mengklik "Beli / Pilih Paket" di landing page akan langsung diarahkan ke link checkout Lynk ini.</p>
+                </div>
+
                 <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" name="is_active" id="create_is_active" value="1" checked
                            class="w-4 h-4 rounded border-slate-300 text-black focus:ring-black">
@@ -399,7 +418,7 @@
                 </button>
             </div>
 
-            <form :action="`{{ url('admin/packages') }}/${editData.id}`" method="POST" class="p-6 space-y-4">
+            <form :action="'/admin/packages/' + editData.id" method="POST" class="p-6 space-y-4">
                 @csrf
                 @method('PUT')
 
@@ -458,6 +477,15 @@
                     </div>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Link Checkout Lynk.id (Opsional)
+                    </label>
+                    <input type="url" name="payment_url" x-model="editData.payment_url" placeholder="https://lynk.id/vexahost/..."
+                           class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-black">
+                    <p class="text-[11px] text-slate-500 mt-1">Jika diisi, pengunjung yang mengklik "Beli / Pilih Paket" di landing page akan langsung diarahkan ke link checkout Lynk ini.</p>
+                </div>
+
                 <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" name="is_active" id="edit_is_active" value="1" :checked="editData.is_active"
                            class="w-4 h-4 rounded border-slate-300 text-black focus:ring-black">
@@ -503,7 +531,7 @@
                 Anda yakin ingin menghapus paket <span class="font-bold text-slate-900" x-text="deleteData.name"></span>? Tindakan ini permanen dan tidak dapat dibatalkan.
             </p>
 
-            <form :action="`{{ url('admin/packages') }}/${deleteData.id}`" method="POST" class="flex items-center justify-center gap-3">
+            <form :action="'/admin/packages/' + deleteData.id" method="POST" class="flex items-center justify-center gap-3">
                 @csrf
                 @method('DELETE')
 

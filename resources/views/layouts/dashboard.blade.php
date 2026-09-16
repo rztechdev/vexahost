@@ -2,7 +2,7 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Client Portal' }} — VexaHost</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
@@ -16,16 +16,16 @@
     </style>
 </head>
 <body class="h-full antialiased bg-white text-slate-900" x-data="{ sidebarOpen: false, userDropdown: false }">
-    <div class="min-h-full flex flex-col md:flex-row">
+    <div class="h-screen w-full flex flex-col md:flex-row overflow-hidden bg-white">
 
         <div x-show="sidebarOpen" class="fixed inset-0 z-40 bg-black/30 md:hidden" @click="sidebarOpen = false" style="display:none;"></div>
 
-        <!-- Sidebar (Wide w-80, Large Font, No Category Headings, Border-r) -->
+        <!-- Sidebar (Wide w-80, Stationary on Desktop, Border-r) -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-               class="fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 md:static md:translate-x-0">
+               class="fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 md:static md:inset-auto md:h-full md:shrink-0 md:translate-x-0">
 
             <!-- Logo (No border-b) -->
-            <div class="h-16 flex items-center justify-between px-6 pt-2">
+            <div class="h-16 flex items-center justify-between px-6 pt-2 shrink-0">
                 <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3">
                     <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-10 w-auto object-contain shrink-0">
                     <span class="text-xl font-bold text-slate-900">VexaHost</span>
@@ -88,6 +88,15 @@
                     <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                 </a>
 
+                <a href="https://wa.flustra.id" target="_blank" rel="noopener noreferrer"
+                   class="flex items-center justify-between px-4 py-3 rounded-lg text-base transition-colors text-slate-700 hover:bg-slate-50 font-medium group">
+                    <div class="flex items-center gap-3.5">
+                        <svg class="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <span>WA Gateway</span>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                </a>
+
                 <a href="{{ route('dashboard.settings') }}"
                    class="flex items-center gap-3.5 px-4 py-3 rounded-lg text-base transition-colors {{ request()->routeIs('dashboard.settings') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50 font-medium' }}">
                     <svg class="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -108,32 +117,44 @@
             </nav>
         </aside>
 
-        <!-- Main Content Area (No lines under headings) -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <!-- Main Content Area (No lines under headings, Independent Scroll) -->
+        <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
             <!-- Header (NO border-b line under title) -->
-            <header class="h-16 bg-white flex items-center justify-between px-6 sm:px-10">
+            <header class="h-16 shrink-0 bg-white flex items-center justify-between px-6 sm:px-10">
                 <div class="flex items-center gap-3">
-                    <button @click="sidebarOpen = true" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    </button>
+                    @if(isset($backUrl))
+                        <a href="{{ $backUrl }}" class="p-1.5 -ml-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center" title="{{ $backLabel ?? 'Kembali' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        </a>
+                    @endif
                     <h1 class="text-base font-bold text-slate-900">{{ $headerTitle ?? 'Dashboard' }}</h1>
                 </div>
 
                 <div class="flex items-center gap-3">
                     <!-- User Profile Dropdown in Header -->
                     <div class="relative" @click.away="userDropdown = false">
-                        <button @click="userDropdown = !userDropdown" class="flex items-center gap-2.5 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none">
-                            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
-                                {{ strtoupper(substr(auth()->user()->full_name, 0, 1)) }}
+                        <button @click="userDropdown = !userDropdown" class="flex items-center gap-1.5 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none" title="{{ auth()->user()->full_name }}">
+                            <div class="rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"
+                                 style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 9999px; aspect-ratio: 1 / 1;">
+                                <svg class="text-blue-600 shrink-0" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
                             </div>
-                            <span class="hidden sm:block text-sm font-semibold text-slate-800">{{ auth()->user()->full_name }}</span>
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
-                        <div x-show="userDropdown" x-transition class="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg py-1.5 z-50 text-sm" style="display:none;">
-                            <div class="px-4 py-2 border-b border-slate-100">
-                                <p class="font-bold text-slate-900">{{ auth()->user()->full_name }}</p>
-                                <p class="text-xs text-slate-500 font-mono-code">{{ auth()->user()->email }}</p>
+                        <div x-show="userDropdown" x-transition class="absolute right-0 mt-2 w-60 bg-white border border-slate-200 rounded-lg shadow-lg py-1.5 z-50 text-sm" style="display:none;">
+                            <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+                                <div class="rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"
+                                     style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 9999px; aspect-ratio: 1 / 1;">
+                                    <svg class="text-blue-600 shrink-0" style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-slate-900 truncate">{{ auth()->user()->full_name }}</p>
+                                    <p class="text-xs text-slate-500 font-mono-code truncate">{{ auth()->user()->email }}</p>
+                                </div>
                             </div>
                             <a href="{{ route('dashboard.settings') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Pengaturan Akun</a>
                             @if(auth()->user()->is_admin)
@@ -147,6 +168,11 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- Mobile Hamburger Button on the Right -->
+                    <button @click="sidebarOpen = true" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 -mr-1.5" aria-label="Buka Menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
                 </div>
             </header>
 
@@ -208,10 +234,12 @@
             </main>
 
             <!-- Footer (No border-t) -->
-            <footer class="py-4 px-6 sm:px-10 text-xs text-slate-400">
+            <footer class="py-4 px-6 sm:px-10 text-xs text-slate-400 shrink-0">
                 &copy; 2026 VexaHost
             </footer>
         </div>
     </div>
+    @include('partials.invoice-modal')
+    @stack('scripts')
 </body>
 </html>

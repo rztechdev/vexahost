@@ -1,26 +1,35 @@
-@extends('layouts.dashboard', ['title' => 'Pengaturan Akun', 'headerTitle' => 'Profil & Pengaturan Akun'])
+@extends('layouts.dashboard', ['title' => 'Pengaturan Akun', 'headerTitle' => 'Profil & Pengaturan Akun', 'backUrl' => route('dashboard.index'), 'backLabel' => 'Kembali ke Dashboard'])
 
 @section('content')
 <div class="space-y-6 max-w-3xl">
-    <!-- Channel & Account Info (No line under title) -->
-    <div class="bg-white rounded-lg border border-slate-200 p-5 flex items-center justify-between">
-        <div>
-            <span class="text-xs font-medium text-slate-500 block">Jalur Pendaftaran</span>
-            <div class="flex items-center gap-2 mt-1">
-                @if($user->channel === 'shopee')
-                    <span class="px-2 py-0.5 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
-                        Shopee (Order: {{ $user->shopee_order_id ?? 'N/A' }})
-                    </span>
-                @else
-                    <span class="px-2 py-0.5 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
-                        Website Direct
-                    </span>
-                @endif
-                <span class="text-xs text-slate-500">Terdaftar {{ $user->created_at->format('d M Y') }}</span>
+    <!-- Profile & Account Info -->
+    <div class="bg-white rounded-lg border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4 min-w-0">
+            <div class="rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"
+                 style="width: 48px; height: 48px; min-width: 48px; min-height: 48px; border-radius: 9999px; aspect-ratio: 1 / 1;">
+                <svg class="text-blue-600 shrink-0" style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div class="min-w-0">
+                <h2 class="text-base font-bold text-slate-900 leading-tight truncate">{{ $user->full_name }}</h2>
+                <p class="text-xs text-slate-500 font-mono-code mt-0.5 truncate">{{ $user->email }}</p>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    @if($user->channel === 'shopee')
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
+                            Shopee (Order: {{ $user->shopee_order_id ?? 'N/A' }})
+                        </span>
+                    @else
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
+                            Website Direct
+                        </span>
+                    @endif
+                    <span class="text-xs text-slate-500">· Terdaftar {{ $user->created_at->format('d M Y') }}</span>
+                </div>
             </div>
         </div>
-        <div class="text-right">
-            <span class="text-xs text-slate-400 font-medium">Username</span>
+        <div class="text-left sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 shrink-0">
+            <span class="text-xs text-slate-400 font-medium block">Username</span>
             <p class="font-mono-code font-bold text-slate-900 text-sm">&#64;{{ $user->username }}</p>
         </div>
     </div>

@@ -32,6 +32,7 @@ class Order extends Model
         'db_port',
         'provider',
         'hostname',
+        'root_password',
         'datacenter_location',
         'os',
         'billing_cycle',
@@ -193,5 +194,26 @@ class Order extends Model
     public function latestProvisioningTask()
     {
         return $this->hasOne(ProvisioningTask::class)->latestOfMany();
+    }
+
+    public function getPaymentMethodNameAttribute(): string
+    {
+        $names = [
+            'lynk' => 'Lynk.id Checkout',
+            'qris' => 'QRIS',
+            'bca_va' => 'BCA Virtual Account',
+            'mandiri_va' => 'Mandiri Virtual Account',
+            'bni_va' => 'BNI Virtual Account',
+            'bri_va' => 'BRI Virtual Account',
+            'cimb_va' => 'CIMB Niaga VA',
+            'permata_va' => 'Permata Bank VA',
+            'gopay' => 'GoPay',
+            'ovo' => 'OVO',
+            'dana' => 'DANA',
+            'shopeepay' => 'ShopeePay',
+            'midtrans_snap' => 'Kartu Kredit/Debit',
+        ];
+
+        return $names[$this->payment_method] ?? strtoupper((string) $this->payment_method);
     }
 }

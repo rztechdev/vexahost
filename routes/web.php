@@ -26,26 +26,92 @@ Route::view('/docs', 'pages.docs')->name('docs');
 Route::view('/status', 'pages.status')->name('status');
 Route::redirect('/kontak', '/#kontak')->name('contact');
 
+// Public Direct Package Section Routes
+Route::redirect('/vps', '/#pricing')->name('packages.vps');
+Route::redirect('/tambah-vps', '/#pricing');
+Route::redirect('/ai', '/#ai-packages')->name('packages.ai');
+Route::redirect('/ai-agent', '/#ai-packages');
+Route::redirect('/tambah-ai-agent', '/#ai-packages');
+Route::redirect('/database', '/#database-packages')->name('packages.db');
+Route::redirect('/db', '/#database-packages');
+Route::redirect('/tambah-database', '/#database-packages');
+
 // Public Legal Pages
 Route::view('/terms', 'pages.terms')->name('terms');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
 Route::view('/sla', 'pages.sla')->name('sla');
 Route::view('/refund', 'pages.refund')->name('refund');
 
+// Public XML Sitemap (Google Search Console)
+Route::get('/sitemap.xml', function () {
+    $baseUrl = rtrim(config('app.url', url('/')), '/');
+    $urls = [
+        ['loc' => $baseUrl . '/', 'changefreq' => 'daily', 'priority' => '1.0'],
+        ['loc' => $baseUrl . '/docs', 'changefreq' => 'weekly', 'priority' => '0.8'],
+        ['loc' => $baseUrl . '/status', 'changefreq' => 'hourly', 'priority' => '0.7'],
+        ['loc' => $baseUrl . '/terms', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => $baseUrl . '/privacy', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => $baseUrl . '/sla', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => $baseUrl . '/refund', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => $baseUrl . '/checkout', 'changefreq' => 'weekly', 'priority' => '0.9'],
+    ];
+
+    try {
+        $specs = \App\Models\VpsSpec::where('is_active', true)->get();
+        foreach ($specs as $spec) {
+            $urls[] = [
+                'loc' => $baseUrl . '/checkout/' . $spec->id,
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        }
+    } catch (\Throwable $e) {
+        // Fallback gracefully jika database belum dimigrate
+    }
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+    foreach ($urls as $u) {
+        $xml .= "    <url>\n";
+        $xml .= "        <loc>" . htmlspecialchars($u['loc'], ENT_XML1) . "</loc>\n";
+        $xml .= "        <lastmod>" . now()->toAtomString() . "</lastmod>\n";
+        $xml .= "        <changefreq>" . $u['changefreq'] . "</changefreq>\n";
+        $xml .= "        <priority>" . $u['priority'] . "</priority>\n";
+        $xml .= "    </url>\n";
+    }
+
+    $xml .= '</urlset>';
+
+    return response($xml, 200, [
+        'Content-Type' => 'application/xml; charset=utf-8',
+    ]);
+})->name('sitemap');
+
 // Website Self-Serve Order Flow (PRD 7.1.1)
 Route::get('/checkout/{spec_id?}', [OrderController::class, 'checkout'])->name('checkout');
 Route::post('/checkout', [OrderController::class, 'store'])->name('order.store');
 Route::post('/checkout/quick-login', [OrderController::class, 'quickLogin'])->name('checkout.quick-login');
 Route::get('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment')->middleware('auth');
-// Halaman polling status pembayaran (read-only, tidak mengubah state).
-Route::get('/order/payment/{id}/status', [OrderController::class, 'paymentStatus'])->name('order.payment.status')->middleware('auth');
+// Halaman polling status pembayaran (read-only, diotentikasi via controller & session order).
+Route::get('/order/payment/{id}/status', [OrderController::class, 'paymentStatus'])->name('order.payment.status');
 // JSON endpoint untuk polling status by frontend.
-Route::get('/order/payment/{id}/status.json', [OrderController::class, 'paymentStatusJson'])->name('order.payment.status.json')->middleware('auth');
+Route::get('/order/payment/{id}/status.json', [OrderController::class, 'paymentStatusJson'])->name('order.payment.status.json');
 // DEV ONLY: simulate payment - dipagari APP_ENV=local dan APP_DEV_SIMULATE_PAYMENT=true.
 Route::post('/order/payment/{id}/dev-simulate', [OrderController::class, 'devSimulatePayment'])
     ->name('order.payment.dev-simulate')
     ->middleware(['auth', 'throttle:5,1']);
-Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success')->middleware('auth');
+Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success');
+Route::get('/order/callback', [OrderController::class, 'paymentCallback'])->name('order.callback');
+Route::get('/payment/callback', [OrderController::class, 'paymentCallback'])->name('payment.callback');
+Route::get('/qris/render', function (\Illuminate\Http\Request $request, \App\Services\QrisService $qrisService) {
+    $amount = max(1000, (float) $request->input('amount', 80000));
+    return response()->json([
+        'amount' => $amount,
+        'payload' => $qrisService->generatePayload($amount),
+        'svg_data_uri' => $qrisService->generateDataUri($amount),
+    ]);
+})->name('qris.render');
 
 // Authentication Routes (PRD 12.1)
 Route::middleware('guest')->group(function () {
@@ -149,6 +215,10 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
     // Admin Panel Routes (Ryan Only - PRD 8.2)
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
+        Route::post('/payments/{id}/approve', [AdminController::class, 'approvePayment'])->name('payments.approve');
+        Route::post('/payments/{id}/hold', [AdminController::class, 'holdPayment'])->name('payments.hold');
+        Route::post('/payments/{id}/reject', [AdminController::class, 'rejectPayment'])->name('payments.reject');
         Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
         Route::post('/orders/{id}/provision', [AdminController::class, 'provision'])->name('orders.provision');
         Route::post('/orders/{id}/cancel', [AdminController::class, 'cancelOrder'])->name('orders.cancel');

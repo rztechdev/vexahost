@@ -16,6 +16,9 @@
                 <p class="text-2xl font-bold text-slate-900 mt-1 font-mono-code">{{ $vps->count() }} <span class="text-xs font-normal text-slate-500 font-sans">Unit</span></p>
                 <p class="text-xs text-slate-400 mt-0.5">
                     {{ $vps->where('status', 'running')->count() }} Berjalan &bull; {{ $vps->where('status', 'stopped')->count() }} Berhenti
+                    @if(isset($provisioningOrders) && $provisioningOrders->count() > 0)
+                        &bull; <span class="text-amber-600 font-semibold">{{ $provisioningOrders->count() }} Setup</span>
+                    @endif
                 </p>
             </div>
             <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-900 flex items-center justify-center font-bold">
@@ -28,10 +31,13 @@
             <div>
                 <p class="text-xs font-medium text-amber-700">Pesanan Diproses</p>
                 <p class="text-2xl font-bold text-amber-900 mt-1 font-mono-code">{{ $pendingOrdersCount }} <span class="text-xs font-normal text-amber-600 font-sans">Order</span></p>
-                <p class="text-xs text-amber-600 mt-0.5">Menunggu setup oleh tim teknis</p>
+                <p class="text-xs text-amber-600 mt-0.5">Sedang dalam setup server oleh VexaHost</p>
             </div>
             <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-5 h-5 animate-spin text-amber-600" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
             </div>
         </div>
         @endif
@@ -147,26 +153,139 @@
     @endif
 
     <!-- VPS & AI Agent List Section -->
-    <div class="space-y-4 pt-2">
-        <div class="flex items-center justify-between gap-3">
+    <div id="provisioning-orders-section" class="space-y-4 pt-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-lg font-bold text-slate-900">Daftar Server, AI Agent &amp; Database</h2>
                 <p class="text-xs text-slate-500">Kelola Cloud VPS, runtime AI Agent, dan Dedicated Database Anda</p>
             </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('home') }}#pricing" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-xs transition-colors">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>Tambah VPS</span>
+                </a>
+                <a href="{{ route('home') }}#ai-packages" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-xs transition-colors">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>AI Agent</span>
+                </a>
+                <a href="{{ route('home') }}#database-packages" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-xs transition-colors">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span>Database</span>
+                </a>
+            </div>
         </div>
 
-        @if($vps->count() === 0)
-            <div class="bg-white rounded-lg border border-slate-200 p-12 text-center max-w-md mx-auto">
+        @if($vps->count() === 0 && (!isset($provisioningOrders) || $provisioningOrders->count() === 0))
+            <div class="bg-white rounded-lg border border-slate-200 p-10 text-center max-w-lg mx-auto">
                 <div class="w-12 h-12 rounded-lg bg-slate-100 text-slate-900 flex items-center justify-center mx-auto mb-3">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
                 </div>
                 <h3 class="text-base font-bold text-slate-900 mb-1">Belum Ada Layanan Aktif</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Server cloud, AI Agent, atau Dedicated Database Anda belum terdaftar. Pilih paket komputasi atau database terisolasi siap pakai melalui menu navigasi.
+                <p class="text-xs text-slate-500 leading-relaxed mb-5">
+                    Server cloud, AI Agent, atau Dedicated Database Anda belum terdaftar. Silakan pilih paket layanan untuk memulai:
                 </p>
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <a href="{{ route('home') }}#pricing" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-colors">
+                        <span>+ Tambah VPS</span>
+                    </a>
+                    <a href="{{ route('home') }}#ai-packages" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-colors">
+                        <span>+ Tambah AI Agent</span>
+                    </a>
+                    <a href="{{ route('home') }}#database-packages" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-colors">
+                        <span>+ Tambah Database</span>
+                    </a>
+                </div>
             </div>
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {{-- Cards untuk Pesanan yang Sedang Dalam Setup Server oleh Pihak VexaHost --}}
+                @if(isset($provisioningOrders))
+                    @foreach($provisioningOrders as $order)
+                        <div id="order-card-{{ $order->id }}" class="bg-white rounded-lg border border-slate-200 p-5 hover:border-slate-300 transition-colors flex flex-col justify-between">
+                            <div>
+                                <!-- Card Header -->
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+                                                <span>{{ $order->hostname ?? 'vx-server-' . $order->id }}</span>
+                                            </h3>
+                                            @if($order->isDatabasePackage())
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                    Managed DB
+                                                </span>
+                                            @elseif($order->isAiPackage())
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-800 border border-blue-200">
+                                                    AI Agent
+                                                </span>
+                                            @else
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-800 border border-slate-200">
+                                                    {{ $order->vpsSpec->name ?? 'Cloud VPS' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-slate-500 mt-0.5">Setup Server Sedang Berjalan</p>
+                                    </div>
+
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Dalam Setup
+                                    </span>
+                                </div>
+
+                                <!-- Status Info Box -->
+                                <div class="mb-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
+                                    <div class="flex items-center justify-between font-medium">
+                                        <span class="text-slate-900 font-semibold flex items-center gap-1.5">
+                                            <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Proses Setup Server
+                                        </span>
+                                        <span class="text-[11px] text-slate-500 font-mono-code">Order #{{ $order->id }}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                                        Pesanan telah terverifikasi. Server sedang dalam proses alokasi dan instalasi oleh tim VexaHost. Estimasi: 15-60 menit.
+                                    </p>
+                                </div>
+
+                                <!-- Hardware Specs -->
+                                <div class="bg-slate-50 rounded p-3 my-2 text-xs space-y-1 border border-slate-100">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Compute:</span>
+                                        <span class="font-semibold text-slate-900">
+                                            {{ $order->vpsSpec->cpu ?? 1 }} vCPU &bull; {{ $order->vpsSpec->ram ?? 1 }} GB RAM &bull; {{ $order->vpsSpec->disk ?? 20 }} GB SSD
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Provider &amp; DC:</span>
+                                        <span class="font-semibold text-slate-900 capitalize">{{ $order->provider_label }} · {{ $order->datacenter_location }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">OS &amp; Stack:</span>
+                                        <span class="font-semibold text-slate-900">{{ $order->os_label }} · {{ $order->control_panel_label }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Pembayaran:</span>
+                                        <span class="font-semibold text-emerald-600 font-mono-code">LUNAS &bull; Rp {{ number_format($order->amount, 0, ',', '.') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Actions -->
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 mt-2">
+                                <a href="{{ route('order.success', $order->id) }}"
+                                   class="flex-1 py-2 px-3 text-center rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-colors">
+                                    Lihat Detail &amp; Faktur
+                                </a>
+                                <a href="{{ route('dashboard.support') }}" title="Hubungi Tim Teknis"
+                                   class="py-2 px-3 text-center rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors">
+                                    Bantuan
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
                 @foreach($vps as $instance)
                     <div class="bg-white rounded-lg border {{ $instance->isDatabasePackage() ? 'border-emerald-300 ring-1 ring-emerald-300/40 shadow-xs' : ($instance->isAiPackage() ? 'border-blue-300 ring-1 ring-blue-300/40 shadow-xs' : 'border-slate-200') }} p-5 hover:border-slate-400 transition-colors flex flex-col justify-between">
                         <div>
@@ -356,3 +475,110 @@
     </div>
 </div>
 @endsection
+
+@if(isset($paymentSuccessOrder) && $paymentSuccessOrder)
+@push('scripts')
+<script>
+(function() {
+    function initPaymentSuccessModal() {
+        if (!window.Swal) {
+            setTimeout(initPaymentSuccessModal, 100);
+            return;
+        }
+
+        // Bersihkan query string di address bar browser agar tidak memicu alert berulang saat F5/reload
+        if (window.history && window.history.replaceState) {
+            const currentUrl = new URL(window.location.href);
+            if (currentUrl.searchParams.has('payment_success') || currentUrl.searchParams.has('order_id')) {
+                currentUrl.searchParams.delete('payment_success');
+                currentUrl.searchParams.delete('order_id');
+                window.history.replaceState({}, document.title, currentUrl.pathname + (currentUrl.search ? currentUrl.search : ''));
+            }
+        }
+
+        window.Swal.fire({
+            title: '<div class="text-xl sm:text-2xl font-bold text-slate-900 mt-2">Pembayaran Berhasil Dikonfirmasi!</div>',
+            html: `
+                <div class="text-left mt-3 space-y-3.5 text-xs text-slate-600">
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] text-emerald-800 font-semibold block">Status Pembayaran:</span>
+                            <span class="text-sm font-bold text-emerald-800 flex items-center gap-1">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                LUNAS
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-emerald-800 block font-mono-code">{{ $paymentSuccessOrder->invoice?->invoice_number ?? ('INV-' . $paymentSuccessOrder->id) }}</span>
+                            <span class="text-sm font-bold text-slate-900 font-mono-code">Rp {{ number_format($paymentSuccessOrder->amount, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                        <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                            <span class="text-slate-500">Layanan:</span>
+                            <span class="font-bold text-slate-900">{{ $paymentSuccessOrder->vpsSpec?->name ?? 'Cloud VPS' }}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                            <span class="text-slate-500">Server Hostname:</span>
+                            <span class="font-mono-code font-bold text-slate-900">{{ $paymentSuccessOrder->hostname ?? ('vx-server-' . $paymentSuccessOrder->id) }}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                            <span class="text-slate-500">OS & Stack:</span>
+                            <span class="font-semibold text-slate-800">{{ $paymentSuccessOrder->os_label }} · {{ $paymentSuccessOrder->control_panel_label }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Datacenter:</span>
+                            <span class="font-semibold text-slate-800 capitalize">{{ $paymentSuccessOrder->provider_label }} · {{ $paymentSuccessOrder->datacenter_location }}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-amber-50/90 border border-amber-200 rounded-xl text-amber-900 text-[11px] leading-relaxed">
+                        <div class="flex items-center gap-1.5 font-bold mb-1 text-amber-950">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Server Sedang Dalam Antrean Setup</span>
+                        </div>
+                        Pesanan Anda telah masuk ke tim teknis VexaHost untuk alokasi resource dan konfigurasi (estimasi 15-60 menit). Kredensial server (IP Publik, SSH, Root Password) akan otomatis dikirimkan ke email Anda begitu setup selesai.
+                    </div>
+                </div>
+            `,
+            icon: 'success',
+            iconColor: '#10b981',
+            confirmButtonText: 'Pantau Status Server',
+            confirmButtonColor: '#000000',
+            showCancelButton: true,
+            cancelButtonText: 'Tutup',
+            cancelButtonColor: '#64748b',
+            customClass: {
+                popup: 'rounded-2xl border border-slate-200 shadow-2xl p-6 sm:p-7 max-w-lg',
+                confirmButton: 'rounded-lg px-5 py-2.5 font-bold text-sm bg-black text-white hover:bg-neutral-800',
+                cancelButton: 'rounded-lg px-4 py-2.5 font-semibold text-sm',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const targetCard = document.getElementById('order-card-{{ $paymentSuccessOrder->id }}') || document.getElementById('provisioning-orders-section');
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetCard.classList.add('ring-2', 'ring-emerald-500', 'ring-offset-2', 'transition-all', 'duration-500');
+                    setTimeout(() => {
+                        targetCard.classList.remove('ring-2', 'ring-emerald-500', 'ring-offset-2');
+                    }, 3000);
+                }
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPaymentSuccessModal);
+    } else {
+        initPaymentSuccessModal();
+    }
+})();
+</script>
+@endpush
+@endif
+

@@ -274,7 +274,7 @@
                         <td style="vertical-align: middle;">
                             <div class="brand-title">VEXAHOST INDONESIA</div>
                             <div class="brand-subtitle">Cloud Infrastructure, Autonomous AI & Database</div>
-                            <div class="brand-address">Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta • support@vexahost.com • vexahost.com</div>
+                            <div class="brand-address">Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta • support@vexahostcloud.my.id • vexahostcloud.my.id</div>
                         </td>
                     </tr>
                 </table>

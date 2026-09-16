@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
         $this->call(VpsSpecSeeder::class);
 
         // 2. Single Admin Account (Dynamically Loaded from .env for Security)
-        $adminEmail = env('ADMIN_EMAIL', 'admin@vexahost.com');
-        $adminUsername = env('ADMIN_USERNAME', 'admin');
-        $adminName = env('ADMIN_NAME', 'Ryan Rizki');
-        $adminPassword = env('ADMIN_PASSWORD', '12345678');
-        $adminCompany = env('ADMIN_COMPANY', 'VexaHost Cloud Indonesia');
+        $adminEmail = env('ADMIN_EMAIL', env('SEED_ADMIN_EMAIL', 'vexahosttech@gmail.com'));
+        $adminUsername = env('ADMIN_USERNAME', env('SEED_ADMIN_USERNAME', 'mryanrizki11'));
+        $adminName = env('ADMIN_NAME', env('SEED_ADMIN_NAME', 'Ryan Rizki'));
+        $adminPassword = env('ADMIN_PASSWORD', env('SEED_ADMIN_PASSWORD', '12345678'));
+        $adminPhone = env('ADMIN_PHONE', env('SEED_ADMIN_PHONE', env('VEXAHOST_WHATSAPP', '6285774410978')));
+        $adminCompany = env('ADMIN_COMPANY', env('SEED_ADMIN_COMPANY', 'VexaHost Cloud Indonesia'));
 
         $admin = User::firstOrNew(['email' => $adminEmail]);
         $admin->forceFill([
@@ -27,8 +28,9 @@ class DatabaseSeeder extends Seeder
             'full_name' => $adminName,
             'password' => Hash::make($adminPassword),
             'is_admin' => true,
+            'email_verified_at' => now(),
             'channel' => 'website',
-            'phone' => env('ADMIN_PHONE', null),
+            'phone' => $adminPhone,
             'company' => $adminCompany,
             'address' => null,
         ])->save();

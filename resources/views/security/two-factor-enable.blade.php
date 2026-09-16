@@ -1,2 +1,21 @@
-@extends('layouts.dashboard', ['title' => 'Aktifkan 2FA', 'headerTitle' => 'Aktifkan 2FA'])
-@section('content')<div class="max-w-xl bg-white border border-slate-200 rounded-xl p-6"><h2 class="text-xl font-bold">Aktifkan authenticator</h2><p class="text-sm text-slate-500 mt-2">Tambahkan secret ini ke Google Authenticator, Authy, atau aplikasi TOTP lain.</p><div class="mt-5 rounded-lg bg-slate-50 border p-4"><p class="text-xs text-slate-500">Secret</p><code class="block mt-1 font-mono-code break-all">{{ $secret }}</code><p class="text-xs text-slate-500 mt-4">Provisioning URI</p><code class="block mt-1 text-xs break-all">{{ $qrUri }}</code></div><form method="POST" action="{{ route('security.two-factor.confirm') }}" class="mt-6 flex gap-2">@csrf<input name="code" required inputmode="numeric" placeholder="Kode 6 digit" class="flex-1 rounded-lg border border-slate-300 px-3 py-2.5"><button class="rounded-lg bg-black px-4 py-2.5 text-sm font-bold text-white">Konfirmasi</button></form></div>@endsection
+@extends('layouts.dashboard', ['title' => 'Aktifkan 2FA', 'headerTitle' => 'Aktifkan 2FA', 'backUrl' => route('security.settings'), 'backLabel' => 'Kembali ke Pengaturan Keamanan'])
+
+@section('content')
+<div class="max-w-xl space-y-4">
+    <div class="bg-white border border-slate-200 rounded-xl p-6">
+        <h2 class="text-xl font-bold">Aktifkan authenticator</h2>
+        <p class="text-sm text-slate-500 mt-2">Tambahkan secret ini ke Google Authenticator, Authy, atau aplikasi TOTP lain.</p>
+        <div class="mt-5 rounded-lg bg-slate-50 border p-4">
+            <p class="text-xs text-slate-500">Secret</p>
+            <code class="block mt-1 font-mono-code break-all">{{ $secret }}</code>
+            <p class="text-xs text-slate-500 mt-4">Provisioning URI</p>
+            <code class="block mt-1 text-xs break-all">{{ $qrUri }}</code>
+        </div>
+        <form method="POST" action="{{ route('security.two-factor.confirm') }}" class="mt-6 flex gap-2">
+            @csrf
+            <input name="code" required inputmode="numeric" placeholder="Kode 6 digit" class="flex-1 rounded-lg border border-slate-300 px-3 py-2.5">
+            <button class="rounded-lg bg-black px-4 py-2.5 text-sm font-bold text-white">Konfirmasi</button>
+        </form>
+    </div>
+</div>
+@endsection
