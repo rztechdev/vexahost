@@ -78,7 +78,7 @@
 
         <!-- Subtitle -->
         <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-            Deploy portfolio, bot Telegram 24 jam, REST API, hingga container Docker dengan akses root SSH penuh, storage NVMe RAID-10 ultra-cepat, dan pilihan 1-click control panel siap pakai.
+            Deploy portfolio, bot Telegram 24 jam, REST API, hingga container Docker dengan akses root SSH penuh, storage NVMe SSD, dan pilihan 1-click control panel siap pakai.
         </p>
 
         <!-- CTA Buttons -->
@@ -98,12 +98,12 @@
                 <p class="text-xs text-slate-400 mt-1">Mulai per bulan flat</p>
             </div>
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">&gt; 99.9%</p>
-                <p class="text-xs text-slate-400 mt-1">Uptime SLA Server</p>
+                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">Full Root</p>
+                <p class="text-xs text-slate-400 mt-1">Akses penuh ke server Anda</p>
             </div>
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">&lt; 2 jam</p>
-                <p class="text-xs text-slate-400 mt-1">Aktivasi setelah pembayaran</p>
+                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">1–2 Jam</p>
+                <p class="text-xs text-slate-400 mt-1">Aktivasi di jam kerja setelah bayar</p>
             </div>
             <div>
                 <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">100% ID</p>
@@ -246,7 +246,7 @@
                                 @elseif($spec->name === 'Mahasiswa Basic')
                                     Resource 2 vCPU lega untuk praktikum, mini server &amp; bot
                                 @elseif($spec->name === 'Standard')
-                                    Pilihan ideal website bisnis, REST API, &amp; bot 24 jam non-stop
+                                    Pilihan ideal website bisnis, REST API, &amp; bot yang berjalan 24 jam
                                 @elseif($spec->name === 'Premium')
                                     Multi-aplikasi Docker &amp; production klien beban tinggi
                                 @elseif($spec->name === 'Business' || $spec->name === 'AI Production Pro')
@@ -285,7 +285,7 @@
                                 </li>
                                 <li class="flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span><strong class="text-slate-900 font-bold text-sm">{{ $spec->disk }} GB</strong> NVMe SSD RAID-10</span>
+                                    <span><strong class="text-slate-900 font-bold text-sm">{{ $spec->disk }} GB</strong> NVMe SSD</span>
                                 </li>
                                 <li class="flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -426,7 +426,7 @@
                                 </li>
                                 <li class="flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span><strong class="text-slate-900 font-bold text-sm">{{ $package->disk }} GB</strong> NVMe SSD RAID-10</span>
+                                    <span><strong class="text-slate-900 font-bold text-sm">{{ $package->disk }} GB</strong> NVMe SSD</span>
                                 </li>
                                 <li class="flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -496,7 +496,7 @@
         <!-- Centered Header -->
         <div class="text-center max-w-2xl mx-auto mb-8">
             <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Paket Managed Database</h2>
-            <p class="text-sm text-slate-600 mt-2">Dedicated DB VPS terisolasi murni. Minim latensi (~3–10ms), aman, dan bebas dari OOM crash.</p>
+            <p class="text-sm text-slate-600 mt-2">Server database khusus yang terpisah dari server aplikasi, sehingga beban aplikasi tidak mengganggu database Anda.</p>
         </div>
 
         @php
@@ -808,7 +808,7 @@
                 </div>
                 <h3 class="text-base font-bold text-slate-900 mb-2">Dedicated Database Server</h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Jalankan instance PostgreSQL, MySQL, Redis, atau MongoDB dengan read/write IOPS tinggi dari NVMe SSD terisolasi.
+                    Jalankan PostgreSQL, MySQL, Redis, atau MongoDB di server database khusus dengan penyimpanan NVMe SSD.
                 </p>
             </div>
 
@@ -830,7 +830,7 @@
                 </div>
                 <h3 class="text-base font-bold text-slate-900 mb-2">Bot &amp; Background Workers</h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Jalankan bot Telegram, bot Discord, scheduled cron jobs, atau Python web scraper yang berjalan 24 jam stabil tanpa downtime.
+                    Jalankan bot Telegram, bot Discord, scheduled cron jobs, atau worker Python yang berjalan 24 jam di server Anda sendiri.
                 </p>
             </div>
 
@@ -849,8 +849,11 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- SECTION: ARSITEKTUR JARINGAN & NODE COMPUTE (Infrastruktur Cloud) -->
+<!-- SECTION: INFRASTRUKTUR CLOUD                                      -->
 <!-- ================================================================= -->
+{{-- Hanya fakta yang tercatat di sistem: penyedia, region, dan jenis virtualisasi.
+     Tidak ada angka ping, bandwidth node, kapasitas DDoS, atau sertifikasi fasilitas,
+     karena server dibeli dari penyedia dan tidak diukur sendiri oleh VexaHost. --}}
 <section class="py-20 bg-white text-slate-800 border-b border-slate-200 relative overflow-hidden" x-data="{ activeRegion: 'jakarta' }">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
@@ -858,181 +861,132 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
                 <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">
-                    Infrastruktur Cloud Enterprise
+                    Infrastruktur Cloud
                 </h2>
                 <p class="text-sm text-slate-600 mt-2 max-w-xl">
-                    Arsitektur node terisolasi hardware KVM tanpa overselling, terhubung langsung ke direct peering exchange nasional dan backbone gateway regional.
+                    Server VexaHost berjalan di atas infrastruktur Tencent Cloud dan Lintasarta Cloudeka, dengan virtualisasi KVM dan akses root penuh.
                 </p>
             </div>
 
-            <!-- Interactive Region Switcher -->
+            <!-- Region Switcher -->
             <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200 shrink-0 self-start md:self-auto">
                 <button @click="activeRegion = 'jakarta'"
                         :class="activeRegion === 'jakarta' ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'"
-                        class="px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-2">
-                    <span>Jakarta (Cyber 1)</span>
-                    <span class="px-1.5 py-0.5 rounded bg-blue-50 text-[#4A6FA5] border border-blue-100 text-[10px] font-mono-code font-bold">&lt; 3ms</span>
+                        class="px-4 py-2 rounded-lg text-xs transition-all">
+                    Jakarta
                 </button>
                 <button @click="activeRegion = 'singapore'"
                         :class="activeRegion === 'singapore' ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'"
-                        class="px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-2">
-                    <span>Singapore Hub</span>
-                    <span class="px-1.5 py-0.5 rounded bg-blue-50 text-[#4A6FA5] border border-blue-100 text-[10px] font-mono-code font-bold">~18ms</span>
+                        class="px-4 py-2 rounded-lg text-xs transition-all">
+                    Singapore
                 </button>
             </div>
         </div>
 
-        <!-- Telemetry & Network Topology Board -->
+        <!-- Detail Region -->
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8 mb-12 shadow-xs">
-            <!-- Region 1: Jakarta Cyber 1 -->
+            <!-- Region 1: Jakarta -->
             <div x-show="activeRegion === 'jakarta'" x-transition class="space-y-6">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-[#4A6FA5] flex items-center justify-center font-bold font-mono-code text-sm">
-                            JKT
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-base font-bold text-slate-900">Gedung Cyber 1, Kuningan Barat</h3>
-                                <span class="px-2 py-0.5 rounded bg-blue-50 text-[#4A6FA5] text-[11px] font-semibold border border-blue-200">Operational</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-0.5">Primary Domestic Datacenter Hub &bull; Direct Meet-Me-Room (MMR)</p>
-                        </div>
+                <div class="flex items-center gap-3 pb-6 border-b border-slate-200">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-[#4A6FA5] flex items-center justify-center font-bold font-mono-code text-sm">
+                        JKT
                     </div>
-
-                    <!-- Live Ping Grid -->
-                    <div class="flex flex-wrap items-center gap-2 font-mono-code text-xs">
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Telkomsel:</span> <strong class="text-[#4A6FA5]">2.8ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Indosat:</span> <strong class="text-[#4A6FA5]">3.1ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Biznet:</span> <strong class="text-[#4A6FA5]">2.2ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">XL Axiata:</span> <strong class="text-[#4A6FA5]">3.4ms</strong>
-                        </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Datacenter Jakarta</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Untuk aplikasi yang melayani pengguna di Indonesia</p>
                     </div>
                 </div>
 
-                <!-- Peering Details Row -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 text-xs">
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Direct Exchange Peering</span>
-                        <p class="text-slate-900 font-bold text-sm">OpenIXP, IIX (APJII), &amp; CDIX</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Koneksi langsung ke jalur pertukaran data internet terbesar di Indonesia tanpa transit perantara.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Penyedia Infrastruktur</span>
+                        <p class="text-slate-900 font-bold text-sm">Tencent Cloud &amp; Lintasarta Cloudeka</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">Penyedia mengikuti paket yang Anda pesan dan tercantum di dashboard.</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Kapasitas Bandwidth Node</span>
-                        <p class="text-slate-900 font-bold text-sm">10 Gbps Redundant Fiber Uplink</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Bebas bottleneck transfer data untuk melayani ribuan concurrent API request tanpa lonjakan latensi.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Cocok Untuk</span>
+                        <p class="text-slate-900 font-bold text-sm">Layanan dengan Pengguna Lokal</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">E-commerce Indonesia, API pembayaran, web sekolah, dan aplikasi yang diakses dari jaringan domestik.</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Sertifikasi &amp; Standar Daya</span>
-                        <p class="text-slate-900 font-bold text-sm">Tier-3 Facility &amp; N+1 Power Genset</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Dilengkapi dual power feed independen, UPS industri, dan sistem pendingin presisi temperatur konstan.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Akses Server</span>
+                        <p class="text-slate-900 font-bold text-sm">IP Publik &amp; Root SSH</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">Setiap server mendapat IP publik sendiri dan akses root penuh.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Region 2: Singapore International Gateway -->
+            <!-- Region 2: Singapore -->
             <div x-show="activeRegion === 'singapore'" x-transition class="space-y-6" style="display: none;">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-[#4A6FA5] flex items-center justify-center font-bold font-mono-code text-sm">
-                            SIN
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-base font-bold text-slate-900">Singapore Gateway (Tier-3)</h3>
-                                <span class="px-2 py-0.5 rounded bg-blue-50 text-[#4A6FA5] text-[11px] font-semibold border border-blue-200">Operational</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-0.5">International Backbone Hub &bull; Multi-Homed Tier-1 Upstream</p>
-                        </div>
+                <div class="flex items-center gap-3 pb-6 border-b border-slate-200">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-[#4A6FA5] flex items-center justify-center font-bold font-mono-code text-sm">
+                        SIN
                     </div>
-
-                    <!-- Live Ping Grid -->
-                    <div class="flex flex-wrap items-center gap-2 font-mono-code text-xs">
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Jakarta &harr; SG:</span> <strong class="text-[#4A6FA5]">18.4ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Kuala Lumpur:</span> <strong class="text-[#4A6FA5]">12.1ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Bangkok:</span> <strong class="text-[#4A6FA5]">29.6ms</strong>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                            <span class="text-slate-500">Hong Kong:</span> <strong class="text-[#4A6FA5]">34.2ms</strong>
-                        </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Datacenter Singapore</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Untuk rute internasional dan integrasi layanan global</p>
                     </div>
                 </div>
 
-                <!-- Peering Details Row -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 text-xs">
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Global Tier-1 Transit</span>
-                        <p class="text-slate-900 font-bold text-sm">SingTel, Telstra, &amp; Hurricane Electric</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Rute internasional optimal untuk pengguna global, integrasi API GitHub, OpenAI, dan cloud publik.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Penyedia Infrastruktur</span>
+                        <p class="text-slate-900 font-bold text-sm">Tencent Cloud</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">Tersedia untuk paket yang berjalan di Tencent Cloud.</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Kapasitas Scrubbing DDoS</span>
-                        <p class="text-slate-900 font-bold text-sm">Automated Terabit Cloud Shield</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Mitigasi otomatis serangan volumetrik SYN Flood, UDP reflection, dan DNS amplification secara instan.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Cocok Untuk</span>
+                        <p class="text-slate-900 font-bold text-sm">Integrasi Layanan Global</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">Bot Discord, integrasi API GitHub dan OpenAI, serta server staging untuk pengguna lintas negara.</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Sertifikasi Keamanan</span>
-                        <p class="text-slate-900 font-bold text-sm">ISO 27001 &amp; SOC 2 Type II Facility</p>
-                        <p class="text-slate-600 mt-1 leading-relaxed">Standar tata kelola keamanan informasi fisik dengan autentikasi biometrik multi-tahap.</p>
+                        <span class="text-slate-400 font-mono-code uppercase text-[11px] block mb-1">Akses Server</span>
+                        <p class="text-slate-900 font-bold text-sm">IP Publik &amp; Root SSH</p>
+                        <p class="text-slate-600 mt-1 leading-relaxed">Setiap server mendapat IP publik sendiri dan akses root penuh.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Hardware & Compute Kernel Strip (Chassis Blueprint) -->
+        <!-- Fondasi Server -->
         <div class="grid grid-cols-1 lg:grid-cols-3 border border-slate-200 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 rounded-2xl bg-white shadow-xs overflow-hidden">
-            <!-- Col 1 -->
             <div class="p-6 sm:p-7">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-[#4A6FA5] font-mono-code font-bold text-xs">KERNEL 01</span>
-                    <h4 class="text-base font-bold text-slate-900">Hardware KVM Virtualization</h4>
+                    <h4 class="text-base font-bold text-slate-900">Virtualisasi KVM</h4>
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Setiap core CPU dan RAM diisolasi secara native pada level kernel Linux. <strong>Zero CPU Steal Policy</strong> memastikan thread compute aplikasi Anda tidak terganggu beban tetangga server.
+                    Setiap VPS berjalan sebagai mesin virtual KVM dengan kernel sendiri, dengan alokasi vCPU dan RAM sesuai paket yang Anda pilih.
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-[11px] font-mono-code text-[#4A6FA5] font-semibold">
-                    <span>✓</span> Isolasi resource 100% murni
+                    <span>✓</span> Akses root penuh
                 </div>
             </div>
 
-            <!-- Col 2 -->
             <div class="p-6 sm:p-7">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-[#4A6FA5] font-mono-code font-bold text-xs">STORAGE 02</span>
-                    <h4 class="text-base font-bold text-slate-900">Enterprise NVMe RAID-10</h4>
+                    <h4 class="text-base font-bold text-slate-900">Penyimpanan NVMe SSD</h4>
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Penyimpanan disk SSD NVMe berkecepatan baca/tulis hingga 3.500 MB/s dan <strong>450.000+ IOPS</strong>. Konfigurasi RAID-10 menjamin integritas data tetap aman meski terjadi kerusakan drive fisik.
+                    Disk NVMe SSD dari penyedia infrastruktur dengan kapasitas sesuai paket. Pencadangan data tetap menjadi tanggung jawab pemilik server.
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-[11px] font-mono-code text-[#4A6FA5] font-semibold">
-                    <span>✓</span> Auto-rebuild disk redundancy
+                    <span>✓</span> Kapasitas tercantum di setiap paket
                 </div>
             </div>
 
-            <!-- Col 3 -->
             <div class="p-6 sm:p-7">
                 <div class="flex items-center gap-3 mb-3">
-                    <span class="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-[#4A6FA5] font-mono-code font-bold text-xs">DEFENSE 03</span>
-                    <h4 class="text-base font-bold text-slate-900">Always-On L3/L4/L7 DDoS Filter</h4>
+                    <span class="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-[#4A6FA5] font-mono-code font-bold text-xs">SECURITY 03</span>
+                    <h4 class="text-base font-bold text-slate-900">Keamanan di Tangan Anda</h4>
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Sistem penyaringan BGP Flowspec cerdas yang menyaring traffic jahat dalam hitungan milidetik. Server Anda tetap dapat diakses publik tanpa throttling saat serangan siber terjadi.
+                    Atur firewall (UFW), login SSH key, dan Fail2ban sesuai kebutuhan aplikasi Anda. Panduan langkah demi langkah tersedia di dokumentasi.
                 </p>
-                <div class="mt-4 flex items-center gap-2 text-[11px] font-mono-code text-[#4A6FA5] font-semibold">
-                    <span>✓</span> Proteksi otomatis bawaan aktif
-                </div>
+                <a href="{{ route('docs') }}" class="mt-4 inline-flex items-center gap-2 text-[11px] font-mono-code text-[#4A6FA5] font-semibold hover:underline">
+                    <span>✓</span> Buka panduan hardening
+                </a>
             </div>
         </div>
 
@@ -1179,8 +1133,8 @@
                             <p class="text-slate-400"># 1. Inisialisasi Autonomous Agent &amp; Omniroute Proxy</p>
                             <p class="text-white"><span class="text-[#6588BC] font-bold">$</span> hermes-agent start --workers=4 --proxy-port=8080</p>
                             <p class="text-slate-400">&gt; Loading vector embeddings cache from NVMe SSD arrays...</p>
-                            <p class="text-slate-400">&gt; Sandbox process ready. 0% CPU steal, 100% compute dedicated.</p>
-                            <p class="text-white font-bold">✓ Worker AI agent berjalan 24 jam non-stop tanpa interupsi!</p>
+                            <p class="text-slate-400">&gt; Sandbox process ready.</p>
+                            <p class="text-white font-bold">✓ Worker AI agent aktif berjalan di background.</p>
                             <p class="text-slate-500 pt-2">Status: <span class="text-slate-300">Active Background Daemon (PID: 14022)</span></p>
                         </div>
                     </div>
@@ -1206,48 +1160,48 @@
         <!-- Header minimalis -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 mb-8 border-b border-slate-200">
             <div>
-                <h3 class="text-lg sm:text-xl font-bold text-slate-900">Kepatuhan Keamanan &amp; Jaminan Layanan Resmi</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900">Keamanan &amp; Layanan</h3>
             </div>
             <p class="text-xs text-slate-600 max-w-md">
-                Infrastruktur dan data Anda dilindungi oleh standar tata kelola teknis berlapis dan diawasi oleh tim operasional profesional.
+                Hal-hal yang kami terapkan pada setiap layanan VexaHost.
             </p>
         </div>
 
         <!-- Unified 4-Column Horizontal Assurance Matrix -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Pillar 1: ISO -->
+            <!-- Pillar 1: Penyedia infrastruktur -->
             <div class="space-y-2 border-l-2 border-[#4A6FA5] pl-4">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">ISO/IEC 27001</span>
-                    <span class="text-[11px] text-slate-500 font-semibold">Audit Compliant</span>
+                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Tencent &amp; Cloudeka</span>
+                    <span class="text-[11px] text-slate-500 font-semibold">Penyedia Cloud</span>
                 </div>
-                <h4 class="text-sm font-bold text-slate-900">Sertifikasi Fisik Datacenter</h4>
+                <h4 class="text-sm font-bold text-slate-900">Infrastruktur Penyedia Besar</h4>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Fasilitas hosting diawasi CCTV 24 jam, pintu biometrik berotoritas ganda, dan kepatuhan sistem manajemen keamanan informasi berstandar internasional.
+                    Server berjalan di infrastruktur Tencent Cloud dan Lintasarta Cloudeka, dengan pilihan lokasi Jakarta dan Singapore.
                 </p>
             </div>
 
             <!-- Pillar 2: SSL/TLS -->
             <div class="space-y-2 border-l-2 border-[#4A6FA5] pl-4">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">TLS 1.3 / AES-256</span>
-                    <span class="text-[11px] text-slate-500 font-semibold">Bank-Grade</span>
+                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">HTTPS / AES-256</span>
+                    <span class="text-[11px] text-slate-500 font-semibold">Terenkripsi</span>
                 </div>
-                <h4 class="text-sm font-bold text-slate-900">Enkripsi Data Menyeluruh</h4>
+                <h4 class="text-sm font-bold text-slate-900">Kredensial Terenkripsi</h4>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Setiap komunikasi web dashboard, API webhook, dan transmisi kredensial dienkripsi dengan cipher suite kelas perbankan dan proteksi HSTS.
+                    Dashboard dan webhook diakses lewat HTTPS dengan HSTS, dan password root disimpan terenkripsi AES-256 serta hanya bisa dibuka setelah verifikasi password akun.
                 </p>
             </div>
 
-            <!-- Pillar 3: SLA -->
+            <!-- Pillar 3: Permintaan server ditangani tim -->
             <div class="space-y-2 border-l-2 border-[#4A6FA5] pl-4">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">SLA 99.9%</span>
-                    <span class="text-[11px] text-slate-500 font-semibold">Money-Backed</span>
+                    <span class="text-xs font-bold font-mono-code text-[#4A6FA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Maks. 6 Jam Kerja</span>
+                    <span class="text-[11px] text-slate-500 font-semibold">Status Transparan</span>
                 </div>
-                <h4 class="text-sm font-bold text-slate-900">Garansi Uptime Mengikat</h4>
+                <h4 class="text-sm font-bold text-slate-900">Permintaan Ditangani Tim</h4>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Jaminan ketersediaan daya &amp; jaringan terikat kontrak SLA. Kompensasi kredit tagihan otomatis jika terjadi anomali di luar toleransi operasional.
+                    Reinstall OS atau server yang tidak bisa diakses diajukan dari dashboard dan dikerjakan langsung oleh tim kami. Perkembangannya bisa Anda pantau sampai selesai.
                 </p>
             </div>
 
@@ -1412,7 +1366,7 @@
                     <span class="text-slate-400 font-mono-code text-base" x-text="openFaq === 4 ? '−' : '+'">+</span>
                 </button>
                 <div x-show="openFaq === 4" class="mt-3 text-xs text-slate-600 leading-relaxed" style="display: none;">
-                    Tersedia dua opsi lokasi datacenter: Singapore (International Gateway Backbone untuk konektivitas regional optimal) dan Indonesia (Gedung Cyber 1 Jakarta untuk rute IIX/OpenIXP domestik tercepat &lt; 5ms).
+                    Tersedia dua opsi lokasi datacenter: Jakarta (Tencent Cloud dan Lintasarta Cloudeka) untuk pengguna di Indonesia, dan Singapore (Tencent Cloud) untuk rute internasional. Lokasi dipilih saat pemesanan dan tercantum di dashboard.
                 </div>
             </div>
         </div>
@@ -1565,21 +1519,21 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs text-xs">
                     <div>
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Resmi</span>
-                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">support@vexahostcloud.my.id</p>
+                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">{{ app(\App\Services\SettingsService::class)->get('support_email', 'support@vexahostcloud.my.id') }}</p>
                         <p class="text-slate-500 mt-0.5">Untuk pertanyaan umum, pengajuan tiket &amp; kerjasama</p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jam Layanan Operasional</span>
-                        <p class="text-sm font-bold text-slate-900 mt-0.5">Senin – Sabtu: 09:00 – 18:00 WIB</p>
-                        <p class="text-slate-500 mt-0.5">Monitoring stabilitas node server hardware 24/7 non-stop</p>
+                        <p class="text-sm font-bold text-slate-900 mt-0.5">{{ app(\App\Services\SettingsService::class)->get('support_hours', 'Senin–Jumat, 09.00–17.00 WIB') }}</p>
+                        <p class="text-slate-500 mt-0.5">Tiket dan pesan di luar jam ini dibalas pada jam kerja berikutnya.</p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Lokasi Datacenter</span>
                         <p class="text-slate-700 mt-1 leading-relaxed">
-                            &bull; <strong>Jakarta:</strong> Gedung Cyber 1, Kuningan Barat (Direct IIX &amp; OpenIXP)<br>
-                            &bull; <strong>Singapore:</strong> International Gateway Hub (Tier-3 Backbone)
+                            &bull; <strong>Jakarta:</strong> Tencent Cloud &amp; Lintasarta Cloudeka<br>
+                            &bull; <strong>Singapore:</strong> Tencent Cloud
                         </p>
                     </div>
 

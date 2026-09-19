@@ -12,9 +12,15 @@
  */
 return [
 
-    'terms_version' => env('TERMS_VERSION', 'TOS-2026-V3'),
+    // V4 (2026-09-19): dokumen SLA dan janji persentase uptime dihapus, Pasal 3
+    // dan 6 disesuaikan dengan infrastruktur penyedia pihak ketiga.
+    //
+    // Sengaja TIDAK dibaca dari env: isi naskah ada di repo (resources/views/pages/terms.blade.php),
+    // jadi versinya harus ikut repo. Env lama di server (mis. TERMS_VERSION=...V3)
+    // tidak boleh bisa menimpa versi naskah yang sebenarnya tampil.
+    'terms_version' => 'TOS-2026-V4',
 
-    'terms_effective_date' => env('TERMS_EFFECTIVE_DATE', '2026-09-18'),
+    'terms_effective_date' => '2026-09-19',
 
     /*
      * Larangan yang wajib selaras dengan Acceptable Use Policy Supplier.

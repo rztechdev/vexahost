@@ -33,7 +33,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 6px 0; color: #71717a;">Waktu:</td>
-                    <td style="padding: 6px 0; color: #000000;">{{ $activity->created_at?->translatedFormat('d F Y, H:i') }} WIB</td>
+                    <td style="padding: 6px 0; color: #000000;">{{ $activity->created_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y, H:i') }} WIB</td>
                 </tr>
             </table>
         </td>

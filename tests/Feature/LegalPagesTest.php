@@ -58,19 +58,10 @@ class LegalPagesTest extends TestCase
         $response->assertSee('PASAL 1');
     }
 
-    public function test_service_level_agreement_page_loads_and_renders_sla_matrix_without_emojis(): void
+    public function test_removed_sla_page_redirects_permanently_to_terms(): void
     {
-        $response = $this->get('/sla');
-        $response->assertStatus(200);
-
-        $content = $response->getContent();
-        $this->assertNoEmojis($content);
-
-        $response->assertSee('Service Level Agreement (SLA 99.9%)');
-        $response->assertSee('99.90%');
-        $response->assertSee('Service Credit');
-        $response->assertSee('43 Menit');
-        $response->assertSee('PASAL 1');
+        // VexaHost tidak menjanjikan persentase uptime; tautan lama tetap berfungsi.
+        $this->get('/sla')->assertRedirect('/terms')->assertStatus(301);
     }
 
     public function test_refund_policy_page_loads_and_renders_refund_clauses_without_emojis(): void
@@ -90,7 +81,7 @@ class LegalPagesTest extends TestCase
 
     public function test_legal_pages_have_working_cross_document_navigation_links(): void
     {
-        $pages = ['/terms', '/privacy', '/sla', '/refund'];
+        $pages = ['/terms', '/privacy', '/refund'];
 
         foreach ($pages as $url) {
             $response = $this->get($url);
@@ -98,8 +89,8 @@ class LegalPagesTest extends TestCase
 
             $response->assertSee(route('terms'));
             $response->assertSee(route('privacy'));
-            $response->assertSee(route('sla'));
             $response->assertSee(route('refund'));
+            $response->assertDontSee('SLA 99.9%');
         }
     }
 }

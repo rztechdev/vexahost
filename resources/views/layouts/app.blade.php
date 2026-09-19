@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     @php
         $seoTitle = $title ?? 'VexaHost — Cloud VPS NVMe KVM Indonesia Mulai Rp 80rb/bln';
-        $seoDescription = $description ?? 'Platform Cloud VPS KVM berkinerja tinggi di Datacenter Jakarta. Spesifikasi 100% NVMe, latency rendah <10ms, Managed DB, & AI Stack siap pakai mulai Rp 80rb.';
+        $seoDescription = $description ?? 'Cloud VPS KVM dengan datacenter Jakarta & Singapore. Penyimpanan NVMe SSD, akses root penuh, Managed DB, & AI Stack siap pakai mulai Rp 80rb.';
         $seoKeywords = $keywords ?? 'cloud vps indonesia, sewa vps murah, vps nvme jakarta, vps mahasiswa, vps kvm murah, managed database postgresql mysql, vps ai server, vexahost';
         $seoImage = asset('images/promo-banner.webp');
         $canonicalUrl = url()->current();
@@ -215,7 +215,7 @@
                                             <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">Managed Database</p>
                                             <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
                                         </div>
-                                        <p class="text-xs text-slate-500 leading-snug">Dedicated DB VPS bebas OOM crash &amp; latency rendah.</p>
+                                        <p class="text-xs text-slate-500 leading-snug">Server database khusus, terpisah dari aplikasi.</p>
                                     </div>
                                 </a>
                             </div>
@@ -664,11 +664,11 @@
                         <span class="text-xl font-bold tracking-tight text-white">Vexa<span class="text-[#6588BC]">Host</span></span>
                     </div>
                     <p class="text-sm leading-relaxed text-slate-400 max-w-sm">
-                        Platform cloud VPS KVM berkinerja tinggi di Indonesia. Menyediakan compute terisolasi, storage NVMe RAID-10 cepat, dan kemudahan 1-click control panel.
+                        Platform cloud VPS KVM di Indonesia dengan akses root penuh, storage NVMe SSD, dan kemudahan 1-click control panel.
                     </p>
                     <div class="space-y-1 text-xs text-slate-400">
                         <p class="text-slate-400 font-normal">Created by <span class="text-slate-300 font-normal">RZ Digital Creative</span></p>
-                        <p>Infrastruktur: Tier-3 Datacenter Singapore &amp; Cyber Building Jakarta</p>
+                        <p>Infrastruktur: Tencent Cloud &amp; Lintasarta Cloudeka (Jakarta &amp; Singapore)</p>
                     </div>
                 </div>
 
@@ -708,7 +708,6 @@
                     <ul class="space-y-2.5 text-xs">
                         <li><a href="{{ route('terms') }}" class="hover:text-white transition-colors">Ketentuan Layanan (ToS)</a></li>
                         <li><a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Kebijakan Privasi</a></li>
-                        <li><a href="{{ route('sla') }}" class="hover:text-white transition-colors">SLA 99.9% Uptime</a></li>
                         <li><a href="{{ route('refund') }}" class="hover:text-white transition-colors">Kebijakan Refund</a></li>
                         <li><a href="{{ route('terms') }}#aup" class="hover:text-white transition-colors">Acceptable Use (AUP)</a></li>
                     </ul>
@@ -757,8 +756,6 @@
                     <a href="{{ route('terms') }}" class="hover:text-slate-300 transition-colors">Terms of Service</a>
                     <span>&bull;</span>
                     <a href="{{ route('privacy') }}" class="hover:text-slate-300 transition-colors">Privacy Policy</a>
-                    <span>&bull;</span>
-                    <a href="{{ route('sla') }}" class="hover:text-slate-300 transition-colors">SLA 99.9%</a>
                     <span>&bull;</span>
                     <a href="{{ route('refund') }}" class="hover:text-slate-300 transition-colors">Refund Policy</a>
                 </div>

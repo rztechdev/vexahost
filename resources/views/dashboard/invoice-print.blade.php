@@ -115,11 +115,11 @@
                 </div>
                 <div>
                     <span class="text-neutral-500 block text-[10px] uppercase font-bold">Tanggal Terbit</span>
-                    <span class="font-bold text-black">{{ $invoice->issued_at ? $invoice->issued_at->format('d F Y') : $invoice->created_at->format('d F Y') }}</span>
+                    <span class="font-bold text-black">{{ $invoice->issued_at ? $invoice->issued_at->timezone('Asia/Jakarta')->format('d F Y') : $invoice->created_at->timezone('Asia/Jakarta')->format('d F Y') }}</span>
                 </div>
                 <div>
                     <span class="text-neutral-500 block text-[10px] uppercase font-bold">Jatuh Tempo</span>
-                    <span class="font-bold text-black">{{ $invoice->due_at ? $invoice->due_at->format('d F Y') : '-' }}</span>
+                    <span class="font-bold text-black">{{ $invoice->due_at ? $invoice->due_at->timezone('Asia/Jakarta')->format('d F Y') : '-' }}</span>
                 </div>
                 <div>
                     <span class="text-neutral-500 block text-[10px] uppercase font-bold">Metode Bayar</span>
@@ -147,7 +147,7 @@
                                 <div class="text-neutral-600 text-[11px] mt-1 space-y-0.5">
                                     <p>&bull; Hostname: <span class="font-mono-code font-semibold text-black">{{ $invoice->order->hostname ?? 'vps-' . $invoice->order->id }}</span> &bull; Provider: {{ $invoice->order->provider_label ?? 'Enterprise Cloud' }}</p>
                                     <p>&bull; Komputasi: {{ $invoice->order->vpsSpec->cpu ?? 2 }} vCPU &bull; Memory: {{ $invoice->order->vpsSpec->ram ?? 4 }} GB RAM &bull; Disk: {{ $invoice->order->vpsSpec->disk ?? 60 }} GB NVMe</p>
-                                    <p>&bull; Datacenter: {{ ucfirst($invoice->order->datacenter_location ?? 'Indonesia') }} Tier-3 &bull; OS: {{ $invoice->order->os_label }} &bull; Panel: {{ $invoice->order->control_panel_label }}</p>
+                                    <p>&bull; Datacenter: {{ ucfirst($invoice->order->datacenter_location ?? 'Indonesia') }} &bull; OS: {{ $invoice->order->os_label }} &bull; Panel: {{ $invoice->order->control_panel_label }}</p>
                                 </div>
                             </td>
                             <td class="p-3 text-center text-neutral-700 border-r border-neutral-200">
@@ -206,7 +206,7 @@
                 <span class="font-bold text-black uppercase tracking-wider block mb-1">Status & Konfirmasi Pembayaran Elektronik:</span>
                 @if($isPaid)
                     <p class="text-neutral-800">Pembayaran faktur ini telah <strong>BERHASIL DITERIMA & DIVERIFIKASI</strong> secara otomatis oleh sistem penagihan VexaHost.</p>
-                    <p class="text-neutral-600 text-[11px] mt-0.5">Waktu Pelunasan: <strong>{{ $invoice->order->paid_at ? $invoice->order->paid_at->format('d F Y, H:i:s') . ' WIB' : '-' }}</strong> &bull; Ref: <strong class="font-mono-code">{{ $invoice->order->payment_reference ?? 'SETTLED-' . $invoice->id }}</strong></p>
+                    <p class="text-neutral-600 text-[11px] mt-0.5">Waktu Pelunasan: <strong>{{ $invoice->order->paid_at ? $invoice->order->paid_at->timezone('Asia/Jakarta')->format('d F Y, H:i:s') . ' WIB' : '-' }}</strong> &bull; Ref: <strong class="font-mono-code">{{ $invoice->order->payment_reference ?? 'SETTLED-' . $invoice->id }}</strong></p>
                 @else
                     <p class="text-neutral-800">Faktur ini berstatus <strong>MENUNGGU PEMBAYARAN</strong>. Silakan selesaikan pembayaran sebelum tanggal jatuh tempo.</p>
                 @endif

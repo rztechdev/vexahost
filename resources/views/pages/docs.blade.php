@@ -15,11 +15,11 @@
     },
     sections: [
         { id: 'intro', title: 'Pengenalan Arsitektur Cloud', category: 'Mulai Cepat' },
-        { id: 'provisioning', title: 'Siklus Otomasi Provisioning', category: 'Mulai Cepat' },
+        { id: 'provisioning', title: 'Alur Aktivasi Server', category: 'Mulai Cepat' },
         { id: 'ssh-access', title: 'Akses SSH & Manajemen Kredensial', category: 'Mulai Cepat' },
         { id: 'dual-provider', title: 'Arsitektur Dual-Provider (Tencent & Cloudeka)', category: 'Infrastruktur' },
         { id: 'datacenters', title: 'Lokasi Datacenter & Peering Jaringan', category: 'Infrastruktur' },
-        { id: 'storage', title: 'Storage NVMe RAID-10 Enterprise', category: 'Infrastruktur' },
+        { id: 'storage', title: 'Penyimpanan NVMe SSD', category: 'Infrastruktur' },
         { id: 'stack-coolify', title: 'Coolify Self-Hosted Platform', category: 'Control Panel' },
         { id: 'stack-dokploy', title: 'Dokploy Modern PaaS Deployment', category: 'Control Panel' },
         { id: 'stack-aapanel', title: 'aaPanel & Traditional Stack (LEMP/LAMP)', category: 'Control Panel' },
@@ -27,10 +27,10 @@
         { id: 'security-ufw', title: 'Konfigurasi Firewall UFW & Port', category: 'Keamanan' },
         { id: 'security-ssh', title: 'Hardening SSH & Port Relocation', category: 'Keamanan' },
         { id: 'security-fail2ban', title: 'Fail2ban & Mitigasi Brute Force', category: 'Keamanan' },
-        { id: 'ops-power', title: 'Manajemen Siklus Power Instance', category: 'Operasional' },
+        { id: 'ops-power', title: 'Restart & Server Tidak Merespons', category: 'Operasional' },
         { id: 'ops-reinstall', title: 'Reinstall Sistem Operasi', category: 'Operasional' },
-        { id: 'ops-monitoring', title: 'Monitoring Resource & Alokasi Kuota', category: 'Operasional' },
-        { id: 'ops-billing', title: 'Siklus Tagihan & Auto-Suspension', category: 'Operasional' },
+        { id: 'ops-monitoring', title: 'Memantau Pemakaian Resource', category: 'Operasional' },
+        { id: 'ops-billing', title: 'Siklus Tagihan & Masa Tenggang', category: 'Operasional' },
         { id: 'api-auth', title: 'Autentikasi & Security Header API', category: 'API Reference' },
         { id: 'api-vps-status', title: 'Endpoint Status Instance (GET)', category: 'API Reference' },
         { id: 'api-shopee-process', title: 'Endpoint Otomasi Shopee (POST)', category: 'API Reference' },
@@ -63,10 +63,9 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                     <span class="text-slate-300">/</span>
                     <span class="text-xs font-semibold text-slate-900 font-mono-code">v1.4 Enterprise</span>
                 </div>
-                <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                    Sistem Operasional Normal
-                </span>
+                <a href="{{ route('status') }}" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">
+                    Cek Status Layanan &rarr;
+                </a>
             </div>
 
             <!-- Quick Search Input Trigger -->
@@ -160,7 +159,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                             <a href="#provisioning" @click="activeSection = 'provisioning'"
                                :class="activeSection === 'provisioning' ? 'bg-slate-200/70 text-slate-900 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'"
                                class="block px-3 py-2 rounded-lg transition-colors">
-                                Siklus Otomasi Provisioning
+                                Alur Aktivasi Server
                             </a>
                         </li>
                         <li>
@@ -198,7 +197,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                             <a href="#storage" @click="activeSection = 'storage'"
                                :class="activeSection === 'storage' ? 'bg-slate-200/70 text-slate-900 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'"
                                class="block px-3 py-2 rounded-lg transition-colors">
-                                Storage NVMe RAID-10 Enterprise
+                                Penyimpanan NVMe SSD
                             </a>
                         </li>
                     </ul>
@@ -284,7 +283,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                             <a href="#ops-power" @click="activeSection = 'ops-power'"
                                :class="activeSection === 'ops-power' ? 'bg-slate-200/70 text-slate-900 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'"
                                class="block px-3 py-2 rounded-lg transition-colors">
-                                Manajemen Siklus Power
+                                Restart & Server Tidak Merespons
                             </a>
                         </li>
                         <li>
@@ -298,14 +297,14 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                             <a href="#ops-monitoring" @click="activeSection = 'ops-monitoring'"
                                :class="activeSection === 'ops-monitoring' ? 'bg-slate-200/70 text-slate-900 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'"
                                class="block px-3 py-2 rounded-lg transition-colors">
-                                Monitoring Resource & Quota
+                                Memantau Pemakaian Resource
                             </a>
                         </li>
                         <li>
                             <a href="#ops-billing" @click="activeSection = 'ops-billing'"
                                :class="activeSection === 'ops-billing' ? 'bg-slate-200/70 text-slate-900 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'"
                                class="block px-3 py-2 rounded-lg transition-colors">
-                                Siklus Tagihan & Auto-Suspension
+                                Siklus Tagihan & Masa Tenggang
                             </a>
                         </li>
                     </ul>
@@ -354,7 +353,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                 <!-- Support Ticket Widget in Sidebar -->
                 <div class="p-4 rounded-xl border border-slate-200 bg-white">
                     <p class="font-bold text-slate-900 text-xs mb-1">Butuh Bantuan Teknis?</p>
-                    <p class="text-slate-500 text-[11px] leading-relaxed mb-3">Tim engineer VexaHost siaga 24/7 untuk investigasi konfigurasi server Anda.</p>
+                    <p class="text-slate-500 text-[11px] leading-relaxed mb-3">Tim VexaHost membantu kendala server Anda pada jam kerja.</p>
                     <a href="{{ route('dashboard.support') }}" class="block text-center py-2 px-3 rounded-lg bg-slate-900 text-white font-bold text-[11px] hover:bg-black transition-colors">
                         Buka Tiket Dukungan
                     </a>
@@ -375,7 +374,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                         Pengenalan Arsitektur Cloud VexaHost
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        VexaHost adalah platform komputasi awan berbasis KVM (Kernel-based Virtual Machine) yang didesain secara spesifik untuk beban kerja modern developer, startup SaaS, automasi bot, dan hosting mandiri berkecepatan tinggi. Setiap instans VPS dialokasikan dengan sumber daya komputasi terisolasi penuh, menjamin performa vCPU, RAM dedicated ECC, serta throughput NVMe yang konsisten tanpa efek <em>noisy neighbor</em>.
+                        VexaHost adalah platform komputasi awan berbasis KVM (Kernel-based Virtual Machine) yang didesain secara spesifik untuk beban kerja modern developer, startup SaaS, automasi bot, dan hosting mandiri berkecepatan tinggi. Setiap VPS mendapat alokasi vCPU, RAM, dan penyimpanan NVMe sesuai paket yang dipilih, lengkap dengan akses root penuh.
                     </p>
 
                     <!-- Alert Note Box -->
@@ -390,17 +389,17 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
 
                 <hr class="border-slate-200">
 
-                <!-- SECTION: SIKLUS OTOMASI PROVISIONING -->
+                <!-- SECTION: ALUR AKTIVASI SERVER -->
                 <section id="provisioning" class="scroll-mt-36 space-y-4">
                     <div class="flex items-center gap-2">
                         <span class="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-code bg-slate-900 text-white uppercase">Alur Kerja</span>
-                        <span class="text-xs font-semibold text-slate-500">Otomasi Sistem</span>
+                        <span class="text-xs font-semibold text-slate-500">Aktivasi Server</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                        Siklus Otomasi Provisioning
+                        Alur Aktivasi Server
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Proses provisioning instans berjalan secara otomatis tanpa intervensi manual melalui arsitektur asynchronous event-driven worker. Runtutan siklus hidup pesanan adalah sebagai berikut:
+                        Setiap server disiapkan langsung oleh tim VexaHost setelah pembayaran terkonfirmasi. Urutannya sebagai berikut:
                     </p>
 
                     <div class="space-y-3 font-mono-code text-xs">
@@ -408,31 +407,31 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                             <span class="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0">1</span>
                             <div>
                                 <span class="font-bold text-slate-900 block font-sans text-xs">Penerimaan Pesanan & Validasi Pembayaran</span>
-                                <span class="text-slate-500 font-sans text-[11px]">Invoice diterbitkan dan diverifikasi seketika melalui webhook QRIS atau gateway e-commerce. Status order berubah menjadi <code class="text-emerald-700 bg-emerald-50 px-1 rounded">paid</code>.</span>
+                                <span class="text-slate-500 font-sans text-[11px]">Invoice diterbitkan. Setelah pembayaran terkonfirmasi (otomatis lewat gateway atau diverifikasi tim), status pesanan berubah menjadi <code class="text-emerald-700 bg-emerald-50 px-1 rounded">paid</code>.</span>
                             </div>
                         </div>
 
                         <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex items-start gap-3">
                             <span class="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0">2</span>
                             <div>
-                                <span class="font-bold text-slate-900 block font-sans text-xs">Dispatch Worker Provisioning</span>
-                                <span class="text-slate-500 font-sans text-[11px]">Sistem menjadwalkan alokasi IP publik dan sub-interface jaringan pada kluster datacenter target (Tencent Cloud API atau Lintasarta Cloudeka Orchestrator).</span>
+                                <span class="font-bold text-slate-900 block font-sans text-xs">Server Disiapkan Tim</span>
+                                <span class="text-slate-500 font-sans text-[11px]">Tim VexaHost menyiapkan server di infrastruktur penyedia (Tencent Cloud atau Lintasarta Cloudeka) sesuai paket dan lokasi yang Anda pilih. Pesanan tampil sebagai "sedang disiapkan" di dashboard.</span>
                             </div>
                         </div>
 
                         <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex items-start gap-3">
                             <span class="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0">3</span>
                             <div>
-                                <span class="font-bold text-slate-900 block font-sans text-xs">Inisialisasi OS Image & Post-Install Script</span>
-                                <span class="text-slate-500 font-sans text-[11px]">Template OS (Ubuntu, Debian, AlmaLinux, Windows) di-deploy ke media penyimpanan NVMe RAID-10. Jika memilih panel seperti Coolify atau Dokploy, skrip otomatisasi cloud-init dijalankan pada bootstrap pertama.</span>
+                                <span class="font-bold text-slate-900 block font-sans text-xs">Pemasangan OS & Stack</span>
+                                <span class="text-slate-500 font-sans text-[11px]">Sistem operasi pilihan Anda dipasang. Jika memilih panel seperti Coolify atau Dokploy, tim memasangnya lalu mencantumkan alamat panelnya di dashboard.</span>
                             </div>
                         </div>
 
                         <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex items-start gap-3">
                             <span class="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0">4</span>
                             <div>
-                                <span class="font-bold text-slate-900 block font-sans text-xs">Pengiriman Kredensial & Aktivasi Portal</span>
-                                <span class="text-slate-500 font-sans text-[11px]">Kredensial SSH (IP Publik, Port 22, Password Root terenkripsi CSPRNG) dikirimkan via email terverifikasi dan instans langsung berstatus <code class="text-emerald-700 bg-emerald-50 px-1 rounded">running</code> di Client Portal.</span>
+                                <span class="font-bold text-slate-900 block font-sans text-xs">Serah Terima di Dashboard</span>
+                                <span class="text-slate-500 font-sans text-[11px]">IP publik, port SSH, dan password root (tersimpan terenkripsi) tampil di Client Portal, dan Anda menerima email pemberitahuan. Status server berubah menjadi <code class="text-emerald-700 bg-emerald-50 px-1 rounded">Aktif</code>.</span>
                             </div>
                         </div>
                     </div>
@@ -490,7 +489,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                         Arsitektur Dual-Provider (Tencent & Cloudeka)
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        VexaHost mengoperasikan arsitektur hybrid multi-cloud terintegrasi dengan memanfaatkan dua raksasa infrastruktur terakreditasi Tier-3: <strong>Tencent Cloud</strong> dan <strong>Lintasarta Cloudeka</strong>. Pemisahan paket dilakukan secara ketat untuk mengoptimalkan keandalan rute transit dan latensi sesuai profil kebutuhan aplikasi Anda.
+                        Server VexaHost berjalan di atas dua penyedia infrastruktur: <strong>Tencent Cloud</strong> dan <strong>Lintasarta Cloudeka</strong>. Setiap paket terhubung ke salah satu penyedia sesuai profil kebutuhan aplikasi Anda.
                     </p>
 
                     <!-- Provider Comparison Table -->
@@ -512,12 +511,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                                 <tr>
                                     <td class="px-4 py-3 font-semibold text-slate-900">Lokasi Datacenter</td>
                                     <td class="px-4 py-3 text-slate-700">Singapore (ap-singapore) & Jakarta (ap-jakarta)</td>
-                                    <td class="px-4 py-3 text-slate-700">Cyber 1 Kuningan & TB Simatupang, Jakarta</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 font-semibold text-slate-900">Karakteristik Latensi</td>
-                                    <td class="px-4 py-3 text-slate-700">Rute global stabil (8-18ms ke regional ASEAN)</td>
-                                    <td class="px-4 py-3 text-slate-700">Ultra-rendah domestik (&lt; 2ms IIX / OpenIXP)</td>
+                                    <td class="px-4 py-3 text-slate-700">Jakarta</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3 font-semibold text-slate-900">Throughput Jaringan</td>
@@ -526,7 +520,7 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3 font-semibold text-slate-900">Skenario Terbaik</td>
-                                    <td class="px-4 py-3 text-slate-700">Bot Discord, scraping API global, proxy, staging</td>
+                                    <td class="px-4 py-3 text-slate-700">Bot Discord, integrasi API global, server staging</td>
                                     <td class="px-4 py-3 text-slate-700">E-Commerce Indonesia, API Payment, Web Sekolah</td>
                                 </tr>
                             </tbody>
@@ -570,25 +564,14 @@ class="min-h-screen bg-slate-50 selection:bg-slate-900 selection:text-white">
                         <span class="text-xs font-semibold text-slate-500">Storage Subsystem</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                        Storage NVMe RAID-10 Enterprise
+                        Penyimpanan NVMe SSD
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Kami tidak menggunakan drive SATA tradisional atau HDD mekanis. Seluruh blok volume VPS didukung oleh solid-state drive berantarmuka <strong>PCIe Gen4 NVMe</strong> yang dikonfigurasi dalam susunan <strong>Hardware RAID-10</strong> dengan battery-backed write cache (BBU).
+                        Disk VPS berjalan di atas penyimpanan SSD dari penyedia infrastruktur (Tencent Cloud atau Lintasarta Cloudeka). Kapasitas disk mengikuti paket yang Anda pilih dan tercantum di dashboard.
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="text-xl font-extrabold text-slate-900 font-mono-code block">&gt; 85.000</span>
-                            <span class="text-[11px] text-slate-500 font-semibold uppercase">Random Read IOPS</span>
-                        </div>
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="text-xl font-extrabold text-slate-900 font-mono-code block">&lt; 0.12 ms</span>
-                            <span class="text-[11px] text-slate-500 font-semibold uppercase">Average Disk Latency</span>
-                        </div>
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="text-xl font-extrabold text-slate-900 font-mono-code block">99.99%</span>
-                            <span class="text-[11px] text-slate-500 font-semibold uppercase">Storage Durability</span>
-                        </div>
-                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Pencadangan data merupakan tanggung jawab Anda sebagai pemilik server. Simpan salinan data penting di luar server, terutama sebelum mengajukan reinstall OS.
+                    </p>
                 </section>
 
                 <hr class="border-slate-200">
@@ -787,24 +770,20 @@ ChallengeResponseAuthentication no</pre>
                         <span class="text-xs font-semibold text-slate-500">Operasional Instance</span>
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Manajemen Siklus Power Instance
+                        Restart & Server Tidak Merespons
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Anda dapat mengendalikan status daya instance langsung melalui Client Portal VexaHost atau API:
+                        Anda memegang akses root penuh, jadi restart dilakukan langsung dari server. Tombol <strong>Cara Reboot</strong> di halaman Detail VPS berisi panduan yang sama.
                     </p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="font-bold text-slate-900 block mb-1">Graceful Shutdown</span>
-                            <p class="text-slate-500 leading-relaxed">Mengirimkan sinyal ACPI ke sistem operasi tamu agar seluruh proses ditutup dengan aman sebelum daya virtual diputus.</p>
+                            <span class="font-bold text-slate-900 block mb-1">Restart Biasa (Mandiri)</span>
+                            <p class="text-slate-500 leading-relaxed">Login lewat SSH lalu jalankan <code class="font-mono-code bg-slate-100 px-1 py-0.5 rounded text-slate-900">sudo reboot</code>. Server kembali dalam 1-2 menit dengan IP dan data yang sama.</p>
                         </div>
                         <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="font-bold text-slate-900 block mb-1">Hard Stop (Poweroff)</span>
-                            <p class="text-slate-500 leading-relaxed">Mematikan pasokan daya seketika pada hypervisor. Digunakan saat instance mengalami kernel panic atau unresponsive.</p>
-                        </div>
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <span class="font-bold text-slate-900 block mb-1">Reboot / Reset</span>
-                            <p class="text-slate-500 leading-relaxed">Melakukan siklus restart instan tanpa mengganti IP publik atau mengubah data partisi penyimpanan NVMe.</p>
+                            <span class="font-bold text-slate-900 block mb-1">Server Tidak Merespons</span>
+                            <p class="text-slate-500 leading-relaxed">Jika SSH tidak bisa diakses sama sekali, klik <strong>Laporkan ke Tim</strong> di halaman Detail VPS. Tim me-restart server dari sisi infrastruktur, maksimal 6 jam kerja.</p>
                         </div>
                     </div>
                 </section>
@@ -818,7 +797,7 @@ ChallengeResponseAuthentication no</pre>
                         Reinstall Sistem Operasi
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Jika Anda ingin memulai dari awal atau beralih distribusi Linux (misal: dari Ubuntu ke Debian 12 atau AlmaLinux 9), Anda dapat mengeksekusi aksi Reinstall dari halaman Detail Instance.
+                        Jika Anda ingin memulai dari awal atau beralih distribusi Linux (misal: dari Ubuntu ke Debian 12), klik <strong>Ajukan Reinstall OS</strong> di halaman Detail VPS. Tim mengerjakannya maksimal 6 jam kerja. Setelah selesai, password root baru tampil di tab Akses dan Anda menerima email pemberitahuan.
                     </p>
 
                     <!-- Alert Caution Box -->
@@ -826,7 +805,7 @@ ChallengeResponseAuthentication no</pre>
                         <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         <div class="space-y-1">
                             <span class="font-bold text-rose-900 block">Peringatan: Seluruh Data Partisi Akan Terhapus</span>
-                            <span>Proses Reinstall memformat ulang seluruh blok storage NVMe. Seluruh file, database lokal, dan konfigurasi server akan musnah permanen. Pastikan Anda telah membuat backup remote sebelum memulai tindakan ini.</span>
+                            <span>Reinstall memformat ulang seluruh disk server. Seluruh file, database lokal, dan konfigurasi akan terhapus permanen. Pastikan Anda sudah membuat backup di luar server sebelum mengajukan.</span>
                         </div>
                     </div>
                 </section>
@@ -837,11 +816,16 @@ ChallengeResponseAuthentication no</pre>
                         <span class="text-xs font-semibold text-slate-500">Resource & Quota</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                        Monitoring Resource & Alokasi Kuota
+                        Memantau Pemakaian Resource
                     </h2>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Dashboard menyajikan grafik realtime penggunaan vCPU, memori RAM, pemakaian disk storage, serta akumulasi bandwidth bulanan. Kuota bandwidth di-reset setiap tanggal 1 pada setiap bulannya.
+                        Dashboard menampilkan spesifikasi paket (vCPU, RAM, disk) dan status layanan. Untuk melihat pemakaian langsung, jalankan perintah berikut di server:
                     </p>
+                    <div class="bg-[#0B0F19] text-slate-300 p-4 rounded-xl font-mono-code text-xs space-y-1">
+                        <p><span class="text-emerald-400">$</span> htop      <span class="text-slate-500"># pemakaian CPU &amp; RAM per proses</span></p>
+                        <p><span class="text-emerald-400">$</span> free -h   <span class="text-slate-500"># sisa memori</span></p>
+                        <p><span class="text-emerald-400">$</span> df -h     <span class="text-slate-500"># sisa ruang disk</span></p>
+                    </div>
                 </section>
 
                 <section id="ops-billing" class="scroll-mt-36 space-y-4">
@@ -850,13 +834,12 @@ ChallengeResponseAuthentication no</pre>
                         <span class="text-xs font-semibold text-slate-500">Billing & Suspension</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                        Siklus Tagihan & Auto-Suspension
+                        Siklus Tagihan & Masa Tenggang
                     </h2>
                     <div class="space-y-2 text-xs text-slate-600">
-                        <p><strong>H-3 Expired:</strong> Invoice perpanjangan otomatis diterbitkan ke portal pelanggan dan notifikasi email terkirim.</p>
-                        <p><strong>Hari H (Jatuh Tempo):</strong> Instance tetap beroperasi normal hingga pukul 23:59 WIB.</p>
-                        <p><strong>H+2 (Grace Period 48 Jam):</strong> Jika invoice belum terbayar, status instans berubah menjadi <code class="font-mono-code bg-amber-50 text-amber-800 px-1 rounded">suspended</code>. Akses jaringan eksternal dinonaktifkan tetapi disk storage dan konfigurasi tetap tersimpan aman.</p>
-                        <p><strong>H+7 (Terminasi Permanen):</strong> Instans yang tidak diperpanjang melewati masa 7 hari akan dihapus permanen dari cluster cloud hypervisor untuk daur ulang IP publik.</p>
+                        <p><strong>Sebelum jatuh tempo:</strong> Pengingat perpanjangan dikirim lewat email. Tanggal jatuh tempo selalu tercantum di dashboard.</p>
+                        <p><strong>Setelah jatuh tempo:</strong> Layanan masuk masa tenggang. Lamanya berbeda per jenis layanan, dan tanggal akhirnya tampil di tab Berlangganan pada halaman Detail VPS.</p>
+                        <p><strong>Setelah masa tenggang:</strong> Jika belum diperpanjang, layanan ditangguhkan (<code class="font-mono-code bg-amber-50 text-amber-800 px-1 rounded">suspended</code>) dan data di server dapat terhapus permanen oleh penyedia infrastruktur. Perpanjang sebelum masa tenggang berakhir agar data tetap aman.</p>
                     </div>
                 </section>
 
@@ -1149,20 +1132,20 @@ ChallengeResponseAuthentication no</pre>
                     </p>
                     <nav class="space-y-1.5 text-slate-600 font-medium">
                         <a href="#intro" class="block hover:text-slate-900 transition-colors py-0.5">Pengenalan Arsitektur Cloud</a>
-                        <a href="#provisioning" class="block hover:text-slate-900 transition-colors py-0.5">Siklus Otomasi Provisioning</a>
+                        <a href="#provisioning" class="block hover:text-slate-900 transition-colors py-0.5">Alur Aktivasi Server</a>
                         <a href="#ssh-access" class="block hover:text-slate-900 transition-colors py-0.5">Akses SSH & Kredensial</a>
                         <a href="#dual-provider" class="block hover:text-slate-900 transition-colors py-0.5">Dual-Provider (Tencent & Cloudeka)</a>
                         <a href="#datacenters" class="block hover:text-slate-900 transition-colors py-0.5">Datacenter & Peering Jaringan</a>
-                        <a href="#storage" class="block hover:text-slate-900 transition-colors py-0.5">Storage NVMe RAID-10</a>
+                        <a href="#storage" class="block hover:text-slate-900 transition-colors py-0.5">Penyimpanan NVMe SSD</a>
                         <a href="#stack-coolify" class="block hover:text-slate-900 transition-colors py-0.5">Coolify Platform Deployment</a>
                         <a href="#stack-dokploy" class="block hover:text-slate-900 transition-colors py-0.5">Dokploy Modern PaaS</a>
                         <a href="#stack-aapanel" class="block hover:text-slate-900 transition-colors py-0.5">aaPanel (LEMP/LAMP)</a>
                         <a href="#security-ufw" class="block hover:text-slate-900 transition-colors py-0.5">Firewall UFW & Port Policy</a>
                         <a href="#security-ssh" class="block hover:text-slate-900 transition-colors py-0.5">Hardening SSH Key-Only</a>
                         <a href="#security-fail2ban" class="block hover:text-slate-900 transition-colors py-0.5">Fail2ban & Brute Force</a>
-                        <a href="#ops-power" class="block hover:text-slate-900 transition-colors py-0.5">Manajemen Siklus Power</a>
+                        <a href="#ops-power" class="block hover:text-slate-900 transition-colors py-0.5">Restart & Server Tidak Merespons</a>
                         <a href="#ops-reinstall" class="block hover:text-slate-900 transition-colors py-0.5">Reinstall Sistem Operasi</a>
-                        <a href="#ops-billing" class="block hover:text-slate-900 transition-colors py-0.5">Siklus Tagihan & Suspension</a>
+                        <a href="#ops-billing" class="block hover:text-slate-900 transition-colors py-0.5">Siklus Tagihan & Masa Tenggang</a>
                         <a href="#api-auth" class="block hover:text-slate-900 transition-colors py-0.5">Autentikasi & Security Header</a>
                         <a href="#api-vps-status" class="block hover:text-slate-900 transition-colors py-0.5">GET Status Instance</a>
                         <a href="#api-shopee-process" class="block hover:text-slate-900 transition-colors py-0.5">POST Otomasi Shopee</a>

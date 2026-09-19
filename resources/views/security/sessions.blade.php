@@ -18,7 +18,7 @@
             <div class="p-5 flex items-center justify-between gap-4">
                 <div>
                     <p class="font-semibold text-sm">{{ $session->user_agent ?: 'Perangkat tidak diketahui' }} @if($session->is_current)<span class="ml-2 rounded-full bg-emerald-100 px-2 py-1 text-xs text-emerald-700">Session ini</span>@endif</p>
-                    <p class="text-xs text-slate-500 mt-1">{{ $session->ip_address ?: '-' }} · {{ $session->last_activity?->format('d M Y H:i') }}</p>
+                    <p class="text-xs text-slate-500 mt-1">{{ $session->ip_address ?: '-' }} · {{ $session->last_activity?->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
                 </div>
                 @unless($session->is_current)
                     <form method="POST" action="{{ route('security.sessions.revoke', $session->id) }}" data-confirm="Cabut session perangkat ini?">

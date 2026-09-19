@@ -55,9 +55,9 @@
                     <td class="text-right font-mono" style="font-weight: 700; color: #0f172a;">
                         Rp {{ number_format($invoice->amount, 0, ',', '.') }}
                     </td>
-                    <td>{{ $invoice->issued_at ? $invoice->issued_at->translatedFormat('d M Y') : ($invoice->created_at ? $invoice->created_at->translatedFormat('d M Y') : '-') }}</td>
-                    <td>{{ $invoice->due_at ? $invoice->due_at->translatedFormat('d M Y') : '-' }}</td>
-                    <td>{{ $invoice->paid_at ? $invoice->paid_at->translatedFormat('d M Y') : '-' }}</td>
+                    <td>{{ $invoice->issued_at ? $invoice->issued_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') : ($invoice->created_at ? $invoice->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') : '-') }}</td>
+                    <td>{{ $invoice->due_at ? $invoice->due_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') : '-' }}</td>
+                    <td>{{ $invoice->paid_at ? $invoice->paid_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') : '-' }}</td>
                 </tr>
             @empty
                 <tr><td colspan="7" class="text-center" style="padding: 16px; color: #94a3b8;">Tidak ada data invoice pada periode ini.</td></tr>

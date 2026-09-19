@@ -53,7 +53,9 @@ Route::redirect('/tambah-database', '/#database-packages');
 // Public Legal Pages
 Route::view('/terms', 'pages.terms')->name('terms');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
-Route::view('/sla', 'pages.sla')->name('sla');
+// Halaman SLA dihapus: VexaHost tidak menjanjikan persentase uptime karena server
+// dibeli retail dari supplier. URL lama dialihkan agar tautan lama tidak 404.
+Route::permanentRedirect('/sla', '/terms');
 Route::view('/refund', 'pages.refund')->name('refund');
 
 // Public XML Sitemap (Google Search Console)
@@ -65,7 +67,6 @@ Route::get('/sitemap.xml', function () {
         ['loc' => $baseUrl . '/status', 'changefreq' => 'hourly', 'priority' => '0.7'],
         ['loc' => $baseUrl . '/terms', 'changefreq' => 'monthly', 'priority' => '0.5'],
         ['loc' => $baseUrl . '/privacy', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['loc' => $baseUrl . '/sla', 'changefreq' => 'monthly', 'priority' => '0.5'],
         ['loc' => $baseUrl . '/refund', 'changefreq' => 'monthly', 'priority' => '0.5'],
         ['loc' => $baseUrl . '/checkout', 'changefreq' => 'weekly', 'priority' => '0.9'],
     ];
@@ -215,11 +216,12 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/vps/{id}', [DashboardController::class, 'show'])->middleware('permission:vps.read')->name('vps.show');
         // Polling endpoint untuk progress provisioning (Poin 4).
         Route::get('/vps/{id}/provisioning-status.json', [DashboardController::class, 'provisioningStatus'])->middleware('permission:vps.read')->name('vps.provisioning-status');
-        Route::post('/vps/{id}/start', [DashboardController::class, 'start'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.start');
-        Route::post('/vps/{id}/stop', [DashboardController::class, 'stop'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.stop');
-        Route::post('/vps/{id}/reboot', [DashboardController::class, 'reboot'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.reboot');
-        Route::post('/vps/{id}/force-reboot', [DashboardController::class, 'forceReboot'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.force-reboot');
-        Route::post('/vps/{id}/reinstall', [DashboardController::class, 'reinstall'])->middleware('permission:vps.reinstall')->middleware('maintenance:vps_actions')->name('vps.reinstall');
+        // Server dibeli retail tanpa API supplier, jadi panel tidak menjalankan
+        // start/stop/reboot/reinstall sendiri. Reboot biasa dilakukan pelanggan
+        // lewat SSH (panduan di halaman detail). Aksi yang butuh akses supplier
+        // diajukan sebagai tiket dan dikerjakan admin secara manual.
+        Route::post('/vps/{id}/requests/reinstall', [DashboardController::class, 'requestReinstall'])->middleware('permission:vps.reinstall')->middleware('maintenance:vps_actions')->middleware('throttle:10,1')->name('vps.request-reinstall');
+        Route::post('/vps/{id}/requests/unreachable', [DashboardController::class, 'reportUnreachable'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->middleware('throttle:10,1')->name('vps.report-unreachable');
         Route::post('/vps/{id}/reveal-password', [DashboardController::class, 'revealPassword'])->middleware('permission:vps.credentials')->name('vps.reveal-password');
         Route::get('/billing', [DashboardController::class, 'billing'])->middleware('permission:billing.read')->name('billing');
         Route::post('/subscriptions/{id}/auto-renew', [DashboardController::class, 'toggleAutoRenew'])->middleware('permission:billing.read')->name('subscriptions.auto-renew');
@@ -259,6 +261,7 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/reports/preview', [AdminController::class, 'previewReport'])->name('reports.preview');
         Route::get('/reports/export', [AdminController::class, 'exportReport'])->name('reports.export');
         Route::post('/instances/{id}/status', [AdminController::class, 'updateInstanceStatus'])->name('instances.status');
+        Route::post('/instances/{id}/panel-url', [AdminController::class, 'updateInstancePanelUrl'])->name('instances.panel-url');
         Route::post('/instances/{id}/suspend', [AdminController::class, 'suspendInstance'])->name('instances.suspend');
         Route::post('/instances/{id}/unsuspend', [AdminController::class, 'unsuspendInstance'])->name('instances.unsuspend');
         Route::post('/instances/{id}/terminate', [AdminController::class, 'terminateInstance'])->name('instances.terminate');
@@ -271,6 +274,7 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/tickets/{id}', [AdminController::class, 'showTicket'])->name('tickets.show');
         Route::post('/tickets/{id}/reply', [AdminController::class, 'replyTicket'])->name('tickets.reply');
         Route::post('/tickets/{id}/assign', [AdminController::class, 'assignTicket'])->name('tickets.assign');
+        Route::post('/tickets/{id}/complete-reinstall', [AdminController::class, 'completeReinstall'])->name('tickets.complete-reinstall');
 
         // ============================================================
         // PHASE 1 - Pengaturan Sistem, Branding, dan Maintenance

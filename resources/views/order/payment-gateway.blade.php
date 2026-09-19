@@ -456,7 +456,7 @@
                             </div>
                             <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                                 <p class="font-bold text-red-700 text-sm">
-                                    {{ ($order->invoice && $order->invoice->due_at) ? $order->invoice->due_at->format('d M Y, H:i') : now()->addDay()->format('d M Y, H:i') }} WIB
+                                    {{ ($order->invoice && $order->invoice->due_at) ? $order->invoice->due_at->timezone('Asia/Jakarta')->format('d M Y, H:i') : now()->addDay()->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
                                 </p>
                                 <p class="text-xs text-red-600 mt-1">Pesanan akan dibatalkan otomatis setelah batas waktu</p>
                             </div>

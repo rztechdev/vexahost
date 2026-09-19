@@ -63,11 +63,11 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
                                         <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
                                             <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Terisolasi murni: Zero OOM crash</span>
+                                            <span>Server database khusus, terpisah dari aplikasi</span>
                                         </div>
                                         <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
                                             <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Tencent Jakarta DC (Latensi ~3-10ms)</span>
+                                            <span>Datacenter Jakarta</span>
                                         </div>
                                         <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
                                             <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -75,7 +75,7 @@
                                         </div>
                                         <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
                                             <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Automated daily backup &amp; buffer tuning</span>
+                                            <span>Kredensial koneksi siap pakai di dashboard</span>
                                         </div>
                                     </div>
                                 </div>

@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 6px 0; color: #71717a;">Jatuh Tempo:</td>
-                    <td style="padding: 6px 0; color: #000000;">{{ $invoice->due_at?->translatedFormat('d F Y') ?? '-' }}</td>
+                    <td style="padding: 6px 0; color: #000000;">{{ $invoice->due_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y') ?? '-' }}</td>
                 </tr>
             </table>
         </td>

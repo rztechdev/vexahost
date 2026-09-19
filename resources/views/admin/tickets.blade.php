@@ -2,6 +2,18 @@
 
 @section('content')
 <div class="space-y-6">
+    @if($openServiceRequestCount > 0)
+        <div class="p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+                <strong class="font-bold text-sm block">{{ $openServiceRequestCount }} permintaan server menunggu dikerjakan</strong>
+                Reinstall OS atau server tidak bisa diakses. Dijanjikan ke pelanggan maksimal {{ \App\Models\SupportTicket::SERVICE_REQUEST_SLA_WORKING_HOURS }} jam kerja.
+            </div>
+            <a href="{{ route('admin.tickets', ['status' => 'active', 'type' => 'service']) }}" class="px-3 py-1.5 rounded-lg bg-white border border-blue-300 hover:bg-blue-100 font-semibold whitespace-nowrap self-start sm:self-auto">
+                Lihat Permintaan
+            </a>
+        </div>
+    @endif
+
     <!-- Filter Bar -->
     <div class="bg-white rounded-lg border border-slate-200 p-4 flex items-center justify-between">
         <form method="GET" action="{{ route('admin.tickets') }}" class="flex items-center gap-3 text-xs">
@@ -9,13 +21,24 @@
                 <label class="block font-medium text-slate-500 mb-1">Status Tiket</label>
                 <select name="status" onchange="this.form.submit()" class="px-3 py-1.5 rounded-lg border border-slate-300 font-medium focus:outline-none bg-white">
                     <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif (Open + In Progress)</option>
                     <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>Open (Belum Dijawab)</option>
                     <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
                     <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
                     <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Closed</option>
                 </select>
             </div>
-            @if(request('status'))
+            <div>
+                <label class="block font-medium text-slate-500 mb-1">Jenis</label>
+                <select name="type" onchange="this.form.submit()" class="px-3 py-1.5 rounded-lg border border-slate-300 font-medium focus:outline-none bg-white">
+                    <option value="">Semua Jenis</option>
+                    <option value="service" {{ request('type') === 'service' ? 'selected' : '' }}>Semua Permintaan Server</option>
+                    @foreach(\App\Models\SupportTicket::typeLabels() as $typeKey => $typeName)
+                        <option value="{{ $typeKey }}" {{ request('type') === $typeKey ? 'selected' : '' }}>{{ $typeName }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if(request('status') || request('type'))
                 <div class="pt-5">
                     <a href="{{ route('admin.tickets') }}" class="text-slate-600 font-semibold hover:underline">Reset</a>
                 </div>
@@ -54,7 +77,12 @@
                                 <span class="text-slate-400 font-mono-code text-[11px]">&#64;{{ $ticket->customer->username }}</span>
                             </td>
                             <td class="px-5 py-3.5">
-                                <a href="{{ route('admin.tickets.show', $ticket->id) }}" class="font-bold text-slate-900 hover:underline transition-colors">
+                                @if($ticket->isServiceRequest())
+                                    <span class="inline-block mb-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $ticket->type === 'reinstall' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $ticket->type === 'reinstall' ? 'Reinstall' : 'Server Down' }}
+                                    </span>
+                                @endif
+                                <a href="{{ route('admin.tickets.show', $ticket->id) }}" class="font-bold text-slate-900 hover:underline transition-colors block">
                                     {{ $ticket->subject }}
                                 </a>
                                 @if($ticket->latestMessage)

@@ -25,9 +25,6 @@
                     <a href="{{ route('privacy') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Privacy Policy
                     </a>
-                    <a href="{{ route('sla') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
-                        SLA 99.9%
-                    </a>
                     <a href="{{ route('refund') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Refund Policy
                     </a>
@@ -221,14 +218,17 @@
                     </div>
                     <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
                         <p>
-                            3.1. Layanan VexaHost merupakan layanan <strong>Unmanaged Cloud VPS</strong>. Tanggung jawab teknis Penyedia terbatas secara eksklusif pada pemeliharaan ketersediaan perangkat keras fisik host node, stabilitas hypervisor KVM, ketersediaan jaringan transit (uplink), serta pasokan daya datacenter.
+                            3.1. Layanan VexaHost merupakan layanan <strong>Unmanaged Cloud VPS</strong> yang berjalan di atas infrastruktur penyedia pihak ketiga (Tencent Cloud dan Lintasarta Cloudeka). Perangkat keras fisik, hypervisor, jaringan transit, dan pasokan daya datacenter dikelola oleh penyedia infrastruktur tersebut. Tanggung jawab Penyedia terbatas pada penyerahan akses server sesuai paket yang dipesan, pengelolaan tagihan, serta penanganan permintaan layanan (seperti install ulang sistem operasi dan pemulihan server yang tidak dapat diakses) melalui dashboard dan tiket dukungan pada jam kerja.
                         </p>
                         <p>
                             3.2. Seluruh instalasi aplikasi pihak ketiga, dependensi pustaka kode, konfigurasi reverse proxy (Nginx, Traefik, Caddy), sertifikat SSL/TLS, database internal, serta keamanan firewall tamu (UFW/iptables) berada sepenuhnya di bawah kendali dan tanggung jawab Pelanggan.
                         </p>
+                        <p>
+                            3.3. Karena infrastruktur fisik dikelola oleh penyedia pihak ketiga, Penyedia tidak menjanjikan persentase ketersediaan (uptime) tertentu. Gangguan yang berasal dari penyedia infrastruktur akan ditindaklanjuti oleh Penyedia dan diinformasikan melalui halaman Status Layanan.
+                        </p>
                         <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
                             <strong class="text-slate-900 block mb-1 font-semibold">Kebijakan Zero-Access Server</strong>
-                            VexaHost menghormati kedaulatan data Pelanggan. Staf teknis kami tidak memiliki akses pintu belakang (backdoor) ke dalam file sistem operasi Pelanggan dan dilarang mengakses lingkungan server tanpa izin eksplisit melalui tiket dukungan teknis resmi.
+                            VexaHost menghormati kedaulatan data Pelanggan. Staf teknis kami tidak memiliki akses pintu belakang (backdoor) ke dalam file sistem operasi Pelanggan dan dilarang mengakses lingkungan server tanpa izin eksplisit melalui tiket dukungan teknis resmi. Password root awal yang disiapkan tim hanya digunakan untuk serah terima, dan Pelanggan disarankan segera menggantinya setelah login pertama.
                         </div>
                     </div>
                 </section>
@@ -374,7 +374,7 @@
                     </div>
                     <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
                         <p>
-                            6.1. Meskipun storage host node VexaHost dilengkapi konfigurasi perangkat keras redundan Enterprise NVMe SSD RAID-10 untuk memitigasi kegagalan media drive fisik, Pelanggan memegang kewajiban utama untuk membuat cadangan data (off-site backup) secara berkala ke lokasi penyimpanan independen.
+                            6.1. Penyimpanan server disediakan oleh penyedia infrastruktur pihak ketiga, dan VexaHost tidak menyediakan pencadangan otomatis. Pelanggan memegang kewajiban utama untuk membuat cadangan data (off-site backup) secara berkala ke lokasi penyimpanan independen.
                         </p>
                         <p>
                             6.2. VexaHost tidak bertanggung jawab atas kerusakan, kehilangan, atau korupsi file yang timbul akibat kesalahan operator Pelanggan, infeksi malware pada guest OS, kegagalan software database aplikasi, atau penghapusan data akibat terminasi tagihan yang terlambat.
@@ -469,7 +469,7 @@
                             <p class="text-[11px] text-slate-400 mt-2">Platform created by RZ Digital Creative.</p>
                         </div>
                         <div class="font-mono-code text-[11px] text-slate-400">
-                            Dokumen Resmi: TOS-2026-V2
+                            Dokumen Resmi: {{ config('legal.terms_version') }}
                         </div>
                     </div>
                 </section>

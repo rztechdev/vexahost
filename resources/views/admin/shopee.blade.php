@@ -35,6 +35,7 @@
     provOs: 'ubuntu2404',
     provSshPort: 22,
     provRootPassword: '',
+    provAppUrl: '',
 
     init() {
         this.syncSpecSettings();
@@ -238,6 +239,7 @@
         this.provOs = data.os_key || 'ubuntu2404';
         this.provSshPort = 22;
         this.provRootPassword = '';
+        this.provAppUrl = '';
         this.provisionModalOpen = true;
     }
 }">
@@ -469,7 +471,7 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                     <label class="block font-medium text-slate-700 mb-1">Lokasi Datacenter *</label>
                     <select name="datacenter_location" required x-model="datacenterLocation" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none bg-white">
                         <template x-if="provider === 'tencent'">
-                            <option value="singapore">Singapore (Tier-3 Gateway)</option>
+                            <option value="singapore">Singapore</option>
                         </template>
                         <option value="indonesia">Indonesia (Cyber Jakarta)</option>
                     </select>
@@ -567,6 +569,13 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                         <input type="text" name="root_password" x-model="rootPassword" placeholder="Biarkan kosong untuk auto-generate"
                                class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
                     </div>
+
+                    <div class="sm:col-span-3" x-show="controlPanel !== 'none'">
+                        <label class="block font-medium text-slate-700 mb-1">Link Control Panel (Opsional)</label>
+                        <input type="text" name="app_url" value="{{ old('app_url') }}" placeholder="http://103.150.12.88:8000 atau https://panel.domain.com"
+                               class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
+                        <p class="mt-1 text-slate-400">Link yang tampil di dashboard pelanggan. Bisa diisi nanti di Admin &gt; Cloud Instances.</p>
+                    </div>
                 </div>
             </div>
 
@@ -644,6 +653,8 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                                 'os' => $so->os_label,
                                 'os_key' => $so->os,
                                 'control_panel' => $so->control_panel_label,
+                                // Sama dengan aturan AdminController::provision: paket ber-panel wajib link panel.
+                                'needs_panel_url' => $so->control_panel !== 'none' && !($so->isDatabasePackage() && $so->db_manager === 'cli_only'),
                                 'status' => $so->status,
                                 'has_instance' => (bool)$instance,
                                 'hostname' => $instance?->hostname ?? ($so->hostname ?? ('vps-' . ($so->customer->username ?? 'node'))),
@@ -689,7 +700,7 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                                 @endif
                             </td>
                             <td class="px-5 py-3.5 text-slate-500 font-mono-code">
-                                {{ $so->created_at->format('d/m/Y H:i') }}
+                                {{ $so->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
                             </td>
                             <td class="px-5 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
@@ -873,6 +884,14 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                     <label class="block font-medium text-slate-700 mb-1">Sistem Operasi *</label>
                     <input type="text" name="os" required x-model="provOs"
                            class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
+                </div>
+
+                <div x-show="provisionModalData?.needs_panel_url">
+                    <label class="block font-medium text-slate-700 mb-1">Link Control Panel *</label>
+                    <input type="text" name="app_url" x-model="provAppUrl" :required="!!provisionModalData?.needs_panel_url" :disabled="!provisionModalData?.needs_panel_url"
+                           placeholder="http://103.150.12.88:8000 atau https://panel.domain.com"
+                           class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
+                    <p class="mt-1 text-slate-400">Link ini yang tampil di dashboard pelanggan. Wajib diawali http:// atau https://.</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">

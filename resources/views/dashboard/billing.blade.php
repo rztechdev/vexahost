@@ -18,7 +18,7 @@
                             <span class="font-semibold text-slate-900">{{ $subscription->vpsInstance->hostname ?? $subscription->vpsSpec->name ?? 'VPS' }}</span>
                             <span class="px-2 py-0.5 rounded text-[10px] uppercase font-semibold border border-slate-300 bg-slate-50">{{ str_replace('_', ' ', $subscription->status) }}</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Periode berikutnya: {{ $subscription->next_billing_at?->format('d M Y') ?? $subscription->current_period_end?->format('d M Y') ?? '-' }} · Rp {{ number_format($subscription->unit_amount, 0, ',', '.') }}/{{ $subscription->billing_cycle === 'yearly' ? 'tahun' : 'bulan' }}</p>
+                        <p class="text-xs text-slate-500 mt-1">Periode berikutnya: {{ $subscription->next_billing_at?->timezone('Asia/Jakarta')->format('d M Y') ?? $subscription->current_period_end?->timezone('Asia/Jakarta')->format('d M Y') ?? '-' }} · Rp {{ number_format($subscription->unit_amount, 0, ',', '.') }}/{{ $subscription->billing_cycle === 'yearly' ? 'tahun' : 'bulan' }}</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 text-xs">
                         @if($subscription->cancelled_at)
@@ -83,10 +83,10 @@
                                 <span class="text-slate-400 block text-[11px]">Stack: {{ $invoice->order->control_panel_label }}</span>
                             </td>
                             <td class="px-5 py-3.5 text-slate-600">
-                                {{ $invoice->issued_at ? $invoice->issued_at->format('d M Y') : $invoice->created_at->format('d M Y') }}
+                                {{ $invoice->issued_at ? $invoice->issued_at->timezone('Asia/Jakarta')->format('d M Y') : $invoice->created_at->timezone('Asia/Jakarta')->format('d M Y') }}
                             </td>
                             <td class="px-5 py-3.5 text-slate-600">
-                                {{ $invoice->due_at ? $invoice->due_at->format('d M Y') : '-' }}
+                                {{ $invoice->due_at ? $invoice->due_at->timezone('Asia/Jakarta')->format('d M Y') : '-' }}
                             </td>
                             <td class="px-5 py-3.5 font-mono-code font-bold text-slate-900">
                                 Rp {{ number_format($invoice->amount, 0, ',', '.') }}

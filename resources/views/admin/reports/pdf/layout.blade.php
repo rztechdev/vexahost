@@ -284,7 +284,7 @@
                 <div class="meta-box">
                     <div>No. Dokumen: <strong class="font-mono">{{ $reportRef ?? 'VXH-RPT-'.date('Ymd-His') }}</strong></div>
                     <div>Periode: <strong>{{ $periodLabel ?? 'Semua Periode' }}</strong></div>
-                    <div>Dicetak: <strong>{{ now()->translatedFormat('d F Y, H:i') }} WIB</strong></div>
+                    <div>Dicetak: <strong>{{ now()->timezone('Asia/Jakarta')->translatedFormat('d F Y, H:i') }} WIB</strong></div>
                     <div>Otorisasi: <strong>{{ $generatedBy ?? 'Administrator Sistem' }}</strong></div>
                 </div>
             </td>

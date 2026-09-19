@@ -299,7 +299,7 @@ class ReportExportService
         $c2 = $metaTable->addCell(4300, ['bgColor' => 'F8FAFC']);
         $c2->addText("Nomor Ref: {$data['reportRef']}", ['bold' => true, 'size' => 8, 'color' => '0F172A']);
         $c2->addText("Periode: {$data['periodLabel']}", ['size' => 8, 'color' => '334155']);
-        $c2->addText("Dicetak: " . now()->format('d F Y, H:i') . " WIB oleh {$data['generatedBy']}", ['size' => 7.5, 'color' => '64748B']);
+        $c2->addText("Dicetak: " . now()->timezone('Asia/Jakarta')->format('d F Y, H:i') . " WIB oleh {$data['generatedBy']}", ['size' => 7.5, 'color' => '64748B']);
 
         $section->addTextBreak(1);
 
@@ -712,7 +712,7 @@ class ReportExportService
                 fputcsv($out, ['METRIK LAPORAN EKSEKUTIF VEXAHOST', 'NILAI', 'KETERANGAN']);
                 fputcsv($out, ['Periode Laporan', $data['periodLabel'], '']);
                 fputcsv($out, ['Nomor Referensi', $data['reportRef'], '']);
-                fputcsv($out, ['Tanggal Cetak', now()->format('Y-m-d H:i:s') . ' WIB', '']);
+                fputcsv($out, ['Tanggal Cetak', now()->timezone('Asia/Jakarta')->format('Y-m-d H:i:s') . ' WIB', '']);
                 fputcsv($out, ['Dicetak Oleh', $data['generatedBy'], '']);
                 fputcsv($out, ['Total Omzet Lunas', $data['revenue'], 'IDR']);
                 fputcsv($out, ['Omzet Cloud VPS', $data['vpsRevenue'], 'IDR']);

@@ -13,7 +13,7 @@
                 <span class="px-2.5 py-1 rounded text-xs font-semibold uppercase border border-slate-300 bg-slate-50 text-slate-900">
                     {{ str_replace('_', ' ', $ticket->status) }}
                 </span>
-                <span class="text-xs text-slate-400">{{ $ticket->created_at->format('d M Y, H:i') }} WIB</span>
+                <span class="text-xs text-slate-400">{{ $ticket->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</span>
             </div>
         </div>
 
@@ -50,7 +50,7 @@
                         @endif
                     </div>
                     <span class="text-xs text-slate-500">
-                        {{ $msg->created_at->format('d M Y, H:i') }} WIB
+                        {{ $msg->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
                     </span>
                 </div>
                 <div class="text-xs text-slate-800 leading-relaxed whitespace-pre-line pl-8">

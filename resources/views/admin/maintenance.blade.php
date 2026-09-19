@@ -25,6 +25,12 @@
         $labelClass = 'block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1';
     @endphp
 
+    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 text-xs text-amber-900">
+        <strong class="font-bold block mb-0.5">Mode manual</strong>
+        Jadwal otomatis (maintenance:sync) dimatikan untuk menghemat beban server. Jendela maintenance tidak mulai atau selesai sendiri,
+        dan email pemberitahuan tidak terkirim otomatis. Gunakan tombol Mulai, Selesaikan, dan Beritahu secara manual.
+    </div>
+
     @if($errors->any())
         <div class="bg-white p-5 rounded-lg border border-red-200">
             <span class="text-xs font-semibold text-red-600 uppercase tracking-wider block mb-2">Periksa Kembali Isian Anda</span>

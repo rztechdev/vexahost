@@ -25,9 +25,6 @@
                     <a href="{{ route('privacy') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Privacy Policy
                     </a>
-                    <a href="{{ route('sla') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
-                        SLA 99.9%
-                    </a>
                     <a href="{{ route('refund') }}" class="px-2.5 py-1 rounded-md font-bold bg-slate-900 text-white whitespace-nowrap">
                         Refund Policy
                     </a>
@@ -69,7 +66,7 @@
                         <span class="font-semibold text-slate-800 mt-0.5 block">48 Jam Sejak Aktivasi</span>
                     </div>
                     <div>
-                        <span class="text-slate-400 block font-medium">SLA Waktu Proses</span>
+                        <span class="text-slate-400 block font-medium">Estimasi Waktu Proses</span>
                         <span class="font-semibold text-slate-800 mt-0.5 block">1 &ndash; 3 Hari Kerja Bank</span>
                     </div>
                     <div>
@@ -295,7 +292,7 @@
                             PASAL 6
                         </span>
                         <h2 class="text-xl font-bold text-slate-900">
-                            Saluran Pencairan &amp; Standar Waktu Proses (SLA)
+                            Saluran Pencairan &amp; Estimasi Waktu Proses
                         </h2>
                     </div>
                     <div class="space-y-4 text-sm text-slate-600 leading-relaxed">

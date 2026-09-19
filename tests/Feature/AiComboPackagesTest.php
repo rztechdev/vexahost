@@ -39,7 +39,8 @@ class AiComboPackagesTest extends TestCase
         // Specs are listed as bullet points
         $response->assertSee('vCPU High Performance');
         $response->assertSee('RAM DDR4/DDR5');
-        $response->assertSee('NVMe SSD RAID-10');
+        $response->assertSee('NVMe SSD');
+        $response->assertDontSee('RAID-10');
 
         // Cleaned up marketing tags must NOT appear
         $response->assertDontSee('Zero Setup • Siap Pakai dalam Hitungan Menit');

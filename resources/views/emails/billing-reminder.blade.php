@@ -35,7 +35,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 6px 0; color: #71717a;">Batas Waktu:</td>
-                    <td style="padding: 6px 0; color: #000000;">{{ $subscription->next_billing_at?->translatedFormat('d F Y') ?? '-' }}</td>
+                    <td style="padding: 6px 0; color: #000000;">{{ $subscription->next_billing_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y') ?? '-' }}</td>
                 </tr>
             </table>
         </td>

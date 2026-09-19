@@ -144,7 +144,7 @@
             </div>
 
             <div class="flex items-center justify-between text-xs text-slate-600">
-                <span>Proteksi Anti-DDoS &amp; Automated Health Check</span>
+                <span>Akses Root Penuh &amp; IP Publik</span>
                 <span class="font-semibold text-emerald-600">Termasuk</span>
             </div>
 
@@ -242,9 +242,7 @@
             <span class="text-xs text-slate-700 leading-relaxed">
                 Saya telah membaca dan menyetujui
                 <a href="{{ route('terms') }}" target="_blank" rel="noopener"
-                   class="font-bold text-slate-900 underline underline-offset-2">Ketentuan Layanan</a>,
-                <a href="{{ route('sla') }}" target="_blank" rel="noopener"
-                   class="font-bold text-slate-900 underline underline-offset-2">SLA</a>, dan
+                   class="font-bold text-slate-900 underline underline-offset-2">Ketentuan Layanan</a> dan
                 <a href="{{ route('refund') }}" target="_blank" rel="noopener"
                    class="font-bold text-slate-900 underline underline-offset-2">Kebijakan Pengembalian Dana</a>
                 VexaHost, termasuk seluruh larangan penggunaan di atas.

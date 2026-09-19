@@ -25,7 +25,7 @@ class BillingReminderNotification extends Notification
     {
         $sub = $this->subscription;
         $spec = $sub->vpsSpec?->name ?? 'Cloud VPS';
-        $due = $sub->next_billing_at?->format('d M Y') ?? '-';
+        $due = $sub->next_billing_at?->timezone('Asia/Jakarta')->format('d M Y') ?? '-';
 
         $subjectText = $this->daysUntil === 0
             ? "Jatuh tempo hari ini — {$spec}"

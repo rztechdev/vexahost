@@ -21,9 +21,6 @@ return [
     // Email admin/billing
     'admin_email' => env('VEXAHOST_ADMIN_EMAIL', 'admin@vexahostcloud.my.id'),
 
-    // SLA Uptime guarantee (%)
-    'sla_uptime' => 99.9,
-
     // Secret API Key untuk mengamankan endpoint /api/admin/*
     'admin_api_key' => env('ADMIN_API_KEY'),
 ];

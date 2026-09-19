@@ -184,26 +184,39 @@ class ExampleTest extends TestCase
         $response->assertSee($vps->public_ip);
     }
 
-    public function test_customer_can_trigger_reboot(): void
+    public function test_customer_reboot_is_self_service_not_a_fake_button(): void
     {
         [$user, $vps] = $this->createCustomerWithVps();
 
-        $response = $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/reboot');
-        $response->assertSessionHas('success');
+        // Panel tidak lagi berpura-pura me-reboot server (tanpa API supplier).
+        $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/reboot')->assertNotFound();
+
+        // Pelanggan diberi panduan reboot lewat SSH.
+        $this->actingAs($user)->get('/dashboard/vps/' . $vps->id)
+            ->assertOk()
+            ->assertSee('sudo reboot');
     }
 
-    public function test_customer_can_trigger_reinstall(): void
+    public function test_customer_reinstall_is_submitted_as_request(): void
     {
         [$user, $vps] = $this->createCustomerWithVps();
 
-        $response = $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/reinstall', [
-            'os' => 'Ubuntu 24.04 LTS',
+        $response = $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/requests/reinstall', [
+            'os' => 'ubuntu2204',
             'control_panel' => 'dokploy',
+            'confirm_hostname' => 'vps-testuser',
         ]);
         $response->assertSessionHas('success');
+
+        // Data server baru berubah setelah admin menyelesaikan permintaan.
         $this->assertDatabaseHas('vps_instances', [
             'id' => $vps->id,
-            'control_panel' => 'dokploy',
+            'control_panel' => 'coolify',
+        ]);
+        $this->assertDatabaseHas('support_tickets', [
+            'vps_instance_id' => $vps->id,
+            'type' => 'reinstall',
+            'status' => 'open',
         ]);
     }
 
@@ -766,7 +779,15 @@ class ExampleTest extends TestCase
         $response->assertSee('Dokploy Modern PaaS');
         $response->assertSee('aaPanel');
         $response->assertSee('Traditional Stack');
-        $response->assertSee('Storage NVMe RAID-10 Enterprise');
+        $response->assertSee('Penyimpanan NVMe SSD');
+        // Klaim performa yang tidak bisa dibuktikan sudah dihapus.
+        $response->assertDontSee('Storage Durability');
+        $response->assertDontSee('Random Read IOPS');
+        $response->assertDontSee('siaga 24/7');
+        // Panduan operasional sesuai alur dashboard saat ini.
+        $response->assertSee('sudo reboot');
+        $response->assertSee('Ajukan Reinstall OS');
+        $response->assertDontSee('Graceful Shutdown');
         $response->assertSee('/api/admin/vps/{id}/status');
         $response->assertSee('/api/admin/shopee/process-order');
         

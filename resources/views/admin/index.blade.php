@@ -18,7 +18,7 @@
                     </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1">
-                    Datacenter: <strong>Singapore (Tier-3 Gateway)</strong> & <strong>Jakarta (Cyber Building)</strong> &bull; Total VPS Aktif: <span class="font-bold text-slate-800">{{ $active_vps }} unit</span>
+                    Datacenter: <strong>Singapore</strong> & <strong>Jakarta</strong> &bull; Total VPS Aktif: <span class="font-bold text-slate-800">{{ $active_vps }} unit</span>
                 </p>
             </div>
         </div>
@@ -55,7 +55,7 @@
             <div>
                 <p class="text-xs font-semibold text-slate-500">VPS Berjalan</p>
                 <p class="text-2xl font-bold text-[#6ABD73] mt-1 font-mono-code">{{ $active_vps }}</p>
-                <p class="text-[11px] text-slate-400 mt-1">Status running 99% SLA</p>
+                <p class="text-[11px] text-slate-400 mt-1">Instance berstatus running</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#6ABD73] flex items-center justify-center font-bold">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>

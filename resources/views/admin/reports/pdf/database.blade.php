@@ -12,7 +12,7 @@
             <td class="kpi-card" style="width: 25%;">
                 <div class="kpi-label">SERVER DATABASE AKTIF</div>
                 <div class="kpi-value">{{ $dbOrders->where('status', 'active')->count() }}</div>
-                <div class="kpi-sub">Instance berjalan tanpa downtime</div>
+                <div class="kpi-sub">Order database berstatus aktif</div>
             </td>
             <td class="kpi-card" style="width: 25%;">
                 <div class="kpi-label">ENGINE DIDUKUNG</div>

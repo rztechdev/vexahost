@@ -165,7 +165,7 @@
                             <div>
                                 <span class="text-slate-500 block text-[11px] mb-0.5">Masa Berlaku:</span>
                                 <span class="font-medium text-slate-800">
-                                    {{ $vps->expires_at ? $vps->expires_at->format('d M Y') : '—' }}
+                                    {{ $vps->expires_at ? $vps->expires_at->timezone('Asia/Jakarta')->format('d M Y') : '—' }}
                                 </span>
                             </div>
                         </div>
@@ -201,7 +201,7 @@
                         <p class="text-sm font-semibold text-amber-800">Menunggu Pembayaran</p>
                         <p class="text-xs text-amber-700 mt-1">Silakan lakukan pembayaran sesuai metode yang dipilih. Setelah pembayaran terkonfirmasi, VPS Anda akan segera di-setup oleh tim kami.</p>
                         @if($order->invoice && $order->invoice->due_at)
-                            <p class="text-xs text-amber-600 mt-2 font-medium">Batas waktu pembayaran: {{ $order->invoice->due_at->format('d M Y, H:i') }} WIB</p>
+                            <p class="text-xs text-amber-600 mt-2 font-medium">Batas waktu pembayaran: {{ $order->invoice->due_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</p>
                         @endif
                     </div>
                 @endif

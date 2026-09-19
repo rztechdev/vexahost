@@ -24,7 +24,7 @@
             </div>
             <div>
                 <span class="text-slate-400 uppercase">Paid at</span>
-                <p class="font-semibold text-slate-800">{{ $order->paid_at?->format('d M Y H:i') ?? '—' }}</p>
+                <p class="font-semibold text-slate-800">{{ $order->paid_at?->timezone('Asia/Jakarta')->format('d M Y H:i') ?? '—' }}</p>
             </div>
             <div>
                 <span class="text-slate-400 uppercase">Prov. Attempts</span>
@@ -76,7 +76,7 @@
                                     @endif
                                 </div>
                                 <div class="text-right flex-shrink-0">
-                                    <p class="text-[11px] text-slate-500 font-mono-code">{{ $h->created_at?->format('d M Y H:i:s') }}</p>
+                                    <p class="text-[11px] text-slate-500 font-mono-code">{{ $h->created_at?->timezone('Asia/Jakarta')->format('d M Y H:i:s') }}</p>
                                     <p class="text-[10px] text-slate-400 mt-0.5">
                                         <span class="inline-block px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
                                             {{ $h->actor_type }}

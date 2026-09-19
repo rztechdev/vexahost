@@ -249,7 +249,7 @@ class SupplierPurchaseTest extends TestCase
         $org = $customer->createPersonalOrganization();
         $customer->switchToOrganization($org);
 
-        foreach (['/', '/checkout', '/terms', '/status', '/sla', '/refund'] as $path) {
+        foreach (['/', '/checkout', '/terms', '/status', '/refund'] as $path) {
             $this->get($path)->assertDontSee('Supplier')->assertDontSee('supplier');
         }
 

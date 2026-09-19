@@ -50,7 +50,7 @@
                 <tr>
                     <td style="padding: 6px 0; color: #71717a;">Batas SLA:</td>
                     <td style="padding: 6px 0; color: #000000; font-weight: 600;">
-                        {{ $ticket->sla_due_at ? \Carbon\Carbon::parse($ticket->sla_due_at)->format('d M Y, H:i') . ' WIB' : '4 Jam setelah tiket dibuat' }}
+                        {{ $ticket->sla_due_at ? \Carbon\Carbon::parse($ticket->sla_due_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') . ' WIB' : '4 Jam setelah tiket dibuat' }}
                     </td>
                 </tr>
             </table>

@@ -28,6 +28,6 @@ class OrganizationInvitationNotification extends Notification
             ->subject("Undangan bergabung ke {$org->name}")
             ->line("Anda diundang bergabung ke organisasi {$org->name} di VexaHost sebagai {$role->name}.")
             ->action('Terima Undangan', $url)
-            ->line('Undangan berlaku sampai ' . optional($this->invitation->expires_at)->format('d M Y H:i'));
+            ->line('Undangan berlaku sampai ' . ($this->invitation->expires_at ? $this->invitation->expires_at->timezone('Asia/Jakarta')->format('d M Y H:i') . ' WIB' : '-'));
     }
 }

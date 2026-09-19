@@ -390,7 +390,7 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 font-mono-code text-[11px] text-slate-600">
-                                    {{ $coupon->starts_at?->format('d M Y') ?? 'Sekarang' }} – {{ $coupon->ends_at?->format('d M Y') ?? 'Tanpa batas' }}
+                                    {{ $coupon->starts_at?->timezone('Asia/Jakarta')->format('d M Y') ?? 'Sekarang' }} – {{ $coupon->ends_at?->timezone('Asia/Jakarta')->format('d M Y') ?? 'Tanpa batas' }}
                                 </td>
                                 <td class="px-5 py-3.5 text-center font-mono-code font-semibold">{{ $coupon->redemptions_count }}{{ $coupon->max_redemptions ? ' / ' . $coupon->max_redemptions : '' }}</td>
                                 <td class="px-5 py-3.5 text-center">

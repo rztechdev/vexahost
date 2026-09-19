@@ -29,7 +29,8 @@ class ManagedDatabasePackagesTest extends TestCase
         // Section exists
         $response->assertSee('id="database-packages"', false);
         $response->assertSee('Paket Managed Database');
-        $response->assertSee('Dedicated DB VPS terisolasi murni');
+        $response->assertSee('Server database khusus yang terpisah dari server aplikasi');
+        $response->assertDontSee('bebas dari OOM crash');
 
         // All 3 database package tiers are present
         $response->assertSee('DB Micro');

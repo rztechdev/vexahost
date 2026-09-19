@@ -60,7 +60,7 @@
                             {{ strtoupper(str_replace('_', ' ', $ticket->status)) }}
                         </span>
                     </td>
-                    <td>{{ $ticket->created_at ? $ticket->created_at->translatedFormat('d M Y H:i') : '-' }}</td>
+                    <td>{{ $ticket->created_at ? $ticket->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y H:i') : '-' }}</td>
                 </tr>
             @empty
                 <tr><td colspan="6" class="text-center" style="padding: 16px; color: #94a3b8;">Tidak ada tiket pada periode ini.</td></tr>

@@ -93,7 +93,8 @@ class SeoMetadataTest extends TestCase
         // SimpleXML validation
         $xml = simplexml_load_string($content);
         $this->assertNotFalse($xml, 'Sitemap is valid XML structure');
-        $this->assertGreaterThanOrEqual(8, count($xml->url));
+        // 7 halaman statis (/sla dihapus karena VexaHost tidak menjanjikan uptime) + halaman checkout per paket.
+        $this->assertGreaterThanOrEqual(7, count($xml->url));
     }
 
     public function test_robots_txt_contains_sitemap_and_disallows(): void

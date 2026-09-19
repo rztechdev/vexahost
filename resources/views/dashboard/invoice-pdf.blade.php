@@ -305,7 +305,7 @@
                 <div class="brand-name">VexaHost Cloud Infrastructure</div>
                 <div class="brand-sub">
                     Enterprise Cloud Hosting &amp; Infrastructure Services<br>
-                    Data Center Hub: Jakarta Tier-3 &bull; Portal: https://vexahostcloud.my.id &bull; Email: {{ config('mail.from.address', 'vexahostcloudtech@gmail.com') }}
+                    Datacenter: Jakarta &amp; Singapore &bull; Portal: https://vexahostcloud.my.id &bull; Email: {{ config('mail.from.address', 'vexahostcloudtech@gmail.com') }}
                 </div>
             </td>
             <td class="invoice-headline" style="width: 45%;">
@@ -372,11 +372,11 @@
             </td>
             <td>
                 <div class="meta-label">Tanggal Terbit:</div>
-                <div class="meta-val">{{ $invoice->issued_at ? $invoice->issued_at->format('d F Y') : $invoice->created_at->format('d F Y') }}</div>
+                <div class="meta-val">{{ $invoice->issued_at ? $invoice->issued_at->timezone('Asia/Jakarta')->format('d F Y') : $invoice->created_at->timezone('Asia/Jakarta')->format('d F Y') }}</div>
             </td>
             <td>
                 <div class="meta-label">Jatuh Tempo:</div>
-                <div class="meta-val">{{ $invoice->due_at ? $invoice->due_at->format('d F Y') : '-' }}</div>
+                <div class="meta-val">{{ $invoice->due_at ? $invoice->due_at->timezone('Asia/Jakarta')->format('d F Y') : '-' }}</div>
             </td>
             <td>
                 <div class="meta-label">Metode Pembayaran:</div>
@@ -409,7 +409,7 @@
                         <span>&bull; Komputasi: {{ $invoice->order->vpsSpec->cpu ?? 2 }} vCPU Core</span>
                         <span>&bull; Memory: {{ $invoice->order->vpsSpec->ram ?? 4 }} GB RAM</span>
                         <span>&bull; Storage: {{ $invoice->order->vpsSpec->disk ?? 60 }} GB NVMe</span><br>
-                        <span>&bull; Datacenter: {{ ucfirst($invoice->order->datacenter_location ?? 'Indonesia') }} Tier-3</span>
+                        <span>&bull; Datacenter: {{ ucfirst($invoice->order->datacenter_location ?? 'Indonesia') }}</span>
                         <span>&bull; OS: {{ $invoice->order->os_label ?? 'Ubuntu 24.04 LTS' }}</span>
                         <span>&bull; Stack Panel: {{ $invoice->order->control_panel_label ?? 'Dokploy' }}</span>
                     </div>
@@ -465,12 +465,12 @@
         <div class="settlement-desc">
             @if($isPaid)
                 Pembayaran faktur ini telah <strong>BERHASIL DITERIMA & DIVERIFIKASI</strong> secara otomatis oleh sistem penagihan VexaHost.<br>
-                Waktu Pelunasan: <strong>{{ $invoice->order->paid_at ? $invoice->order->paid_at->format('d F Y, H:i:s') . ' WIB' : '-' }}</strong> &bull;
+                Waktu Pelunasan: <strong>{{ $invoice->order->paid_at ? $invoice->order->paid_at->timezone('Asia/Jakarta')->format('d F Y, H:i:s') . ' WIB' : '-' }}</strong> &bull;
                 Ref Transaksi: <strong>{{ $invoice->order->payment_reference ?? 'SETTLED-' . $invoice->id . '-' . $invoice->order->id }}</strong> &bull;
                 Status Layanan: <strong>AKTIF / DALAM PROSES PROVISIONING</strong>
             @else
                 Faktur ini berstatus <strong>MENUNGGU PEMBAYARAN</strong>. Silakan selesaikan pembayaran sebelum tanggal jatuh tempo.<br>
-                Batas Waktu Pelunasan: <strong>{{ $invoice->due_at ? $invoice->due_at->format('d F Y, H:i') . ' WIB' : '-' }}</strong>
+                Batas Waktu Pelunasan: <strong>{{ $invoice->due_at ? $invoice->due_at->timezone('Asia/Jakarta')->format('d F Y, H:i') . ' WIB' : '-' }}</strong>
             @endif
         </div>
     </div>

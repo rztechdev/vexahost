@@ -21,9 +21,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
+    /** Pesan validasi untuk link control panel (kolom app_url). */
+    private const PANEL_URL_MESSAGES = [
+        'app_url.required' => 'Link control panel wajib diisi untuk paket dengan panel.',
+        'app_url.url' => 'Link control panel harus lengkap dan diawali http:// atau https:// (contoh: http://103.150.10.2:8000 atau https://panel.domain.com).',
+    ];
+
     public function __construct(
         protected OrderStateMachine $orderStateMachine,
         protected VpsStateMachine $vpsStateMachine,
@@ -394,13 +401,11 @@ class AdminController extends Controller
             'ssh_port' => 'nullable|integer|min:1|max:65535',
         ];
 
-        if ($hasPanel) {
-            $rules['app_url'] = 'required|string|max:255';
-        } else {
-            $rules['app_url'] = 'nullable|string|max:255';
-        }
+        // Link panel wajib berformat URL lengkap agar tautan di dashboard pelanggan
+        // tidak rusak (mis. "panel.domain.com" tanpa skema menjadi link relatif).
+        $rules['app_url'] = [$hasPanel ? 'required' : 'nullable', 'url:http,https', 'max:255'];
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, self::PANEL_URL_MESSAGES);
 
         try {
             $instance = DB::transaction(function () use ($order, $validated, $isDb, $hasPanel) {
@@ -713,7 +718,8 @@ class AdminController extends Controller
             'public_ip' => 'nullable|required_if:auto_provision,1|ip',
             'ssh_port' => 'nullable|integer|min:1|max:65535',
             'root_password' => 'nullable|string|min:8',
-        ]);
+            'app_url' => ['nullable', 'url:http,https', 'max:255'],
+        ], self::PANEL_URL_MESSAGES);
 
         $existingOrder = Order::where('shopee_order_id', $validated['shopee_order_id'])->first();
         if ($existingOrder) {
@@ -899,7 +905,12 @@ class AdminController extends Controller
                     $sshPort = !empty($validated['ssh_port']) ? (int)$validated['ssh_port'] : 22;
 
                     $isAiPlan = $spec->isAiPackage();
-                    $appUrl = ($isDb && $dbManager === 'cloudbeaver') ? "https://{$validated['public_ip']}:8080" : null;
+                    // Link yang diisi admin diutamakan; tanpa isian, hanya CloudBeaver
+                    // (paket Database) yang punya alamat bawaan.
+                    $hasPanel = $validated['control_panel'] !== 'none' && !($isDb && $dbManager === 'cli_only');
+                    $appUrl = $hasPanel && !empty($validated['app_url'])
+                        ? $validated['app_url']
+                        : (($isDb && $dbManager === 'cloudbeaver') ? "https://{$validated['public_ip']}:8080" : null);
                     $appName = $isAiPlan ? $spec->name : (($isDb && $dbManager === 'cloudbeaver') ? 'CloudBeaver Web GUI' : null);
                     $appGuide = $isAiPlan ? $spec->solution : null;
                     $osLabel = Order::osLabels()[$validated['os']] ?? $validated['os'];
@@ -1071,10 +1082,11 @@ class AdminController extends Controller
 
         $aiPanels = ['vscode_server', 'hermes_agent', 'hermes_omniroute', 'claude_opencode', 'dify_ollama', 'anythingllm', 'ollama'];
 
+        // app_url tidak dipakai sebagai penanda paket AI: VPS biasa juga menyimpan
+        // link control panel (mis. Coolify) di kolom itu. Sama dengan VpsInstance::isAiPackage().
         if ($category === 'ai') {
             $query->where(function ($q) use ($aiPanels) {
                 $q->whereIn('control_panel', $aiPanels)
-                  ->orWhereNotNull('app_url')
                   ->orWhereHas('order.vpsSpec', function ($sq) {
                       $sq->where('category', 'ai_combo')
                          ->orWhereIn('id', [7, 8, 9, 10]);
@@ -1093,7 +1105,6 @@ class AdminController extends Controller
         } elseif ($category === 'vps') {
             $query->where(function ($q) use ($aiPanels) {
                 $q->whereNotIn('control_panel', array_merge($aiPanels, ['managed_database']))
-                  ->whereNull('app_url')
                   ->whereNull('db_engine')
                   ->where('hostname', 'not like', 'vx-db-%')
                   ->where(function ($subQ) {
@@ -1119,7 +1130,6 @@ class AdminController extends Controller
 
         $aiCount = VpsInstance::where(function ($q) use ($aiPanels) {
             $q->whereIn('control_panel', $aiPanels)
-              ->orWhereNotNull('app_url')
               ->orWhereHas('order.vpsSpec', function ($sq) {
                   $sq->where('category', 'ai_combo')->orWhereIn('id', [7, 8, 9, 10]);
               });
@@ -1275,6 +1285,33 @@ class AdminController extends Controller
         return back()->with('success', 'Status VPS ' . ($instance->hostname ?? $instance->id) . ' berhasil diubah menjadi ' . $validated['status'] . '.');
     }
 
+    /**
+     * Ubah link control panel (kolom app_url) yang tampil di dashboard pelanggan.
+     * Dipakai bila link belum diisi saat serah terima atau perlu dikoreksi.
+     */
+    public function updateInstancePanelUrl(Request $request, $id)
+    {
+        $instance = VpsInstance::findOrFail($id);
+
+        $validated = $request->validate([
+            'app_url' => ['nullable', 'url:http,https', 'max:255'],
+        ], self::PANEL_URL_MESSAGES);
+
+        $newUrl = $validated['app_url'] ?? null;
+        $instance->update(['app_url' => $newUrl]);
+
+        $instance->logActivity(
+            action: 'panel_url_updated',
+            description: $newUrl ? "Link control panel diperbarui tim: {$newUrl}" : 'Link control panel dikosongkan oleh tim.',
+            status: 'completed',
+            userId: Auth::id()
+        );
+
+        $serverName = $instance->hostname ?? ('#' . $instance->id);
+
+        return back()->with('success', "Link control panel {$serverName} berhasil disimpan.");
+    }
+
     public function suspendInstance(Request $request, $id)
     {
         $instance = VpsInstance::findOrFail($id);
@@ -1390,11 +1427,26 @@ class AdminController extends Controller
         $query = SupportTicket::with(['customer', 'vpsInstance', 'latestMessage', 'assignee'])->orderBy('updated_at', 'desc');
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            // 'active' = semua tiket yang masih perlu ditangani (open + in_progress).
+            if ($request->status === 'active') {
+                $query->whereIn('status', SupportTicket::OPEN_STATUSES);
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
+        if ($request->type === 'service') {
+            // Semua permintaan layanan server (reinstall + server tidak bisa diakses).
+            $query->serviceRequests();
+        } elseif ($request->filled('type') && array_key_exists($request->type, SupportTicket::typeLabels())) {
+            $query->where('type', $request->type);
+        }
+
+        // Jumlah permintaan layanan server yang masih menunggu, untuk penanda di daftar.
+        $openServiceRequestCount = SupportTicket::serviceRequests()->awaitingTeam()->count();
+
         $tickets = $query->paginate(15)->withQueryString();
-        return view('admin.tickets', compact('tickets'));
+        return view('admin.tickets', compact('tickets', 'openServiceRequestCount'));
     }
 
     public function showTicket($id)
@@ -1402,6 +1454,108 @@ class AdminController extends Controller
         $ticket = SupportTicket::with(['customer', 'vpsInstance', 'messages.user', 'assignee'])->findOrFail($id);
         $admins = User::where('is_admin', true)->orderBy('full_name')->get();
         return view('admin.ticket-show', compact('ticket', 'admins'));
+    }
+
+    /**
+     * Selesaikan permintaan reinstall OS dari pelanggan.
+     *
+     * Reinstall sudah dikerjakan admin secara manual di dashboard supplier
+     * (server dibeli retail, tanpa API). Di sini admin mencatat OS/stack yang
+     * terpasang dan password root baru, menutup tiket, lalu memberi tahu
+     * pelanggan. Password tidak pernah dikirim lewat email: pelanggan melihatnya
+     * di dashboard setelah verifikasi password akun.
+     */
+    public function completeReinstall(Request $request, $id)
+    {
+        $ticket = SupportTicket::with('vpsInstance')->findOrFail($id);
+
+        if ($ticket->type !== SupportTicket::TYPE_REINSTALL) {
+            return back()->with('error', 'Tiket ini bukan permintaan reinstall.');
+        }
+        if (!$ticket->isOpen()) {
+            return back()->with('error', 'Permintaan reinstall ini sudah ditutup.');
+        }
+
+        $vps = $ticket->vpsInstance;
+        if (!$vps) {
+            return back()->with('error', 'Server yang terkait dengan tiket ini tidak ditemukan.');
+        }
+
+        $osOptions = $vps->reinstallOsOptions();
+        $stackOptions = $vps->reinstallStackOptions();
+
+        $rules = [
+            'os' => ['required', 'string', Rule::in(array_keys($osOptions))],
+            'root_password' => ['required', 'string', 'min:8', 'max:128'],
+            'message' => ['nullable', 'string', 'max:2000'],
+        ];
+        if (!$vps->hasFixedStack()) {
+            $rules['control_panel'] = ['required', 'string', Rule::in(array_keys($stackOptions))];
+        }
+        $validated = $request->validate($rules);
+
+        $controlPanel = $vps->hasFixedStack() ? $vps->control_panel : $validated['control_panel'];
+        $osLabel = $osOptions[$validated['os']];
+        $serverName = $vps->hostname ?? ('VPS-' . $vps->id);
+        $ticketCode = '#TK-' . str_pad((string) $ticket->id, 4, '0', STR_PAD_LEFT);
+
+        $customerMessage = trim((string) ($validated['message'] ?? ''));
+        if ($customerMessage === '') {
+            $customerMessage = "Reinstall OS {$osLabel} untuk server {$serverName} sudah selesai.\n\n"
+                . "Password root baru dapat dilihat di Dashboard > Detail VPS > tab Akses (perlu verifikasi password akun). "
+                . "Setelah login, segera ganti password root dengan perintah passwd.";
+        }
+
+        $completed = DB::transaction(function () use ($ticket, $vps, $validated, $controlPanel, $osLabel, $customerMessage, $ticketCode) {
+            // Kunci tiket agar dua admin tidak menyelesaikan permintaan yang sama.
+            $lockedTicket = SupportTicket::whereKey($ticket->id)->lockForUpdate()->first();
+            if (!$lockedTicket || !$lockedTicket->isOpen()) {
+                return false;
+            }
+
+            $lockedVps = VpsInstance::whereKey($vps->id)->lockForUpdate()->firstOrFail();
+            $lockedVps->os = $validated['os'];
+            $lockedVps->control_panel = $controlPanel;
+            $lockedVps->initial_root_password = $validated['root_password'];
+            // Reset agar pelanggan melihat password baru sebagai belum pernah dibuka.
+            $lockedVps->root_password_revealed_at = null;
+            $lockedVps->save();
+
+            TicketMessage::create([
+                'ticket_id' => $lockedTicket->id,
+                'user_id' => Auth::id(),
+                'message' => $customerMessage,
+                'is_admin_reply' => true,
+                'is_internal' => false,
+            ]);
+
+            $lockedTicket->update([
+                'status' => 'resolved',
+                'resolved_at' => now(),
+                'first_response_at' => $lockedTicket->first_response_at ?: now(),
+            ]);
+
+            $lockedVps->logActivity(
+                action: 'reinstall_completed',
+                description: "Reinstall OS {$osLabel} selesai dikerjakan tim. Password root baru tersedia di tab Akses. ({$ticketCode})",
+                status: 'completed',
+                userId: Auth::id()
+            );
+
+            return true;
+        });
+
+        if (!$completed) {
+            return back()->with('error', 'Permintaan reinstall ini sudah diselesaikan oleh admin lain.');
+        }
+
+        try {
+            $ticket->refresh()->customer?->notify(new \App\Notifications\TicketRepliedNotification($ticket, $customerMessage));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('admin.ticket_reinstall.notify_failed', ['ticket_id' => $ticket->id, 'error' => $e->getMessage()]);
+        }
+
+        return back()->with('success', "Reinstall {$serverName} ditandai selesai. Password root baru tersimpan dan pelanggan sudah diberi tahu.");
     }
 
     public function replyTicket(Request $request, $id)

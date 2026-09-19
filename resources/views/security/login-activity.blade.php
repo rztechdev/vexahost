@@ -21,7 +21,7 @@
                 <tbody class="divide-y">
                     @forelse($activities as $activity)
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap">{{ $activity->created_at->format('d M Y H:i') }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap">{{ $activity->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</td>
                             <td class="px-6 py-3"><span class="rounded-full px-2 py-1 text-xs font-semibold {{ $activity->outcome === 'success' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">{{ $activity->outcome }}</span></td>
                             <td class="px-6 py-3 font-mono-code text-xs">{{ $activity->ip_address ?: '-' }}</td>
                             <td class="px-6 py-3">{{ $activity->device_label ?: Str::limit($activity->user_agent, 45) }}</td>

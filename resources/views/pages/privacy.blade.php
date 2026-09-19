@@ -25,9 +25,6 @@
                     <a href="{{ route('privacy') }}" class="px-2.5 py-1 rounded-md font-bold bg-slate-900 text-white whitespace-nowrap">
                         Privacy Policy
                     </a>
-                    <a href="{{ route('sla') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
-                        SLA 99.9%
-                    </a>
                     <a href="{{ route('refund') }}" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap">
                         Refund Policy
                     </a>

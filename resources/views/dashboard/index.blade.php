@@ -15,7 +15,7 @@
                 <p class="text-xs font-medium text-slate-500">VPS Instances</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1 font-mono-code">{{ $vps->count() }} <span class="text-xs font-normal text-slate-500 font-sans">Unit</span></p>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    {{ $vps->where('status', 'running')->count() }} Berjalan &bull; {{ $vps->where('status', 'stopped')->count() }} Berhenti
+                    {{ $vps->where('status', 'running')->count() }} Aktif &bull; {{ $vps->whereIn('status', ['suspended', 'stopped', 'error'])->count() }} Perlu Perhatian
                     @if(isset($provisioningOrders) && $provisioningOrders->count() > 0)
                         &bull; <span class="text-amber-600 font-semibold">{{ $provisioningOrders->count() }} Setup</span>
                     @endif
@@ -318,27 +318,11 @@
                                     </div>
                                 </div>
 
-                                @if($instance->status === 'running')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-emerald-300 text-emerald-800 bg-emerald-50">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        Running
-                                    </span>
-                                @elseif($instance->status === 'stopped')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-slate-300 text-slate-700 bg-slate-100">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                        Stopped
-                                    </span>
-                                @elseif($instance->status === 'suspended')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-amber-300 text-amber-800 bg-amber-50">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                        Suspended
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-red-300 text-red-800 bg-red-50">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                        {{ ucfirst($instance->status) }}
-                                    </span>
-                                @endif
+                                @php $instanceStatus = $instance->customer_status; @endphp
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border {{ $instanceStatus['class'] }}" title="Status layanan">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $instanceStatus['dot'] }}"></span>
+                                    {{ $instanceStatus['label'] }}
+                                </span>
                             </div>
 
                             <!-- Subscription & Expiry Tag -->
@@ -349,15 +333,15 @@
                                     </span>
                                 @elseif($instance->isInGracePeriod())
                                     <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                                        Masa Tenggang s/d {{ $instance->grace_period_ends_at?->format('d M') }}
+                                        Masa Tenggang s/d {{ $instance->grace_period_ends_at?->timezone('Asia/Jakarta')->format('d M') }}
                                     </span>
                                 @elseif($instance->isExpired())
                                     <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-red-50 text-red-800 border border-red-200">
-                                        Expired {{ $instance->expires_at?->format('d M Y') }}
+                                        Expired {{ $instance->expires_at?->timezone('Asia/Jakarta')->format('d M Y') }}
                                     </span>
                                 @elseif($instance->expires_at)
                                     <span class="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                        Tempo: {{ $instance->expires_at->format('d M Y') }} ({{ now()->diffInDays($instance->expires_at, false) }} hr)
+                                        Tempo: {{ $instance->expires_at->timezone('Asia/Jakarta')->format('d M Y') }} ({{ $instance->days_until_expiry }} hr)
                                     </span>
                                 @endif
                             </div>
@@ -392,10 +376,6 @@
                                         {{ str_replace('_', ' ', $instance->billing_cycle ?? 'monthly') }}
                                     </span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>Uptime SLA:</span>
-                                    <span class="font-semibold text-slate-900">99.9%</span>
-                                </div>
                             </div>
 
                             @if($instance->isAiPackage())
@@ -419,7 +399,7 @@
                                         </div>
                                     @else
                                         <p class="text-[11px] text-slate-500 italic">
-                                            {{ $instance->status === 'running' ? 'Mengalokasikan tautan web...' : 'Server non-aktif. Nyalakan untuk membuka app.' }}
+                                            {{ $instance->status === 'running' ? 'Tautan web sedang disiapkan tim.' : 'Layanan sedang tidak aktif. Buka detail untuk informasi lebih lanjut.' }}
                                         </p>
                                     @endif
                                 </div>
@@ -443,29 +423,6 @@
                                    class="flex-1 py-2 px-3 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold text-xs text-center transition-colors">
                                     Kelola Layanan
                                 </a>
-                            @endif
-
-                            @if($instance->status === 'running')
-                                <form action="{{ route('dashboard.vps.stop', $instance->id) }}" method="POST" data-confirm="Matikan instance {{ $instance->hostname }}?">
-                                    @csrf
-                                    <button type="submit" title="Matikan Server" class="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 transition-colors">
-                                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    </button>
-                                </form>
-
-                                <form action="{{ route('dashboard.vps.reboot', $instance->id) }}" method="POST" data-confirm="Reboot instance {{ $instance->hostname }}?">
-                                    @csrf
-                                    <button type="submit" title="Reboot Server" class="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 transition-colors">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                    </button>
-                                </form>
-                            @elseif($instance->status === 'stopped')
-                                <form action="{{ route('dashboard.vps.start', $instance->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" title="Nyalakan Server" class="p-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    </button>
-                                </form>
                             @endif
                         </div>
                     </div>

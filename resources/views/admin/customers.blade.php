@@ -81,7 +81,7 @@
                                 {{ $customer->orders_count }} Order
                             </td>
                             <td class="px-5 py-3.5 text-slate-500 font-mono-code">
-                                {{ $customer->created_at->format('d/m/Y') }}
+                                {{ $customer->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}
                             </td>
                             <td class="px-5 py-3.5 text-right">
                                 @unless($customer->is_admin)

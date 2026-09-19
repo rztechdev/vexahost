@@ -45,7 +45,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 6px 0; color: #71717a;">Tanggal:</td>
-                    <td style="padding: 6px 0; color: #000000;">{{ now()->translatedFormat('d F Y, H:i') }} WIB</td>
+                    <td style="padding: 6px 0; color: #000000;">{{ now()->timezone('Asia/Jakarta')->translatedFormat('d F Y, H:i') }} WIB</td>
                 </tr>
             </table>
         </td>

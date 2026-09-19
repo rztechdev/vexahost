@@ -24,7 +24,7 @@
                             Website Direct
                         </span>
                     @endif
-                    <span class="text-xs text-slate-500">· Terdaftar {{ $user->created_at->format('d M Y') }}</span>
+                    <span class="text-xs text-slate-500">· Terdaftar {{ $user->created_at->timezone('Asia/Jakarta')->format('d M Y') }}</span>
                 </div>
             </div>
         </div>

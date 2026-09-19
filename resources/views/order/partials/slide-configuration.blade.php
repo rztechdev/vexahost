@@ -94,7 +94,7 @@
                 <img src="{{ asset('images/logos/providers/cloudeka.svg') }}" alt="Cloudeka by Lintasarta" class="w-8 h-8 object-contain shrink-0 mt-0.5" />
                 <div>
                     <p class="font-semibold text-sm text-slate-900">Cloudeka by Lintasarta</p>
-                    <p class="text-xs text-slate-500 mt-1">Indonesia (Tier-3 Datacenter)</p>
+                    <p class="text-xs text-slate-500 mt-1">Indonesia (Jakarta)</p>
                 </div>
             </button>
         </div>
@@ -113,13 +113,11 @@
                 <div class="grid sm:grid-cols-2 gap-3">
                     <label x-show="provider === 'tencent'" class="p-3 rounded-lg border cursor-pointer flex items-center justify-between" :class="datacenter === 'singapore' ? 'border-black bg-slate-50' : 'border-slate-200 hover:border-slate-300'">
                         <input type="radio" name="datacenter_location" value="singapore" x-model="datacenter" class="sr-only">
-                        <span><b class="block text-sm">Singapore</b><small class="text-xs text-slate-500">Tier-3 Global Backbone</small></span>
-                        <span class="text-xs text-slate-500">~12ms</span>
+                        <span><b class="block text-sm">Singapore</b><small class="text-xs text-slate-500">Rute internasional</small></span>
                     </label>
                     <label class="p-3 rounded-lg border cursor-pointer flex items-center justify-between" :class="datacenter === 'indonesia' ? 'border-black bg-slate-50' : 'border-slate-200 hover:border-slate-300'">
                         <input type="radio" name="datacenter_location" value="indonesia" x-model="datacenter" class="sr-only">
-                        <span><b class="block text-sm">Indonesia (Jakarta)</b><small class="text-xs text-slate-500">IIX / OpenIXP</small></span>
-                        <span class="text-xs text-slate-500">~3ms</span>
+                        <span><b class="block text-sm">Indonesia (Jakarta)</b><small class="text-xs text-slate-500">Untuk pengguna di Indonesia</small></span>
                     </label>
                 </div>
             </div>

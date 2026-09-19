@@ -3,13 +3,15 @@
 @section('content')
 <div class="space-y-6" x-data="{
     activeTab: '{{ $vps->isAiPackage() ? 'webapp' : ($vps->isDatabasePackage() ? 'database' : 'overview') }}',
-    reinstallModal: false,
+    reinstallModal: {{ $errors->hasAny(['os', 'control_panel', 'confirm_hostname', 'notes']) ? 'true' : 'false' }},
+    rebootGuideModal: false,
+    unreachableModal: {{ $errors->has('description') ? 'true' : 'false' }},
     passwordModal: false,
     challengePassword: '',
     passwordError: '',
     passwordLoading: false,
     revealedPassword: '',
-    revealedAt: '{{ $vps->root_password_revealed_at ? $vps->root_password_revealed_at->format('d M Y H:i:s') : '' }}',
+    revealedAt: '{{ $vps->root_password_revealed_at ? $vps->root_password_revealed_at->timezone('Asia/Jakarta')->format('d M Y H:i:s') : '' }}',
     showDbPassword: false,
     copyText(text) {
         if (!text) return;
@@ -69,7 +71,7 @@
             <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <div class="text-xs">
                 <strong class="font-bold text-sm block">Masa Tenggang Berlangganan (Grace Period)</strong>
-                Masa aktif VPS telah jatuh tempo. Anda memiliki masa tenggang hingga <strong>{{ $vps->grace_period_ends_at?->format('d M Y, H:i') }}</strong> sebelum layanan dihentikan otomatis.
+                Masa aktif VPS telah jatuh tempo. Anda memiliki masa tenggang hingga <strong>{{ $vps->grace_period_ends_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }}</strong> sebelum layanan dihentikan otomatis.
             </div>
         </div>
     @elseif($vps->isExpired())
@@ -77,10 +79,28 @@
             <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <div class="text-xs">
                 <strong class="font-bold text-sm block">Masa Aktif Berakhir (Expired)</strong>
-                Masa aktif server telah kadaluarsa pada {{ $vps->expires_at?->format('d M Y, H:i') }}. Harap segera hubungi billing untuk aktivasi kembali.
+                Masa aktif server telah kadaluarsa pada {{ $vps->expires_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }}. Harap segera hubungi billing untuk aktivasi kembali.
             </div>
         </div>
     @endif
+
+    <!-- Permintaan layanan yang masih diproses tim -->
+    @foreach($openRequests as $openRequest)
+        <div class="p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-xs">
+                    <strong class="font-bold text-sm block">
+                        {{ $openRequest->type_label }} sedang {{ $openRequest->status === 'in_progress' ? 'dikerjakan' : 'menunggu diproses' }} tim
+                    </strong>
+                    Diajukan {{ $openRequest->created_at->locale('id')->diffForHumans() }}. Estimasi selesai maksimal {{ $slaHours }} jam kerja ({{ $supportHours }}). Anda akan menerima email saat selesai.
+                </div>
+            </div>
+            <a href="{{ route('dashboard.support.show', $openRequest->id) }}" class="px-3.5 py-1.5 rounded-lg bg-white border border-blue-300 hover:bg-blue-100 text-blue-900 text-xs font-semibold whitespace-nowrap self-start sm:self-auto">
+                Lihat Tiket #TK-{{ str_pad($openRequest->id, 4, '0', STR_PAD_LEFT) }}
+            </a>
+        </div>
+    @endforeach
 
     <!-- Server Top Card -->
     <div class="bg-white rounded-lg border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -100,27 +120,11 @@
                             AI Combo
                         </span>
                     @endif
-                    @if($vps->status === 'running')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-emerald-300 text-emerald-800 bg-emerald-50">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Running
-                        </span>
-                    @elseif($vps->status === 'stopped')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-slate-300 text-slate-700 bg-slate-100">
-                            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                            Stopped
-                        </span>
-                    @elseif($vps->status === 'suspended')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-amber-300 text-amber-800 bg-amber-50">
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                            Suspended
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border border-red-300 text-red-800 bg-red-50">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                            {{ ucfirst($vps->status) }}
-                        </span>
-                    @endif
+                    @php $customerStatus = $vps->customer_status; @endphp
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase border {{ $customerStatus['class'] }}" title="Status layanan">
+                        <span class="w-2 h-2 rounded-full {{ $customerStatus['dot'] }}"></span>
+                        {{ $customerStatus['label'] }}
+                    </span>
                 </div>
                 <div class="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-slate-600 mt-1.5">
                     <span>IP: <strong class="text-slate-900 font-mono-code">{{ $vps->public_ip ?? 'Belum dialokasikan' }}</strong></span>
@@ -146,53 +150,36 @@
                     </a>
                 @elseif($vps->isDatabasePackage() && $vps->web_manager_url_resolved)
                     <a href="{{ $vps->web_manager_url_resolved }}" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
-                        <span>Buka Web Manager (Port 8080)</span>
+                        <span>Buka Web Manager</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
-                @elseif(!$vps->isDatabasePackage())
-                    <a href="http://{{ $vps->public_ip }}:8000" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5">
+                @elseif(!$vps->isDatabasePackage() && $vps->panel_url)
+                    {{-- Hanya link yang diisi admin; tanpa link, tombol tidak ditampilkan (bukan menebak IP:port). --}}
+                    <a href="{{ $vps->panel_url }}" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5">
                         <span>Panel Web</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
                 @endif
             @endif
 
-            @if($vps->status === 'stopped')
-                <form action="{{ route('dashboard.vps.start', $vps->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Nyalakan Server
-                    </button>
-                </form>
-            @elseif($vps->status === 'running')
-                <form action="{{ route('dashboard.vps.stop', $vps->id) }}" method="POST" data-confirm="Lakukan graceful shutdown pada server {{ $vps->hostname }}?">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-900 transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Matikan (Stop)
-                    </button>
-                </form>
-
-                <form action="{{ route('dashboard.vps.reboot', $vps->id) }}" method="POST" data-confirm="Reboot server {{ $vps->hostname }}?">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-900 transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Reboot
-                    </button>
-                </form>
+            {{-- Panel tidak menjalankan aksi daya sendiri (server retail tanpa API).
+                 Reboot dilakukan pelanggan lewat SSH, reinstall diajukan ke tim. --}}
+            {{-- Panduan reboot lewat SSH hanya relevan bila server menyala (atau sedang
+                 bermasalah, karena modalnya juga berisi tombol lapor ke tim). --}}
+            @if(in_array($vps->status, ['running', 'error'], true))
+                <button type="button" @click="rebootGuideModal = true" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-900 transition-colors flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Cara Reboot
+                </button>
             @endif
 
-            @if(!in_array($vps->status, ['suspended', 'terminated']))
-                <form action="{{ route('dashboard.vps.force-reboot', $vps->id) }}" method="POST" data-confirm="Peringatan: Force reboot mematikan daya secara paksa (hard reset). Lanjutkan?">
-                    @csrf
-                    <button type="submit" class="px-3 py-2 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-semibold text-red-700 transition-colors" title="Force Reboot / Hard Reset">
-                        Force Reset
-                    </button>
-                </form>
-
-                <button @click="reinstallModal = true" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-900 transition-colors">
-                    Reinstall OS
+            @if(isset($openRequests['reinstall']))
+                <a href="{{ route('dashboard.support.show', $openRequests['reinstall']->id) }}" class="px-4 py-2 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-xs font-semibold text-blue-800 transition-colors">
+                    Reinstall Sedang Diproses
+                </a>
+            @elseif($vps->acceptsServiceRequests())
+                <button type="button" @click="reinstallModal = true" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-900 transition-colors">
+                    Ajukan Reinstall OS
                 </button>
             @endif
         </div>
@@ -210,7 +197,7 @@
             <button @click="activeTab = 'overview'"
                     :class="activeTab === 'overview' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
                     class="py-2 px-4 rounded-lg transition-colors">
-                Ringkasan & Metrik
+                Ringkasan Server
             </button>
             <button @click="activeTab = 'access'"
                     :class="activeTab === 'access' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
@@ -227,7 +214,7 @@
             <button @click="activeTab = 'overview'"
                     :class="activeTab === 'overview' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
                     class="py-2 px-4 rounded-lg transition-colors">
-                Ringkasan & Metrik
+                Ringkasan Server
             </button>
             <button @click="activeTab = 'access'"
                     :class="activeTab === 'access' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
@@ -238,7 +225,7 @@
             <button @click="activeTab = 'overview'"
                     :class="activeTab === 'overview' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
                     class="py-2 px-4 rounded-lg transition-colors">
-                Ringkasan & Metrik
+                Ringkasan Server
             </button>
             <button @click="activeTab = 'access'"
                     :class="activeTab === 'access' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
@@ -261,6 +248,17 @@
             </button>
         @endif
 
+        <button @click="activeTab = 'requests'"
+                :class="activeTab === 'requests' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                class="py-2 px-4 rounded-lg transition-colors flex items-center gap-1.5">
+            <span>Permintaan & Bantuan</span>
+            @if($openRequests->isNotEmpty())
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 text-blue-800" :class="activeTab === 'requests' ? 'bg-neutral-800 text-white' : ''">
+                    {{ $openRequests->count() }}
+                </span>
+            @endif
+        </button>
+
         <button @click="activeTab = 'logs'"
                 :class="activeTab === 'logs' ? 'bg-black text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
                 class="py-2 px-4 rounded-lg transition-colors flex items-center gap-1.5">
@@ -269,6 +267,8 @@
                 {{ $vps->activityLogs->count() }}
             </span>
         </button>
+    </div>
+
     @if($vps->isDatabasePackage())
     @php
         $dbHost = $vps->public_ip ?? '103.xxx.xxx.xxx';
@@ -471,7 +471,7 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                     <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Panduan Remote Database Client</h4>
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Server ini terisolasi khusus database di Datacenter Jakarta untuk menjaga latensi minimal (~3–10ms), anti-crash memory swap otomatis, dan proteksi penuh. Anda dapat menghubungkan aplikasi backend (Vercel, Railway, VPS luar) atau remote client (DBeaver, TablePlus, DataGrip, Navicat, psql, mysql client) via Dedicated IP Publik Static server:
+                    Server ini khusus untuk database dan terpisah dari server aplikasi Anda. Anda dapat menghubungkan aplikasi backend (Vercel, Railway, VPS luar) atau remote client (DBeaver, TablePlus, DataGrip, Navicat, psql, mysql client) via Dedicated IP Publik Static server:
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                     <div class="bg-white p-2.5 rounded border border-emerald-100">
@@ -583,126 +583,118 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
     </div>
     @endif
 
-    <!-- Tab 1: Overview & Metrics -->
+    <!-- Tab 1: Ringkasan -->
     <div x-show="activeTab === 'overview'" class="space-y-6">
-        <!-- Resource Metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @if(!$vps->isAiPackage() && !$vps->isDatabasePackage() && $vps->status === 'running')
+            <!-- Mulai di sini: 3 langkah pertama untuk server baru -->
+            <div class="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 class="text-base font-bold text-slate-900">Mulai di Sini</h3>
+                <p class="text-xs text-slate-500 mt-0.5 mb-4">Tiga langkah pertama setelah server Anda aktif.</p>
+
+                <ol class="grid gap-3 md:grid-cols-3 text-xs">
+                    <li class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-black text-white font-bold">1</span>
+                        <p class="font-semibold text-slate-900">Ambil password root</p>
+                        <p class="text-slate-500">Butuh verifikasi password akun VexaHost Anda.</p>
+                        <button type="button" @click="openPasswordModal()" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold">
+                            Tampilkan Password
+                        </button>
+                    </li>
+                    <li class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-black text-white font-bold">2</span>
+                        <p class="font-semibold text-slate-900">Login ke server lewat SSH</p>
+                        <p class="text-slate-500">Jalankan dari Terminal, PowerShell, atau PuTTY.</p>
+                        <div class="flex items-center justify-between gap-2 p-2 rounded bg-black text-white font-mono-code text-[11px]">
+                            <span class="truncate">{{ $vps->ssh_command }}</span>
+                            <button type="button" @click="copyText(@js($vps->ssh_command))" class="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 font-sans shrink-0">Salin</button>
+                        </div>
+                    </li>
+                    <li class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-black text-white font-bold">3</span>
+                        <p class="font-semibold text-slate-900">Ganti password root</p>
+                        <p class="text-slate-500">Setelah diganti, simpan password baru Anda sendiri. Password awal di panel tidak berlaku lagi.</p>
+                        <div class="flex items-center justify-between gap-2 p-2 rounded bg-black text-white font-mono-code text-[11px]">
+                            <span>passwd</span>
+                            <button type="button" @click="copyText('passwd')" class="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 font-sans shrink-0">Salin</button>
+                        </div>
+                    </li>
+                </ol>
+
+                @if($vps->control_panel && $vps->control_panel !== 'none')
+                    <p class="text-xs text-slate-500 mt-4">
+                        Memakai {{ $vps->control_panel_label }}? Buka tab
+                        <button type="button" @click="activeTab = 'panel'" class="font-semibold text-slate-900 underline">Control Panel</button>
+                        untuk alamat panelnya.
+                    </p>
+                @endif
+            </div>
+        @endif
+
+        <!-- Ringkasan paket: hanya data yang benar-benar tercatat -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white rounded-lg border border-slate-200 p-5">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-slate-500 font-semibold">CPU</span>
-                    <span class="text-xs font-bold text-slate-900 font-mono-code">
-                        @if($cpuUsage !== null)
-                            {{ $cpuUsage }}%
-                        @else
-                            <span class="text-slate-400">—</span>
-                        @endif
-                    </span>
-                </div>
-                <div class="w-full bg-slate-100 rounded h-2 mb-2">
-                    <div class="bg-black h-2 rounded transition-all duration-500" style="width: {{ $cpuUsage ?? 0 }}%"></div>
-                </div>
-                <p class="text-xs text-slate-500">{{ $cpuCores }} vCPU Dedicated Core</p>
+                <span class="text-xs text-slate-500 font-semibold block mb-1">Prosesor</span>
+                <p class="text-lg font-bold text-slate-900">{{ $vps->cpu ?? 1 }} vCPU</p>
             </div>
 
             <div class="bg-white rounded-lg border border-slate-200 p-5">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-slate-500 font-semibold">RAM</span>
-                    <span class="text-xs font-bold text-slate-900 font-mono-code">
-                        @if($ramPercent !== null)
-                            {{ $ramPercent }}%
-                        @else
-                            <span class="text-slate-400">—</span>
-                        @endif
-                    </span>
-                </div>
-                <div class="w-full bg-slate-100 rounded h-2 mb-2">
-                    <div class="bg-black h-2 rounded transition-all duration-500" style="width: {{ $ramPercent ?? 0 }}%"></div>
-                </div>
-                <p class="text-xs text-slate-500">
-                    @if($ramUsedGb !== null)
-                        {{ $ramUsedGb }} GB dari {{ $ramGb }} GB terpakai
+                <span class="text-xs text-slate-500 font-semibold block mb-1">Memori</span>
+                <p class="text-lg font-bold text-slate-900">{{ $vps->ram ?? 1 }} GB RAM</p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 p-5">
+                <span class="text-xs text-slate-500 font-semibold block mb-1">Penyimpanan</span>
+                <p class="text-lg font-bold text-slate-900">{{ $vps->disk ?? 20 }} GB</p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 p-5">
+                <span class="text-xs text-slate-500 font-semibold block mb-1">Status Layanan</span>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold border {{ $customerStatus['class'] }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $customerStatus['dot'] }}"></span>
+                    {{ $customerStatus['label'] }}
+                </span>
+                <p class="text-xs text-slate-500 mt-1.5">
+                    @if($vps->expires_at)
+                        {{ $vps->isExpired() ? 'Berakhir' : 'Aktif s/d' }} {{ $vps->expires_at->timezone('Asia/Jakarta')->format('d M Y') }}
                     @else
-                        {{ $ramGb }} GB (data monitoring belum tersedia)
+                        Masa aktif belum tercatat
                     @endif
-                </p>
-            </div>
-
-            <div class="bg-white rounded-lg border border-slate-200 p-5">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-slate-500 font-semibold">NVMe Storage</span>
-                    <span class="text-xs font-bold text-slate-900 font-mono-code">
-                        @if($diskPercent !== null)
-                            {{ $diskPercent }}%
-                        @else
-                            <span class="text-slate-400">—</span>
-                        @endif
-                    </span>
-                </div>
-                <div class="w-full bg-slate-100 rounded h-2 mb-2">
-                    <div class="bg-black h-2 rounded transition-all duration-500" style="width: {{ $diskPercent ?? 0 }}%"></div>
-                </div>
-                <p class="text-xs text-slate-500">
-                    @if($diskUsedGb !== null)
-                        {{ $diskUsedGb }} GB dari {{ $diskGb }} GB SSD
-                    @else
-                        {{ $diskGb }} GB SSD (data monitoring belum tersedia)
-                    @endif
-                </p>
-            </div>
-
-            <div class="bg-white rounded-lg border border-slate-200 p-5">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-slate-500 font-semibold">Status Server</span>
-                    @php $badge = $vps->statusBadge; @endphp
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border {{ $badge['bg'] }}">{{ $badge['label'] }}</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded h-2 mb-2">
-                    <div class="h-2 rounded transition-all duration-500 {{ $isRunning ? 'bg-emerald-500' : 'bg-slate-300' }}" style="width: {{ $isRunning ? '100' : '0' }}%"></div>
-                </div>
-                <p class="text-xs text-slate-500">
-                    SLA Garansi: 99.9% Uptime
                 </p>
             </div>
         </div>
 
-        <!-- Specifications -->
+        <!-- Detail Server -->
         <div class="bg-white rounded-lg border border-slate-200 p-6">
-            <h3 class="text-base font-bold text-slate-900 mb-4">Spesifikasi Virtual Machine</h3>
+            <h3 class="text-base font-bold text-slate-900 mb-4">Detail Server</h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
                 <div>
-                    <span class="text-slate-400 block mb-1">Compute Processor:</span>
-                    <p class="font-bold text-slate-900 text-sm">VexaCloud vCPU</p>
-                    <p class="text-slate-500">{{ $vps->cpu ?? 1 }} Core Dedicated</p>
+                    <span class="text-slate-400 block mb-1">Sistem Operasi:</span>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->os_label ?: '—' }}</p>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 block mb-1">Memori RAM:</span>
-                    <p class="font-bold text-slate-900 text-sm">{{ $vps->ram ?? 1 }} GB DDR4/DDR5</p>
-                    <p class="text-slate-500">Unbuffered ECC</p>
+                    <span class="text-slate-400 block mb-1">Stack / Control Panel:</span>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->control_panel_label ?: '—' }}</p>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 block mb-1">Penyimpanan Utama:</span>
-                    <p class="font-bold text-slate-900 text-sm">{{ $vps->disk ?? 20 }} GB NVMe SSD</p>
-                    <p class="text-slate-500">High IOPS Enterprise Storage</p>
+                    <span class="text-slate-400 block mb-1">Lokasi Datacenter:</span>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->datacenter_location ? ucfirst($vps->datacenter_location) : '—' }}</p>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 block mb-1">Konektivitas Port:</span>
-                    <p class="font-bold text-slate-900 text-sm">30–100 Mbps Port</p>
-                    <p class="text-slate-500">Unmetered Fair-share Traffic</p>
+                    <span class="text-slate-400 block mb-1">Alamat IP Publik:</span>
+                    <p class="font-bold text-slate-900 text-sm font-mono-code">{{ $vps->public_ip ?? 'Belum dialokasikan' }}</p>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 block mb-1">Lokasi Node Cluster:</span>
-                    <p class="font-bold text-slate-900 text-sm">Singapore / Jakarta</p>
-                    <p class="text-slate-500">Tier-3 Enterprise Datacenter</p>
+                    <span class="text-slate-400 block mb-1">Infrastruktur:</span>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->provider_label }}</p>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 block mb-1">Hypervisor Virtualisasi:</span>
-                    <p class="font-bold text-slate-900 text-sm">KVM</p>
-                    <p class="text-slate-500">Hardware Isolated Kernel</p>
+                    <span class="text-slate-400 block mb-1">Aktif Sejak:</span>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->starts_at ? $vps->starts_at->timezone('Asia/Jakarta')->format('d M Y') : '—' }}</p>
                 </div>
             </div>
         </div>
@@ -746,7 +738,8 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-3 gap-2">
                     <div>
                         <span class="text-slate-500 font-medium block">Password Root Awal:</span>
-                        <span class="text-[11px] text-slate-400">Memerlukan verifikasi password akun sebelum ditampilkan.</span>
+                        <span class="text-[11px] text-slate-400 block">Memerlukan verifikasi password akun sebelum ditampilkan.</span>
+                        <span class="text-[11px] text-slate-400 block">Jika Anda sudah menggantinya lewat <code class="font-mono-code">passwd</code>, password ini tidak berlaku lagi.</span>
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -791,7 +784,7 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                             <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Panduan Remote Database Client</h4>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Server ini terisolasi khusus database di Datacenter Jakarta untuk menjaga latensi minimal (~3–10ms), anti-crash memory swap otomatis, dan proteksi penuh. Anda dapat menghubungkan aplikasi backend (Vercel, Railway, VPS luar) atau remote client (DBeaver, TablePlus, DataGrip, Navicat, psql, mysql client) via Dedicated IP Publik Static server:
+                            Server ini khusus untuk database dan terpisah dari server aplikasi Anda. Anda dapat menghubungkan aplikasi backend (Vercel, Railway, VPS luar) atau remote client (DBeaver, TablePlus, DataGrip, Navicat, psql, mysql client) via Dedicated IP Publik Static server:
                         </p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                             <div class="bg-white p-2.5 rounded border border-emerald-100">
@@ -861,20 +854,20 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
 
                 <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
                     <span class="text-xs text-slate-500 block mb-1">Tanggal Mulai Layanan</span>
-                    <p class="font-bold text-slate-900 text-sm">{{ $vps->starts_at ? $vps->starts_at->format('d M Y') : '-' }}</p>
-                    <p class="text-[11px] text-slate-500 mt-1">{{ $vps->starts_at ? $vps->starts_at->format('H:i T') : '' }}</p>
+                    <p class="font-bold text-slate-900 text-sm">{{ $vps->starts_at ? $vps->starts_at->timezone('Asia/Jakarta')->format('d M Y') : '-' }}</p>
+                    <p class="text-[11px] text-slate-500 mt-1">{{ $vps->starts_at ? $vps->starts_at->timezone('Asia/Jakarta')->format('H:i T') : '' }}</p>
                 </div>
 
                 <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
                     <span class="text-xs text-slate-500 block mb-1">Tanggal Jatuh Tempo (Expiry)</span>
                     <p class="font-bold text-slate-900 text-sm {{ $vps->isExpired() ? 'text-red-600' : '' }}">
-                        {{ $vps->expires_at ? $vps->expires_at->format('d M Y') : '30 Hari' }}
+                        {{ $vps->expires_at ? $vps->expires_at->timezone('Asia/Jakarta')->format('d M Y') : '—' }}
                     </p>
                     <p class="text-[11px] text-slate-500 mt-1">
                         @if($vps->isExpired())
                             <span class="text-red-600 font-semibold">Telah Kadaluarsa</span>
                         @elseif($vps->expires_at)
-                            Sisa {{ now()->diffInDays($vps->expires_at, false) }} hari lagi
+                            Sisa {{ $vps->days_until_expiry }} hari lagi
                         @endif
                     </p>
                 </div>
@@ -882,10 +875,10 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                 <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
                     <span class="text-xs text-slate-500 block mb-1">Batas Masa Tenggang</span>
                     <p class="font-bold text-slate-900 text-sm">
-                        {{ $vps->grace_period_ends_at ? $vps->grace_period_ends_at->format('d M Y') : '+7 Hari' }}
+                        {{ $vps->grace_period_ends_at ? $vps->grace_period_ends_at->timezone('Asia/Jakarta')->format('d M Y') : '—' }}
                     </p>
                     <p class="text-[11px] text-slate-500 mt-1">
-                        Grace Period: 7 hari pasca-expiry
+                        Masa tenggang: {{ $graceDays }} hari setelah jatuh tempo
                     </p>
                 </div>
             </div>
@@ -912,26 +905,139 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
         <div class="bg-white rounded-lg border border-slate-200 p-6 space-y-4">
             <h3 class="text-base font-bold text-slate-900 mb-1">Akses Stack Server</h3>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Stack server (<strong class="text-slate-900">{{ $vps->control_panel_label }}</strong>) terpasang pada port standar:
+                Stack terpasang: <strong class="text-slate-900">{{ $vps->control_panel_label }}</strong>
             </p>
 
-            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-700 font-medium">URL Dashboard Panel:</span>
-                    <a href="http://{{ $vps->public_ip }}:8000" target="_blank" rel="noopener" class="font-mono-code font-bold text-slate-900 underline">
-                        http://{{ $vps->public_ip }}:8000 &rarr;
+            @if($vps->panel_url)
+                <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span class="text-slate-700 font-medium">URL Dashboard Panel:</span>
+                        <div class="flex items-center gap-2 min-w-0">
+                            <a href="{{ $vps->panel_url }}" target="_blank" rel="noopener" class="font-mono-code font-bold text-slate-900 underline truncate">
+                                {{ $vps->panel_url }}
+                            </a>
+                            <button type="button" @click="copyText(@js($vps->panel_url))" class="px-2 py-0.5 rounded border border-slate-300 bg-white hover:bg-slate-100 font-semibold text-slate-900 shrink-0">Salin</button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">Buka URL di atas untuk masuk atau membuat akun administrator panel.</p>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <a href="{{ $vps->panel_url }}" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold text-xs transition-colors">
+                        Buka Control Panel
+                    </a>
+                    <a href="{{ route('dashboard.support') }}" class="px-5 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-900 font-semibold text-xs transition-colors">
+                        Bantuan Setup
                     </a>
                 </div>
-                <p class="text-xs text-slate-500">Buka URL di atas untuk membuat akun administrator master.</p>
+            @else
+                <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                    <p class="font-semibold">Alamat panel belum tersedia</p>
+                    <p>Tim kami belum mencantumkan alamat panel untuk server ini. Hubungi support dan kami akan mengirimkannya.</p>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <a href="{{ route('dashboard.support') }}" class="px-5 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold text-xs transition-colors">
+                        Minta Alamat Panel
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tab: Permintaan & Bantuan -->
+    <div x-show="activeTab === 'requests'" class="space-y-6" style="display: none;">
+        <!-- Apa yang bisa dilakukan sendiri dan apa yang lewat tim -->
+        <div class="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 class="text-base font-bold text-slate-900">Butuh Apa?</h3>
+            <p class="text-xs text-slate-500 mt-0.5 mb-4">
+                Beberapa hal bisa Anda lakukan sendiri dalam hitungan detik. Sisanya dikerjakan tim kami maksimal {{ $slaHours }} jam kerja ({{ $supportHours }}).
+            </p>
+
+            <div class="divide-y divide-slate-100 text-xs">
+                @if(in_array($vps->status, ['running', 'error'], true))
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3">
+                        <div>
+                            <p class="font-semibold text-slate-900">Restart server</p>
+                            <p class="text-slate-500">Lakukan sendiri lewat SSH, selesai dalam 1-2 menit.</p>
+                        </div>
+                        <button type="button" @click="rebootGuideModal = true" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold text-slate-900 self-start sm:self-auto">Lihat Caranya</button>
+                    </div>
+                @endif
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">Ganti password root</p>
+                        <p class="text-slate-500">Lakukan sendiri: login SSH lalu jalankan <code class="font-mono-code">passwd</code>.</p>
+                    </div>
+                    <button type="button" @click="copyText('passwd')" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold text-slate-900 self-start sm:self-auto">Salin Perintah</button>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">Server tidak bisa diakses sama sekali</p>
+                        <p class="text-slate-500">SSH tidak merespons atau server hang. Tim akan me-restart dari sisi infrastruktur.</p>
+                    </div>
+                    @if(isset($openRequests['unreachable']))
+                        <a href="{{ route('dashboard.support.show', $openRequests['unreachable']->id) }}" class="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold self-start sm:self-auto">Sedang Diproses</a>
+                    @elseif($vps->acceptsServiceRequests())
+                        <button type="button" @click="unreachableModal = true" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold self-start sm:self-auto">Laporkan ke Tim</button>
+                    @endif
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">Install ulang OS (reinstall)</p>
+                        <p class="text-slate-500">Seluruh data terhapus. Tim memasang OS baru dan password root baru muncul di dashboard.</p>
+                    </div>
+                    @if(isset($openRequests['reinstall']))
+                        <a href="{{ route('dashboard.support.show', $openRequests['reinstall']->id) }}" class="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold self-start sm:self-auto">Sedang Diproses</a>
+                    @elseif($vps->acceptsServiceRequests())
+                        <button type="button" @click="reinstallModal = true" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold text-slate-900 self-start sm:self-auto">Ajukan Reinstall</button>
+                    @endif
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">Pertanyaan atau kendala lain</p>
+                        <p class="text-slate-500">Konfigurasi, domain, panel, atau tagihan.</p>
+                    </div>
+                    <a href="{{ route('dashboard.support') }}" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold text-slate-900 self-start sm:self-auto">Buat Tiket Bantuan</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat tiket server ini -->
+        <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-200">
+                <h3 class="text-base font-bold text-slate-900">Riwayat Permintaan Server Ini</h3>
+                <p class="text-xs text-slate-500 mt-0.5">10 tiket terakhir yang terkait dengan server ini.</p>
             </div>
 
-            <div class="flex gap-3 pt-2">
-                <a href="http://{{ $vps->public_ip }}:8000" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold text-xs transition-colors">
-                    Buka Control Panel
-                </a>
-                <a href="{{ route('dashboard.support') }}" class="px-5 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-900 font-semibold text-xs transition-colors">
-                    Bantuan Setup
-                </a>
+            @php
+                $ticketStatusLabels = [
+                    'open' => ['Menunggu', 'bg-amber-50 text-amber-800 border-amber-200'],
+                    'in_progress' => ['Dikerjakan', 'bg-blue-50 text-blue-800 border-blue-200'],
+                    'resolved' => ['Selesai', 'bg-emerald-50 text-emerald-800 border-emerald-200'],
+                    'closed' => ['Ditutup', 'bg-slate-100 text-slate-700 border-slate-300'],
+                ];
+            @endphp
+
+            <div class="divide-y divide-slate-100 text-xs">
+                @forelse($serverTickets as $serverTicket)
+                    @php [$ticketStatusText, $ticketStatusClass] = $ticketStatusLabels[$serverTicket->status] ?? [ucfirst($serverTicket->status), 'bg-slate-100 text-slate-700 border-slate-300']; @endphp
+                    <a href="{{ route('dashboard.support.show', $serverTicket->id) }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-6 py-3 hover:bg-slate-50 transition-colors">
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ $serverTicket->subject }}</p>
+                            <p class="text-slate-500">
+                                #TK-{{ str_pad($serverTicket->id, 4, '0', STR_PAD_LEFT) }} &bull; {{ $serverTicket->type_label }} &bull; {{ $serverTicket->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
+                            </p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded border text-[11px] font-semibold self-start sm:self-auto {{ $ticketStatusClass }}">{{ $ticketStatusText }}</span>
+                    </a>
+                @empty
+                    <p class="px-6 py-8 text-center text-slate-500">Belum ada permintaan untuk server ini.</p>
+                @endforelse
             </div>
         </div>
     </div>
@@ -942,7 +1048,7 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
             <div class="p-6 border-b border-slate-200 flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-bold text-slate-900">Audit Trail & Riwayat Aktivitas Server</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Mencatat 25 riwayat lifecycle event, eksekusi daya, dan audit keamanan instance.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">25 aktivitas terakhir: permintaan layanan, akses kredensial, dan perubahan status server.</p>
                 </div>
                 <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-700 border border-slate-300">
                     Immutable Audit Log
@@ -964,10 +1070,10 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                         @forelse($vps->activityLogs as $log)
                             <tr class="hover:bg-slate-50/70 transition-colors">
                                 <td class="py-3 px-4 whitespace-nowrap text-slate-600 font-mono-code">
-                                    {{ $log->created_at->format('d M Y, H:i:s') }}
+                                    {{ $log->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i:s') }}
                                 </td>
                                 <td class="py-3 px-4 whitespace-nowrap">
-                                    @if(in_array($log->action, ['start', 'provision']))
+                                    @if(in_array($log->action, ['start', 'provision', 'reinstall_completed']))
                                         <span class="px-2 py-0.5 rounded font-mono-code text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
                                             {{ $log->action }}
                                         </span>
@@ -977,6 +1083,10 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                                         </span>
                                     @elseif(in_array($log->action, ['reboot', 'force_reboot']))
                                         <span class="px-2 py-0.5 rounded font-mono-code text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+                                            {{ $log->action }}
+                                        </span>
+                                    @elseif(in_array($log->action, ['reinstall_requested', 'unreachable_reported']))
+                                        <span class="px-2 py-0.5 rounded font-mono-code text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 uppercase">
                                             {{ $log->action }}
                                         </span>
                                     @elseif($log->action === 'password_reveal')
@@ -993,8 +1103,16 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                                     {{ $log->description }}
                                 </td>
                                 <td class="py-3 px-4 whitespace-nowrap">
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase {{ $log->status === 'completed' ? 'bg-slate-100 text-slate-800' : 'bg-amber-100 text-amber-800' }}">
-                                        {{ $log->status }}
+                                    @php
+                                        $logStatusLabel = [
+                                            'completed' => 'Selesai',
+                                            'submitted' => 'Diajukan',
+                                            'pending' => 'Menunggu',
+                                            'failed' => 'Gagal',
+                                        ][$log->status] ?? $log->status;
+                                    @endphp
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase {{ in_array($log->status, ['completed', 'submitted'], true) ? 'bg-slate-100 text-slate-800' : 'bg-amber-100 text-amber-800' }}">
+                                        {{ $logStatusLabel }}
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 whitespace-nowrap text-slate-500 font-mono-code">
@@ -1054,45 +1172,175 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
         </div>
     </div>
 
-    <!-- Reinstall Modal -->
-    <div x-show="reinstallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" style="display: none;">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-md w-full shadow-xl" @click.away="reinstallModal = false">
-            <h3 class="text-base font-bold text-slate-900 mb-2">Reinstall Sistem Operasi VPS</h3>
-            <p class="text-xs text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-300 mb-4 font-medium">
-                Peringatan: Seluruh data pada disk akan diformat ulang secara permanen. Pastikan Anda sudah membackup data sebelum melanjutkan.
-            </p>
+    @php $serverName = $vps->hostname ?? ('VPS-' . $vps->id); @endphp
 
-            <form action="{{ route('dashboard.vps.reinstall', $vps->id) }}" method="POST" class="space-y-4 text-xs">
-                @csrf
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Pilih Distribusi OS Baru</label>
-                    <select name="os" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none bg-white">
-                        <option value="Ubuntu 24.04 LTS">Ubuntu 24.04 LTS</option>
-                        <option value="Ubuntu 22.04 LTS">Ubuntu 22.04 LTS</option>
-                        <option value="Debian 12">Debian 12 Bookworm</option>
-                    </select>
-                </div>
+    <!-- Modal: Panduan Reboot lewat SSH -->
+    <div x-show="rebootGuideModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" style="display: none;">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto" @click.away="rebootGuideModal = false">
+            <h3 class="text-base font-bold text-slate-900 mb-1">Cara Restart Server</h3>
+            <p class="text-xs text-slate-500 mb-4">Anda memegang akses root, jadi restart bisa dilakukan sendiri dan langsung berjalan.</p>
 
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Pilih Control Panel</label>
-                    <select name="control_panel" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none bg-white">
-                        <option value="coolify">Coolify PaaS</option>
-                        <option value="dokploy">Dokploy Docker Manager</option>
-                        <option value="cpanel">CloudPanel / cPanel</option>
-                        <option value="hermes_omniroute">Hermes AI Stack</option>
-                    </select>
-                </div>
+            <ol class="space-y-3 text-xs">
+                <li>
+                    <p class="font-semibold text-slate-900 mb-1">1. Login ke server</p>
+                    <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-black text-white font-mono-code">
+                        <span class="truncate">{{ $vps->ssh_command }}</span>
+                        <button type="button" @click="copyText(@js($vps->ssh_command))" class="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 font-sans shrink-0">Salin</button>
+                    </div>
+                </li>
+                <li>
+                    <p class="font-semibold text-slate-900 mb-1">2. Jalankan perintah restart</p>
+                    <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-black text-white font-mono-code">
+                        <span>sudo reboot</span>
+                        <button type="button" @click="copyText('sudo reboot')" class="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 font-sans shrink-0">Salin</button>
+                    </div>
+                </li>
+                <li>
+                    <p class="font-semibold text-slate-900 mb-1">3. Tunggu 1-2 menit, lalu login kembali</p>
+                    <p class="text-slate-500">Koneksi SSH akan terputus saat server restart. Itu normal.</p>
+                </li>
+            </ol>
 
-                <div class="pt-4 flex items-center justify-end gap-2">
-                    <button type="button" @click="reinstallModal = false" class="px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">
-                        Batal
+            <div class="mt-5 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+                <p class="font-semibold text-slate-900">Tidak bisa login SSH sama sekali?</p>
+                <p class="text-slate-500 mt-0.5">Laporkan ke tim. Kami akan me-restart server dari sisi infrastruktur.</p>
+                @if(isset($openRequests['unreachable']))
+                    <a href="{{ route('dashboard.support.show', $openRequests['unreachable']->id) }}" class="inline-block mt-2 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold">
+                        Laporan Anda sedang diproses &rarr;
+                    </a>
+                @elseif($vps->acceptsServiceRequests())
+                    <button type="button" @click="rebootGuideModal = false; unreachableModal = true" class="mt-2 px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold">
+                        Laporkan Server Tidak Bisa Diakses
                     </button>
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-bold">
-                        Konfirmasi Reinstall
-                    </button>
-                </div>
-            </form>
+                @endif
+            </div>
+
+            <div class="pt-4 flex justify-end">
+                <button type="button" @click="rebootGuideModal = false" class="px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 font-medium text-xs">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
+
+    @if($vps->acceptsServiceRequests() && !isset($openRequests['unreachable']))
+        <!-- Modal: Laporkan server tidak bisa diakses -->
+        <div x-show="unreachableModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" style="display: none;">
+            <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-md w-full shadow-xl" @click.away="unreachableModal = false">
+                <h3 class="text-base font-bold text-slate-900 mb-1">Laporkan Server Tidak Bisa Diakses</h3>
+                <p class="text-xs text-slate-500 mb-4">
+                    Tim akan mengecek dan me-restart <strong class="text-slate-900">{{ $serverName }}</strong> dari sisi infrastruktur, maksimal {{ $slaHours }} jam kerja ({{ $supportHours }}).
+                </p>
+
+                <form action="{{ route('dashboard.vps.report-unreachable', $vps->id) }}" method="POST" class="space-y-4 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Keterangan (opsional)</label>
+                        <textarea name="description" rows="3" maxlength="1000" placeholder="Contoh: SSH timeout sejak jam 10 pagi, website juga tidak bisa dibuka."
+                                  class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none">{{ old('description') }}</textarea>
+                        @error('description')
+                            <p class="mt-1 text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="pt-2 flex items-center justify-end gap-2">
+                        <button type="button" @click="unreachableModal = false" class="px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-bold">
+                            Kirim Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    @if($vps->acceptsServiceRequests() && !isset($openRequests['reinstall']))
+        @php
+            $reinstallOsOptions = $vps->reinstallOsOptions();
+            $reinstallStackOptions = $vps->reinstallStackOptions();
+            $selectedOs = old('os', array_key_exists((string) $vps->os, $reinstallOsOptions) ? $vps->os : array_key_first($reinstallOsOptions));
+            $selectedStack = old('control_panel', $vps->control_panel);
+        @endphp
+        <!-- Modal: Ajukan Reinstall OS -->
+        <div x-show="reinstallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" style="display: none;">
+            <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto" @click.away="reinstallModal = false">
+                <h3 class="text-base font-bold text-slate-900 mb-1">Ajukan Reinstall OS</h3>
+                <p class="text-xs text-slate-500 mb-3">
+                    Reinstall dikerjakan tim kami, maksimal {{ $slaHours }} jam kerja ({{ $supportHours }}). Server tetap berjalan seperti biasa sampai tim mulai mengerjakan.
+                </p>
+                <p class="text-xs text-red-800 bg-red-50 p-3 rounded-lg border border-red-200 mb-4 font-medium">
+                    Seluruh data di server akan terhapus permanen. Backup data Anda sebelum mengajukan.
+                </p>
+
+                <form action="{{ route('dashboard.vps.request-reinstall', $vps->id) }}" method="POST" class="space-y-4 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Sistem Operasi Baru</label>
+                        <select name="os" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none bg-white">
+                            @foreach($reinstallOsOptions as $osKey => $osName)
+                                <option value="{{ $osKey }}" @selected((string) $selectedOs === (string) $osKey)>{{ $osName }}</option>
+                            @endforeach
+                        </select>
+                        @error('os')
+                            <p class="mt-1 text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Stack / Control Panel</label>
+                        @if($vps->hasFixedStack())
+                            <p class="px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
+                                {{ $vps->control_panel_label }} (bawaan paket, dipasang ulang)
+                            </p>
+                        @else
+                            <select name="control_panel" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none bg-white">
+                                @foreach($reinstallStackOptions as $stackKey => $stackName)
+                                    <option value="{{ $stackKey }}" @selected((string) $selectedStack === (string) $stackKey)>{{ $stackName }}</option>
+                                @endforeach
+                            </select>
+                            @error('control_panel')
+                                <p class="mt-1 text-red-600">{{ $message }}</p>
+                            @enderror
+                        @endif
+                    </div>
+
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Catatan untuk tim (opsional)</label>
+                        <textarea name="notes" rows="2" maxlength="1000" placeholder="Contoh: mohon aktifkan swap 2 GB setelah install."
+                                  class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none">{{ old('notes') }}</textarea>
+                        @error('notes')
+                            <p class="mt-1 text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">
+                            Ketik <span class="font-mono-code font-bold text-slate-900">{{ $serverName }}</span> untuk konfirmasi
+                        </label>
+                        <input type="text" name="confirm_hostname" required autocomplete="off" value="{{ old('confirm_hostname') }}"
+                               class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-black bg-white font-mono-code">
+                        @error('confirm_hostname')
+                            <p class="mt-1 text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <p class="text-[11px] text-slate-500">
+                        Setelah selesai, password root baru tampil di tab Akses dan Anda menerima email pemberitahuan.
+                    </p>
+
+                    <div class="pt-2 flex items-center justify-end gap-2">
+                        <button type="button" @click="reinstallModal = false" class="px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-bold">
+                            Kirim Permintaan Reinstall
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

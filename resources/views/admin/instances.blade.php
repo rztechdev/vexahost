@@ -176,7 +176,26 @@
                                 @else
                                     <span class="font-medium text-slate-900 block">{{ $instance->os_label }}</span>
                                     <span class="text-slate-500 text-[11px] block">{{ $instance->control_panel_label ?: 'Standard SSH' }}</span>
+                                    @if($instance->panel_url)
+                                        <a href="{{ $instance->panel_url }}" target="_blank" rel="noopener" class="text-[11px] text-slate-800 hover:text-black font-mono-code underline block truncate max-w-[190px] mt-0.5">
+                                            Panel: {{ $instance->panel_url }}
+                                        </a>
+                                    @elseif($instance->control_panel && $instance->control_panel !== 'none')
+                                        <span class="text-[11px] font-semibold text-amber-700 block mt-0.5">Link panel belum diisi</span>
+                                    @endif
                                 @endif
+
+                                {{-- Link yang disimpan di sini yang tampil di dashboard pelanggan. --}}
+                                <details class="mt-1.5 text-[11px]">
+                                    <summary class="cursor-pointer text-slate-500 hover:text-black font-medium">Ubah link panel</summary>
+                                    <form action="{{ route('admin.instances.panel-url', $instance->id) }}" method="POST" class="mt-1.5 flex items-center gap-1.5">
+                                        @csrf
+                                        <input type="text" name="app_url" value="{{ $instance->panel_url }}" maxlength="255"
+                                               placeholder="http://IP:8000 atau https://panel.domain.com"
+                                               class="w-48 px-2 py-1 rounded border border-slate-300 font-mono-code bg-white focus:outline-none">
+                                        <button type="submit" class="px-2 py-1 rounded bg-black hover:bg-neutral-800 text-white font-bold">Simpan</button>
+                                    </form>
+                                </details>
                             </td>
 
                             <!-- Jaringan & Node -->

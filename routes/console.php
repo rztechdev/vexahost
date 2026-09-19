@@ -50,16 +50,19 @@ Schedule::command('billing:terminate-expired')
     ->description('Terminate subscription yang suspended > 30 hari.');
 
 // ============================================================
-// PHASE 1 - Maintenance terjadwal
+// PHASE 1 - Maintenance terjadwal (TIDAK dijadwalkan)
 // ============================================================
-// Berjalan tiap 5 menit agar jendela maintenance mulai dan berakhir
-// mendekati waktu yang dijadwalkan admin.
-Schedule::command('maintenance:sync')
-    ->everyFiveMinutes()
-    ->timezone('Asia/Jakarta')
-    ->withoutOverlapping()
-    ->onOneServer()
-    ->description('Mulai/akhiri jendela maintenance terjadwal dan kirim pemberitahuannya.');
+// Fitur jadwal maintenance tidak dipakai, jadi maintenance:sync tidak lagi
+// berjalan tiap 5 menit agar tidak membebani server. Jendela maintenance
+// tetap bisa dimulai/diselesaikan manual dari Admin > Maintenance.
+// Aktifkan kembali blok ini bila fitur jadwal otomatis mulai dipakai:
+//
+// Schedule::command('maintenance:sync')
+//     ->everyFiveMinutes()
+//     ->timezone('Asia/Jakarta')
+//     ->withoutOverlapping()
+//     ->onOneServer()
+//     ->description('Mulai/akhiri jendela maintenance terjadwal dan kirim pemberitahuannya.');
 
 // ============================================================
 // PHASE 3 - Pengingat perpanjangan instance
@@ -86,11 +89,16 @@ Schedule::command('fulfillment:check-sla')
     ->description('Peringatkan admin tentang order dibayar yang belum diserahkan melewati ambang.');
 
 // ============================================================
-// Provisioning reconciliation scheduler (Poin 4)
+// Provisioning reconciliation (TIDAK dijadwalkan)
 // ============================================================
-Schedule::command('provider:reconcile')
-    ->everyFifteenMinutes()
-    ->timezone('Asia/Jakarta')
-    ->withoutOverlapping()
-    ->onOneServer()
-    ->description('Rekonsiliasi status VPS antara database dan provider.');
+// Server dibeli retail tanpa API supplier, sehingga provider 'manual' tidak
+// bisa membaca status mesin. Menjalankan provider:reconcile tiap 15 menit
+// hanya menulis ulang setiap baris VPS tanpa manfaat, jadi tidak dijadwalkan.
+// Aktifkan kembali bila sudah ada adapter provider yang benar-benar memanggil API:
+//
+// Schedule::command('provider:reconcile')
+//     ->everyFifteenMinutes()
+//     ->timezone('Asia/Jakarta')
+//     ->withoutOverlapping()
+//     ->onOneServer()
+//     ->description('Rekonsiliasi status VPS antara database dan provider.');

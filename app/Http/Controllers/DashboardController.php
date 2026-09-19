@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\InvalidStateTransitionException;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\SupportTicket;
@@ -10,18 +9,19 @@ use App\Models\Subscription;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Models\VpsInstance;
-use App\Services\VpsStateMachine;
+use App\Services\RenewalService;
+use App\Services\SettingsService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
-    public function __construct(protected VpsStateMachine $vpsStateMachine)
+    public function __construct(protected SettingsService $settings)
     {
     }
 
@@ -143,205 +143,283 @@ class DashboardController extends Controller
             }])
             ->findOrFail($id);
 
-        $cpuCores = $vps->cpu ?? 1;
-        $ramGb = $vps->ram ?? 1;
-        $diskGb = $vps->disk ?? 20;
+        // Tiket terbaru untuk server ini (permintaan layanan maupun bantuan umum).
+        $serverTickets = SupportTicket::where('organization_id', $this->organizationId())
+            ->where('vps_instance_id', $vps->id)
+            ->latest('id')
+            ->take(10)
+            ->get();
 
-        $isRunning = ($vps->status === 'running');
+        // Permintaan layanan yang masih diproses, dikunci per tipe
+        // (paling banyak satu reinstall dan satu laporan terbuka per server).
+        $openRequests = SupportTicket::where('organization_id', $this->organizationId())
+            ->where('vps_instance_id', $vps->id)
+            ->serviceRequests()
+            ->awaitingTeam()
+            ->latest('id')
+            ->get()
+            ->unique('type')
+            ->keyBy('type');
 
-        // Resource metrics: Data ini akan tersedia ketika monitoring agent terhubung.
-        // Untuk saat ini, tampilkan null jika belum ada data real dari monitoring.
-        // Nanti bisa diintegrasikan dengan Prometheus/node_exporter/Uptime Kuma.
-        $cpuUsage = null;
-        $ramUsedGb = null;
-        $ramPercent = null;
-        $diskUsedGb = null;
-        $diskPercent = null;
-        $uptime = $vps->uptime_percent;
+        $supportHours = $this->settings->get('support_hours', 'jam kerja');
+        $slaHours = SupportTicket::SERVICE_REQUEST_SLA_WORKING_HOURS;
+        // Lama masa tenggang mengikuti pengaturan admin per jenis layanan.
+        $graceDays = app(RenewalService::class)->graceDaysFor($vps);
 
         return view('dashboard.show', compact(
             'vps',
-            'cpuCores',
-            'ramGb',
-            'diskGb',
-            'cpuUsage',
-            'ramUsedGb',
-            'ramPercent',
-            'diskUsedGb',
-            'diskPercent',
-            'uptime',
-            'isRunning'
+            'serverTickets',
+            'openRequests',
+            'supportHours',
+            'slaHours',
+            'graceDays'
         ));
     }
 
-    public function start($id)
+    /**
+     * Pengajuan install ulang OS.
+     *
+     * Server dibeli retail dari supplier tanpa API, jadi reinstall TIDAK
+     * dijalankan otomatis. Permintaan dicatat sebagai tiket bertipe
+     * 'reinstall', lalu admin mengerjakannya di dashboard supplier dan
+     * mengisi password root baru lewat panel admin.
+     *
+     * Data server (OS, stack, password) sengaja tidak diubah di sini agar
+     * dashboard tidak menampilkan kondisi yang belum benar-benar terjadi.
+     */
+    public function requestReinstall(Request $request, $id)
     {
         $vps = VpsInstance::where('organization_id', $this->organizationId())->findOrFail($id);
 
-        if ($vps->isExpired()) {
-            return back()->with('error', 'Layanan VPS telah kadaluarsa. Silakan perpanjang langganan atau hubungi support.');
+        if (!$vps->acceptsServiceRequests()) {
+            return back()->with('error', $this->serviceRequestBlockedMessage($vps));
         }
 
-        if ($vps->status === 'running') {
-            return back()->with('info', 'VPS ' . ($vps->hostname ?? $vps->id) . ' sudah dalam keadaan berjalan (running).');
+        $serverName = $vps->hostname ?? ('VPS-' . $vps->id);
+        $osOptions = $vps->reinstallOsOptions();
+        $stackOptions = $vps->reinstallStackOptions();
+
+        $rules = [
+            'os' => ['required', 'string', Rule::in(array_keys($osOptions))],
+            'confirm_hostname' => ['required', 'string', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ];
+        if (!$vps->hasFixedStack()) {
+            $rules['control_panel'] = ['required', 'string', Rule::in(array_keys($stackOptions))];
         }
 
-        try {
-            $this->vpsStateMachine->transition($vps, 'running', [
-                'reason' => 'Instance dinyalakan (Boot / Power On) oleh pelanggan.',
-                'actor_type' => 'customer',
+        $validated = $request->validate($rules, [
+            'os.in' => 'Sistem operasi yang dipilih tidak tersedia untuk server ini.',
+            'control_panel.in' => 'Stack yang dipilih tidak tersedia untuk server ini.',
+            'confirm_hostname.required' => 'Ketik nama server untuk konfirmasi.',
+        ]);
+
+        // Reinstall menghapus seluruh data, jadi pelanggan wajib mengetik nama server.
+        if (strcasecmp(trim($validated['confirm_hostname']), $serverName) !== 0) {
+            return back()->withInput()->withErrors([
+                'confirm_hostname' => 'Nama server tidak cocok. Ketik persis: ' . $serverName,
             ]);
-
-            $vps->refresh()->logActivity(
-                action: 'start',
-                description: 'Instance dinyalakan (Boot / Power On) oleh pengguna',
-                status: 'completed'
-            );
-        } catch (InvalidStateTransitionException $e) {
-            return back()->with('error', 'Aksi tidak diizinkan: ' . $e->getMessage());
         }
 
-        return back()->with('success', 'VPS ' . ($vps->hostname ?? $vps->id) . ' berhasil dinyalakan.');
+        $controlPanel = $vps->hasFixedStack() ? $vps->control_panel : $validated['control_panel'];
+        $osLabel = $osOptions[$validated['os']];
+        $stackLabel = $stackOptions[(string) $controlPanel] ?? $vps->control_panel_label;
+
+        $lines = [
+            'Saya mengajukan install ulang OS untuk server ' . $serverName . ' (IP ' . ($vps->public_ip ?? '-') . ').',
+            '',
+            'Sistem operasi: ' . $osLabel,
+            'Stack / control panel: ' . $stackLabel,
+            '',
+            'Saya memahami seluruh data di server ini akan terhapus.',
+        ];
+        if (!empty($validated['notes'])) {
+            $lines[] = '';
+            $lines[] = 'Catatan: ' . $validated['notes'];
+        }
+
+        $result = $this->openServiceRequest(
+            vps: $vps,
+            type: SupportTicket::TYPE_REINSTALL,
+            subject: 'Permintaan Reinstall OS - ' . $serverName,
+            message: implode("\n", $lines),
+            requestData: ['os' => $validated['os'], 'control_panel' => $controlPanel],
+            activityAction: 'reinstall_requested',
+            activityDescription: "Permintaan reinstall OS ({$osLabel}, stack {$stackLabel}) diajukan. Menunggu dikerjakan tim.",
+        );
+
+        $ticketCode = $this->ticketCode($result['ticket']);
+
+        if (!$result['created']) {
+            return redirect()->route('dashboard.support.show', $result['ticket']->id)
+                ->with('info', "Permintaan reinstall untuk server ini masih diproses ({$ticketCode}). Pantau perkembangannya di tiket ini.");
+        }
+
+        return redirect()->route('dashboard.vps.show', $vps->id)
+            ->with('success', "Permintaan reinstall diterima ({$ticketCode}). Tim kami memprosesnya maksimal "
+                . SupportTicket::SERVICE_REQUEST_SLA_WORKING_HOURS . ' jam kerja dan Anda akan menerima email saat selesai. '
+                . 'Server tetap berjalan seperti biasa sampai tim mulai mengerjakan.');
     }
 
-    public function stop($id)
+    /**
+     * Laporan server tidak bisa diakses (hang, SSH tidak merespons).
+     *
+     * Pelanggan bisa reboot sendiri lewat SSH selama server masih merespons.
+     * Kalau server tidak merespons, hanya admin yang bisa me-restart dari
+     * dashboard supplier, jadi laporan ini masuk sebagai tiket prioritas tinggi.
+     */
+    public function reportUnreachable(Request $request, $id)
     {
         $vps = VpsInstance::where('organization_id', $this->organizationId())->findOrFail($id);
 
-        if ($vps->status === 'stopped') {
-            return back()->with('info', 'VPS ' . ($vps->hostname ?? $vps->id) . ' sudah dalam keadaan mati (stopped).');
-        }
-
-        try {
-            $this->vpsStateMachine->transition($vps, 'stopped', [
-                'reason' => 'Graceful shutdown (ACPI Power Off) oleh pelanggan.',
-                'actor_type' => 'customer',
-            ]);
-
-            $vps->refresh()->logActivity(
-                action: 'stop',
-                description: 'Perintah graceful shutdown (ACPI Power Off) dieksekusi oleh pengguna',
-                status: 'completed'
-            );
-        } catch (InvalidStateTransitionException $e) {
-            return back()->with('error', 'Aksi tidak diizinkan: ' . $e->getMessage());
-        }
-
-        return back()->with('success', 'VPS ' . ($vps->hostname ?? $vps->id) . ' berhasil dimatikan (graceful shutdown).');
-    }
-
-    public function reboot($id)
-    {
-        $vps = VpsInstance::where('organization_id', $this->organizationId())->findOrFail($id);
-
-        if ($vps->isExpired()) {
-            return back()->with('error', 'Layanan VPS telah kadaluarsa. Silakan perpanjang langganan.');
-        }
-
-        try {
-            // rebooting → running (2 langkah dalam 1 transaction agar terlihat di history)
-            $this->vpsStateMachine->transition($vps, 'rebooting', [
-                'reason' => 'Soft reboot (ACPI) diminta pelanggan.',
-                'actor_type' => 'customer',
-                'allowSame' => true, // idempotent kalau spam klik
-            ]);
-            $this->vpsStateMachine->transition($vps->refresh(), 'running', [
-                'reason' => 'Reboot selesai.',
-                'actor_type' => 'system',
-            ]);
-
-            $vps->refresh()->logActivity(
-                action: 'reboot',
-                description: 'Perintah soft reboot (ACPI reboot) dieksekusi oleh pengguna',
-                status: 'completed'
-            );
-        } catch (InvalidStateTransitionException $e) {
-            return back()->with('error', 'Aksi tidak diizinkan: ' . $e->getMessage());
-        }
-
-        return back()->with('success', 'Permintaan reboot untuk VPS ' . ($vps->hostname ?? $vps->id) . ' berhasil dieksekusi. Layanan normal kembali dalam 1-2 menit.');
-    }
-
-    public function forceReboot($id)
-    {
-        $vps = VpsInstance::where('organization_id', $this->organizationId())->findOrFail($id);
-
-        if ($vps->isExpired()) {
-            return back()->with('error', 'Layanan VPS telah kadaluarsa.');
-        }
-
-        try {
-            $this->vpsStateMachine->transition($vps, 'rebooting', [
-                'reason' => 'Hard reset / Force reboot (Power Cycle).',
-                'actor_type' => 'customer',
-                'allowSame' => true,
-            ]);
-            $this->vpsStateMachine->transition($vps->refresh(), 'running', [
-                'reason' => 'Force reboot selesai.',
-                'actor_type' => 'system',
-            ]);
-
-            $vps->refresh()->logActivity(
-                action: 'force_reboot',
-                description: 'Hard reset / Force reboot (Power Cycle) dipicu oleh pengguna',
-                status: 'completed'
-            );
-        } catch (InvalidStateTransitionException $e) {
-            return back()->with('error', 'Aksi tidak diizinkan: ' . $e->getMessage());
-        }
-
-        return back()->with('warning', 'Hard reset (force reboot) untuk VPS ' . ($vps->hostname ?? $vps->id) . ' telah dieksekusi.');
-    }
-
-    public function reinstall(Request $request, $id)
-    {
-        $vps = VpsInstance::where('organization_id', $this->organizationId())->findOrFail($id);
-
-        if ($vps->isExpired()) {
-            return back()->with('error', 'Layanan VPS telah kadaluarsa.');
+        if (!$vps->acceptsServiceRequests()) {
+            return back()->with('error', $this->serviceRequestBlockedMessage($vps));
         }
 
         $validated = $request->validate([
-            'os' => 'required|string|in:Ubuntu 24.04 LTS,Ubuntu 22.04 LTS,Debian 12',
-            'control_panel' => 'required|string|in:none,coolify,dokploy,aapanel,cloudpanel,docker,cyberpanel,hestiacp,hermes_agent,openclaw,omniroute,9router,agent_zero,n8n,ollama,anythingllm,librechat,vscode_server,gitea_forgejo,uptime_kuma,netdata_beszel,wordpress,ghost,strapi_directus,prestashop_bagisto',
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $newRootPassword = Str::random(10) . '@' . Str::upper(Str::random(4)) . rand(10, 99);
+        $serverName = $vps->hostname ?? ('VPS-' . $vps->id);
 
-        try {
-            // Transisi: → reinstalling → running (dalam 1 transaction via nested)
-            $this->vpsStateMachine->transition($vps, 'reinstalling', [
-                'reason' => 'Reinstall OS dan control panel.',
-                'actor_type' => 'customer',
-                'metadata' => [
-                    'new_os' => $validated['os'],
-                    'new_control_panel' => $validated['control_panel'],
-                ],
-                'onLocked' => function (VpsInstance $locked) use ($validated, $newRootPassword) {
-                    $locked->os = $validated['os'];
-                    $locked->control_panel = $validated['control_panel'];
-                    $locked->initial_root_password = $newRootPassword;
-                    $locked->root_password_revealed_at = null;
-                    $locked->save();
-                },
-                'allowSame' => true,
-            ]);
-
-            $this->vpsStateMachine->transition($vps->refresh(), 'running', [
-                'reason' => 'Reinstall selesai.',
-                'actor_type' => 'system',
-            ]);
-
-            $vps->refresh()->logActivity(
-                action: 'reinstall',
-                description: "Install ulang OS: {$validated['os']} dengan panel {$validated['control_panel']}. Kredensial root baru telah di-generate.",
-                status: 'completed'
-            );
-        } catch (InvalidStateTransitionException $e) {
-            return back()->with('error', 'Aksi tidak diizinkan: ' . $e->getMessage());
+        $lines = [
+            'Server ' . $serverName . ' (IP ' . ($vps->public_ip ?? '-') . ') tidak bisa diakses.',
+            'Mohon dicek dan di-restart dari sisi infrastruktur.',
+        ];
+        if (!empty($validated['description'])) {
+            $lines[] = '';
+            $lines[] = 'Keterangan: ' . $validated['description'];
         }
 
-        return back()->with('success', 'Sistem operasi dan control panel VPS berhasil dijadwalkan untuk install ulang. Password root baru telah di-generate.');
+        $result = $this->openServiceRequest(
+            vps: $vps,
+            type: SupportTicket::TYPE_UNREACHABLE,
+            subject: 'Server Tidak Bisa Diakses - ' . $serverName,
+            message: implode("\n", $lines),
+            requestData: [],
+            activityAction: 'unreachable_reported',
+            activityDescription: 'Laporan server tidak bisa diakses dikirim. Menunggu pengecekan tim.',
+        );
+
+        $ticketCode = $this->ticketCode($result['ticket']);
+
+        if (!$result['created']) {
+            return redirect()->route('dashboard.support.show', $result['ticket']->id)
+                ->with('info', "Laporan untuk server ini sudah kami terima dan masih diproses ({$ticketCode}). Pantau perkembangannya di tiket ini.");
+        }
+
+        return redirect()->route('dashboard.vps.show', $vps->id)
+            ->with('success', "Laporan diterima ({$ticketCode}). Tim akan mengecek dan me-restart server dari sisi infrastruktur, maksimal "
+                . SupportTicket::SERVICE_REQUEST_SLA_WORKING_HOURS . ' jam kerja. Anda akan menerima email saat selesai.');
+    }
+
+    /**
+     * Buat tiket permintaan layanan, atau kembalikan tiket yang masih terbuka
+     * bila jenis yang sama sudah pernah diajukan (mencegah tiket ganda karena
+     * dobel klik atau pengajuan berulang).
+     *
+     * @return array{ticket: SupportTicket, created: bool}
+     */
+    private function openServiceRequest(
+        VpsInstance $vps,
+        string $type,
+        string $subject,
+        string $message,
+        array $requestData,
+        string $activityAction,
+        string $activityDescription,
+    ): array {
+        $organizationId = $this->organizationId();
+
+        $result = DB::transaction(function () use ($vps, $type, $subject, $message, $requestData, $activityAction, $activityDescription, $organizationId) {
+            // Kunci baris VPS supaya dua request bersamaan tidak membuat dua tiket.
+            VpsInstance::whereKey($vps->id)->lockForUpdate()->first();
+
+            $existing = SupportTicket::where('vps_instance_id', $vps->id)
+                ->where('type', $type)
+                ->awaitingTeam()
+                ->latest('id')
+                ->first();
+
+            if ($existing) {
+                return ['ticket' => $existing, 'created' => false];
+            }
+
+            $ticket = SupportTicket::create([
+                'customer_id' => Auth::id(),
+                'organization_id' => $organizationId,
+                'vps_instance_id' => $vps->id,
+                'subject' => $subject,
+                'type' => $type,
+                'request_data' => $requestData ?: null,
+                'priority' => 'high',
+                'status' => 'open',
+                'sla_due_at' => now()->addHours(SupportTicket::SERVICE_REQUEST_SLA_WORKING_HOURS),
+                'last_customer_reply_at' => now(),
+            ]);
+
+            TicketMessage::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'message' => $message,
+                'is_admin_reply' => false,
+            ]);
+
+            // Log bersifat permanen, jadi statusnya 'submitted' (pengajuan tercatat),
+            // bukan 'pending' yang akan terlihat menggantung setelah permintaan selesai.
+            $vps->logActivity(
+                action: $activityAction,
+                description: $activityDescription . ' (' . $this->ticketCode($ticket) . ')',
+                status: 'submitted'
+            );
+
+            return ['ticket' => $ticket, 'created' => true];
+        });
+
+        if ($result['created']) {
+            $this->notifyAdminOfTicket($result['ticket'], $message, 'created');
+        }
+
+        return $result;
+    }
+
+    private function serviceRequestBlockedMessage(VpsInstance $vps): string
+    {
+        if ($vps->isExpired()) {
+            return 'Masa aktif server sudah berakhir. Perpanjang layanan terlebih dahulu, atau hubungi support.';
+        }
+
+        return match ($vps->status) {
+            'suspended' => 'Layanan sedang ditangguhkan. Selesaikan tagihan atau hubungi support.',
+            'provisioning' => 'Server masih disiapkan tim. Permintaan bisa diajukan setelah server aktif.',
+            'rebooting', 'reinstalling' => 'Server sedang diproses tim. Tunggu hingga selesai sebelum mengajukan permintaan baru.',
+            'terminated' => 'Layanan server ini sudah dihentikan.',
+            default => 'Permintaan belum bisa diajukan untuk server ini. Silakan hubungi support.',
+        };
+    }
+
+    private function ticketCode(SupportTicket $ticket): string
+    {
+        return '#TK-' . str_pad((string) $ticket->id, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Kirim email ke admin tentang tiket baru atau balasan pelanggan.
+     * Kegagalan kirim email tidak boleh menggagalkan request pelanggan.
+     */
+    private function notifyAdminOfTicket(SupportTicket $ticket, string $message, string $eventType): void
+    {
+        try {
+            $ticket->loadMissing('customer');
+            $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
+            if ($adminEmail) {
+                \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
+                    ->notify(new \App\Notifications\AdminTicketNotification($ticket, $message, $eventType));
+            }
+        } catch (\Throwable $e) {
+            $logKey = $eventType === 'created' ? 'support.ticket_create.notify_failed' : 'support.ticket_reply.notify_failed';
+            \Illuminate\Support\Facades\Log::error($logKey, ['ticket_id' => $ticket->id, 'error' => $e->getMessage()]);
+        }
     }
 
     public function revealPassword(Request $request, $id)
@@ -388,7 +466,7 @@ class DashboardController extends Controller
         return response()->json([
             'success' => true,
             'password' => $vps->initial_root_password,
-            'revealed_at' => $vps->root_password_revealed_at->format('d M Y H:i:s'),
+            'revealed_at' => $vps->root_password_revealed_at->timezone('Asia/Jakarta')->format('d M Y H:i:s'),
             'expires_at' => $expiresAt->toIso8601String(),
             'visible_seconds' => 60,
         ]);
@@ -519,16 +597,7 @@ class DashboardController extends Controller
         ]);
 
         // Notifikasi ke email admin bahwa ada tiket support baru
-        try {
-            $ticket->loadMissing('customer');
-            $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
-            if ($adminEmail) {
-                \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
-                    ->notify(new \App\Notifications\AdminTicketNotification($ticket, $validated['message'], 'created'));
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('support.ticket_create.notify_failed', ['ticket_id' => $ticket->id, 'error' => $e->getMessage()]);
-        }
+        $this->notifyAdminOfTicket($ticket, $validated['message'], 'created');
 
         return redirect()->route('dashboard.support.show', $ticket->id)->with('success', 'Tiket bantuan #' . $ticket->id . ' berhasil dikirim. Tim VexaHost akan merespon dalam waktu maksimal 4 jam.');
     }
@@ -572,16 +641,7 @@ class DashboardController extends Controller
             }
 
             // Notifikasi ke email admin bahwa customer membalas tiket
-            try {
-                $ticket->loadMissing('customer');
-                $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
-                if ($adminEmail) {
-                    \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
-                        ->notify(new \App\Notifications\AdminTicketNotification($ticket, $validated['message'], 'replied'));
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('support.ticket_reply.notify_failed', ['ticket_id' => $ticket->id, 'error' => $e->getMessage()]);
-            }
+            $this->notifyAdminOfTicket($ticket, $validated['message'], 'replied');
         }
         $ticket->touch();
 

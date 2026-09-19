@@ -27,47 +27,36 @@ class StatusPageTest extends TestCase
         );
     }
 
-    public function test_status_page_loads_and_renders_enterprise_saas_metrics_without_emojis(): void
+    public function test_status_page_shows_only_real_data_without_uptime_claims(): void
     {
         $response = $this->get('/status');
         $response->assertStatus(200);
 
-        $content = $response->getContent();
-        $this->assertNoEmojis($content);
+        $this->assertNoEmojis($response->getContent());
 
-        // Core Status & Uptime Header
-        $response->assertSee('Status Sistem &amp; Infrastruktur Real-Time', false);
+        // Isi berasal dari data nyata (system_components dari seeder).
+        $response->assertSee('Status Layanan VexaHost');
         $response->assertSee('Semua Sistem Beroperasi Normal');
-        $response->assertSee('99.98%');
+        $response->assertSee('Status Komponen Layanan');
         $response->assertSee('RZ Digital Creative');
-
-        // Infrastructure Components
-        $response->assertSee('Datacenter Singapore (Cluster SG-01)');
-        $response->assertSee('Datacenter Jakarta (Cluster JKT-01)');
-        $response->assertSee('NVMe PCIe Gen4 RAID-10 Storage Array');
-        $response->assertSee('Anti-DDoS Scrubbing &amp; Filtering Engine', false);
-
-        // Peering & Networks
-        $response->assertSee('Jakarta Peering Exchange (OpenIXP &amp; IIX-APJII)', false);
-        $response->assertSee('Singapore Global Transit &amp; Equinix IX', false);
-        $response->assertSee('Anycast DNS Resolver &amp; Authoritative Nameservers', false);
-
-        // Platform & Gateways
-        $response->assertSee('Customer Dashboard &amp; Web Control Portal', false);
-        $response->assertSee('Automated KVM Provisioning Engine');
-        $response->assertSee('Billing &amp; Payment Gateway (Lynk, QRIS, Shopee)', false);
-
-        // Databases & AI Stacks
-        $response->assertSee('Managed Database Engine (PostgreSQL 16, MariaDB 11, Redis 7)');
-        $response->assertSee('AI Agent Runtime &amp; Docker Engine Environment', false);
-
-        // Incident Log
-        $response->assertSee('Riwayat Pemeliharaan &amp; Catatan Insiden', false);
-        $response->assertSee('Gedung Cyber 1 Jakarta');
-        $response->assertSee('[TERSELESAIKAN]');
-
-        // Links
-        $response->assertSee(route('sla'));
+        $response->assertSee(route('terms'));
         $response->assertSee(route('docs'));
+
+        // Tidak ada lagi klaim uptime/SLA atau metrik yang tidak diukur.
+        $response->assertDontSee('SLA');
+        $response->assertDontSee('Uptime');
+        $response->assertDontSee('99.9');
+        $response->assertDontSee('100.0%');
+        $response->assertDontSee('Latensi');
+        $response->assertDontSee('Gedung Cyber 1');
+    }
+
+    public function test_status_page_hides_component_uptime_percentage(): void
+    {
+        \App\Models\SystemComponent::query()->update(['uptime_percent' => 97.12]);
+
+        $this->get('/status')
+            ->assertStatus(200)
+            ->assertDontSee('97.12');
     }
 }

@@ -79,8 +79,9 @@ class VpsInstance extends Model
         if ($this->order && $this->order->vpsSpec) {
             return $this->order->vpsSpec->isAiPackage();
         }
-        return in_array($this->control_panel, ['vscode_server', 'hermes_agent', 'hermes_omniroute', 'claude_opencode', 'dify_ollama', 'anythingllm', 'ollama'], true)
-            || !empty($this->attributes['app_url']);
+        // Catatan: app_url TIDAK dipakai sebagai penanda paket AI, karena VPS biasa
+        // juga menyimpan link control panel (mis. Coolify) di kolom yang sama.
+        return in_array($this->control_panel, ['vscode_server', 'hermes_agent', 'hermes_omniroute', 'claude_opencode', 'dify_ollama', 'anythingllm', 'ollama'], true);
     }
 
     public function isDatabasePackage(): bool
@@ -148,8 +149,28 @@ class VpsInstance extends Model
         if ($this->db_manager === 'cli_only') {
             return null;
         }
+
+        // Link yang diisi admin saat serah terima selalu diutamakan.
+        if ($this->panel_url) {
+            return $this->panel_url;
+        }
+
         $host = $this->public_ip ?: '127.0.0.1';
         return "https://{$host}:8080";
+    }
+
+    /**
+     * Link control panel yang diisi admin saat serah terima (kolom app_url).
+     *
+     * Sengaja tidak menebak dari IP + port: tiap panel memakai port berbeda
+     * (Coolify 8000, Dokploy 3000, CloudPanel 8443, aaPanel acak) dan banyak
+     * admin memakai domain sendiri. Null berarti link belum diisi admin.
+     */
+    public function getPanelUrlAttribute(): ?string
+    {
+        $url = trim((string) ($this->attributes['app_url'] ?? ''));
+
+        return $url !== '' ? $url : null;
     }
 
     public function getAppUrlAttribute(): ?string
@@ -336,5 +357,112 @@ class VpsInstance extends Model
             return false;
         }
         return $this->expires_at->isPast() && $this->grace_period_ends_at->isFuture();
+    }
+
+    /**
+     * Label status untuk pelanggan.
+     *
+     * Panel tidak memantau mesin secara langsung (server dibeli retail tanpa
+     * API), jadi label ini menggambarkan status LAYANAN, bukan kondisi mesin
+     * saat ini. Karena itu tidak memakai kata "Running" maupun animasi live.
+     */
+    public function getCustomerStatusAttribute(): array
+    {
+        return match ($this->status) {
+            'running' => [
+                'label' => 'Aktif',
+                'class' => 'border-emerald-300 text-emerald-800 bg-emerald-50',
+                'dot' => 'bg-emerald-500',
+            ],
+            'provisioning' => [
+                'label' => 'Sedang Disiapkan',
+                'class' => 'border-blue-300 text-blue-800 bg-blue-50',
+                'dot' => 'bg-blue-500',
+            ],
+            'rebooting', 'reinstalling' => [
+                'label' => 'Sedang Diproses Tim',
+                'class' => 'border-blue-300 text-blue-800 bg-blue-50',
+                'dot' => 'bg-blue-500',
+            ],
+            'stopped' => [
+                'label' => 'Dimatikan',
+                'class' => 'border-slate-300 text-slate-700 bg-slate-100',
+                'dot' => 'bg-slate-400',
+            ],
+            'suspended' => [
+                'label' => 'Ditangguhkan',
+                'class' => 'border-amber-300 text-amber-800 bg-amber-50',
+                'dot' => 'bg-amber-500',
+            ],
+            'error' => [
+                'label' => 'Dalam Pengecekan',
+                'class' => 'border-red-300 text-red-800 bg-red-50',
+                'dot' => 'bg-red-500',
+            ],
+            'terminated' => [
+                'label' => 'Dihentikan',
+                'class' => 'border-slate-300 text-slate-600 bg-slate-100',
+                'dot' => 'bg-slate-400',
+            ],
+            default => [
+                'label' => ucfirst(str_replace('_', ' ', (string) $this->status)),
+                'class' => 'border-slate-300 text-slate-700 bg-slate-100',
+                'dot' => 'bg-slate-400',
+            ],
+        };
+    }
+
+    /**
+     * Sisa hari masa aktif dalam bilangan bulat.
+     * Carbon 3 mengembalikan pecahan untuk diffInDays, jadi dibulatkan ke bawah.
+     */
+    public function getDaysUntilExpiryAttribute(): ?int
+    {
+        if (!$this->expires_at) {
+            return null;
+        }
+
+        return (int) floor(now()->diffInDays($this->expires_at, false));
+    }
+
+    /**
+     * Apakah pelanggan boleh mengajukan permintaan layanan (reinstall atau
+     * laporan server tidak bisa diakses) untuk server ini.
+     */
+    public function acceptsServiceRequests(): bool
+    {
+        if ($this->isExpired()) {
+            return false;
+        }
+
+        return in_array($this->status, ['running', 'stopped', 'error'], true);
+    }
+
+    /**
+     * Paket AI Combo dan Managed Database memakai stack bawaan paket,
+     * jadi reinstall selalu memasang ulang stack yang sama.
+     */
+    public function hasFixedStack(): bool
+    {
+        return $this->isAiPackage() || $this->isDatabasePackage();
+    }
+
+    /** Pilihan OS untuk reinstall, mengikuti daftar OS provider server ini. */
+    public function reinstallOsOptions(): array
+    {
+        return Order::operatingSystems()[$this->provider] ?? Order::osLabels();
+    }
+
+    /** Pilihan stack untuk reinstall (key => label). */
+    public function reinstallStackOptions(): array
+    {
+        if ($this->hasFixedStack()) {
+            return [(string) $this->control_panel => $this->control_panel_label];
+        }
+
+        // Stack khusus paket AI/Database tidak ditawarkan untuk VPS biasa.
+        return collect(Order::stackLabels())
+            ->except(['managed_database', 'claude_opencode', 'dify_ollama'])
+            ->all();
     }
 }

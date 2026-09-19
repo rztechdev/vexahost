@@ -157,7 +157,7 @@
                             </td>
 
                             <td class="px-5 py-4 whitespace-nowrap">
-                                <div class="text-slate-800">{{ $order->created_at->translatedFormat('d M Y, H:i') }}</div>
+                                <div class="text-slate-800">{{ $order->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }}</div>
                                 <div class="text-[11px] text-slate-500 mt-0.5">{{ $order->created_at->diffForHumans() }}</div>
                             </td>
 

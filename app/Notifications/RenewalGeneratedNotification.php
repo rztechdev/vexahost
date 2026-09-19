@@ -33,7 +33,7 @@ class RenewalGeneratedNotification extends Notification
             ->line("Invoice perpanjangan {$spec} telah dibuat.")
             ->line("Nomor invoice: {$this->invoice->invoice_number}")
             ->line("Nominal: {$amount}")
-            ->line("Batas pembayaran: " . optional($this->invoice->due_at)->format('d M Y H:i'))
+            ->line("Batas pembayaran: " . ($this->invoice->due_at ? $this->invoice->due_at->timezone('Asia/Jakarta')->format('d M Y H:i') . ' WIB' : '-'))
             ->action('Bayar Sekarang', url('/dashboard/billing'));
     }
 
