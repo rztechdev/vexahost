@@ -36,7 +36,7 @@
             <div>
                 <h2 class="text-base font-bold text-slate-900">Status Koneksi WhatsApp Gateway</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Notifikasi pelanggan dikirim melalui Flustra WA Gateway. Penautan nomor, QR code, dan riwayat pengiriman dikelola di dashboard gateway.
+                    Notifikasi pelanggan dikirim melalui VexaHost WA Gateway. Penautan nomor, QR code, dan riwayat pengiriman dikelola di dashboard gateway.
                 </p>
             </div>
             <span id="wa-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
@@ -128,7 +128,7 @@
                            value="{{ old('wa_url', $pengaturan['wa_url']['value']) }}"
                            placeholder="https://wa.vexahostcloud.my.id"
                            class="{{ $inputClass }}">
-                    <p class="text-[11px] text-slate-500 mt-1">Alamat endpoint server Flustra WA Gateway.</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Alamat endpoint server VexaHost WA Gateway.</p>
                 </div>
 
                 <!-- API Key Gateway -->

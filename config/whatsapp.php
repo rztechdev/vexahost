@@ -18,7 +18,7 @@ return [
     // Status aktif pengiriman WhatsApp. Default false sampai admin mengisi API key.
     'enabled' => env('WA_GATEWAY_ENABLED', false),
 
-    // URL Flustra / VexaHost WA Gateway.
+    // URL VexaHost WA Gateway.
     'url' => env('WA_GATEWAY_URL', 'https://wa.vexahostcloud.my.id'),
 
     // API key milik tenant/workspace aplikasi ini di dashboard gateway.

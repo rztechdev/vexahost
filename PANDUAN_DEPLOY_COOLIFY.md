@@ -1,6 +1,6 @@
 # 🚀 Panduan Lengkap Deploy VexaHost ke Coolify
 
-Panduan resmi deployment aplikasi **VexaHost Cloud Platform** (`vexahostcloud.my.id`) ke server VPS menggunakan **Coolify**, mengikuti standar arsitektur ekosistem Flustra.
+Panduan resmi deployment aplikasi **VexaHost Cloud Platform** (`vexahostcloud.my.id`) ke server VPS menggunakan **Coolify**, mengikuti standar arsitektur VexaHost.
 
 ---
 
@@ -78,7 +78,7 @@ Ulangi langkah berikut untuk setiap environment (`production`, `staging`, `devel
      - Staging: `https://staging.vexahostcloud.my.id`
      - Dev: `https://dev.vexahostcloud.my.id`
    - **Port**: `80`
-   - **Healthcheck**: **Matikan / Uncheck** *Enable Healthcheck* (mengikuti standar Flustra).
+   - **Healthcheck**: **Matikan / Uncheck** *Enable Healthcheck* (direkomendasikan untuk stabilitas container).
 
 ### Konfigurasi Command di General Settings:
 

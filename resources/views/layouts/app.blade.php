@@ -374,7 +374,7 @@
                         </a>
 
                         <!-- WA Gateway -->
-                        <a href="https://wa.flustra.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors text-slate-700">
+                        <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors text-slate-700">
                             <span class="relative pb-0.5">
                                 WA Gateway
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
@@ -524,7 +524,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
                     </svg>
                 </a>
-                <a href="https://wa.flustra.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
                     <span>WA Gateway</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
