@@ -48,6 +48,7 @@ class ServerProvisioningStandardTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'test-vps-server',
             'root_password' => 'short7',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'John Doe',
             'email' => 'john.pwd2@test.com',
@@ -65,6 +66,7 @@ class ServerProvisioningStandardTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'test-vps-server',
             'root_password' => 'MyVexaRootPass@2026',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'John Doe',
             'email' => 'john.valid@test.com',
@@ -79,7 +81,7 @@ class ServerProvisioningStandardTest extends TestCase
 
     public function test_admin_provision_locks_customer_parameters_and_uses_order_root_password(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         $customer = User::create([
             'username' => 'clientlocked',
@@ -166,7 +168,7 @@ class ServerProvisioningStandardTest extends TestCase
 
     public function test_admin_orders_page_renders_provision_button_with_order_id_and_orders_data(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $customer = User::create([
             'username' => 'clienttestbtn',
             'email' => 'clienttestbtn@test.com',

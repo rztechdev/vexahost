@@ -16,6 +16,7 @@
     </style>
 </head>
 <body class="h-full antialiased bg-white text-slate-900" x-data="{ sidebarOpen: false, userDropdown: false }">
+    @include('partials.impersonation-banner')
     <div class="h-screen w-full flex flex-col md:flex-row overflow-hidden bg-white">
 
         <div x-show="sidebarOpen" class="fixed inset-0 z-40 bg-black/30 md:hidden" @click="sidebarOpen = false" style="display:none;"></div>
@@ -230,6 +231,31 @@
 
             <!-- Main Page Body (No lines under headings) -->
             <main class="flex-1 px-6 sm:px-10 pb-12 pt-2">
+                {{-- PHASE 1 - Spanduk pemberitahuan maintenance terjadwal.
+                     Muncul otomatis H-notice_days sebelum jadwal berjalan. --}}
+                @if(!empty($upcomingMaintenance) && count($upcomingMaintenance) > 0)
+                    @foreach($upcomingMaintenance as $window)
+                        <div class="bg-white p-4 rounded-lg border border-amber-200 mb-4">
+                            <div class="flex items-start gap-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                                    Maintenance
+                                </span>
+                                <div class="min-w-0">
+                                    <div class="text-sm font-bold text-slate-900">{{ $window->title }}</div>
+                                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                                        Terjadwal
+                                        {{ $window->starts_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }}
+                                        &ndash;
+                                        {{ $window->ends_at->timezone('Asia/Jakarta')->format('H:i') }} WIB.
+                                        @if($window->description) {{ $window->description }} @endif
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+
                 @yield('content')
             </main>
 

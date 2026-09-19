@@ -207,4 +207,55 @@
             <li>Server langsung disiapkan secara otomatis oleh sistem kami segera setelah pembayaran berhasil diverifikasi.</li>
         </ul>
     </div>
+
+    {{-- Card 5: Persetujuan Ketentuan Penggunaan (WAJIB).
+         Persetujuan ini dicatat ke tabel terms_acceptances beserta versi naskah,
+         waktu, dan alamat IP. Validasi ulang dilakukan di sisi server. --}}
+    <div class="border border-slate-300 rounded-xl p-5 bg-slate-50 shadow-xs">
+        <div class="flex items-center gap-2 mb-3">
+            <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.74 4a2 2 0 00-3.48 0l-7.1 12.25A2 2 0 004.99 19z"/>
+            </svg>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Ketentuan Penggunaan Layanan</h3>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            Layanan ini <strong>dilarang</strong> digunakan untuk: serangan siber dan DDoS, spam dan phishing,
+            penambangan kripto, konten ilegal dan judi online, pemindaian port agresif,
+            <strong>layanan VPN dan proxy</strong>, <strong>scraping dan crawling</strong>,
+            <strong>agregator torrent</strong>, serta <strong>bot dan skrip otomatis</strong> yang menyalahi
+            ketentuan pihak ketiga.
+        </p>
+
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 mb-4">
+            <p class="text-[11px] text-amber-900 leading-relaxed">
+                Pelanggaran dapat mengakibatkan <strong>terminasi instan tanpa pengembalian dana</strong>, dan
+                berdampak pada seluruh pelanggan lain karena pembatasan dapat dikenakan di tingkat akun
+                penyedia infrastruktur hulu. Pencadangan data sepenuhnya menjadi tanggung jawab Anda.
+            </p>
+        </div>
+
+        <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" name="terms_accepted" value="1" required
+                   x-model="termsAccepted"
+                   class="w-4 h-4 mt-0.5 rounded border-slate-400 text-black focus:ring-black shrink-0">
+            <span class="text-xs text-slate-700 leading-relaxed">
+                Saya telah membaca dan menyetujui
+                <a href="{{ route('terms') }}" target="_blank" rel="noopener"
+                   class="font-bold text-slate-900 underline underline-offset-2">Ketentuan Layanan</a>,
+                <a href="{{ route('sla') }}" target="_blank" rel="noopener"
+                   class="font-bold text-slate-900 underline underline-offset-2">SLA</a>, dan
+                <a href="{{ route('refund') }}" target="_blank" rel="noopener"
+                   class="font-bold text-slate-900 underline underline-offset-2">Kebijakan Pengembalian Dana</a>
+                VexaHost, termasuk seluruh larangan penggunaan di atas.
+                <span class="block mt-1 text-[11px] text-slate-500 font-mono-code">
+                    Versi naskah: {{ config('legal.terms_version') }}
+                </span>
+            </span>
+        </label>
+
+        @error('terms_accepted')
+            <p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
 </div>

@@ -57,6 +57,23 @@
 
                 <!-- Primary System Operational Banner -->
                 <div class="shrink-0">
+                    @if(!($allOperational ?? true) || ($globalMaintenance ?? false))
+                    {{-- Ada komponen yang tidak normal atau maintenance global menyala. --}}
+                    <div class="inline-flex items-center gap-3.5 px-5 py-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 shadow-lg shadow-sky-950/20">
+                        <span class="relative flex h-3.5 w-3.5 shrink-0">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-sky-500"></span>
+                        </span>
+                        <div>
+                            <div class="text-sm font-bold text-sky-300 tracking-wide">
+                                {{ ($globalMaintenance ?? false) ? 'Sistem Dalam Pemeliharaan' : 'Sebagian Layanan Terganggu' }}
+                            </div>
+                            <div class="text-[11px] text-sky-400/80 font-mono-code mt-0.5">
+                                SLA Global 90 Hari: {{ $overallUptime ?? '99.98' }}%
+                            </div>
+                        </div>
+                    </div>
+                    @else
                     <div class="inline-flex items-center gap-3.5 px-5 py-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-lg shadow-emerald-950/20">
                         <span class="relative flex h-3.5 w-3.5 shrink-0">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -64,9 +81,12 @@
                         </span>
                         <div>
                             <div class="text-sm font-bold text-emerald-300 tracking-wide">Semua Sistem Beroperasi Normal</div>
-                            <div class="text-[11px] text-emerald-400/80 font-mono-code mt-0.5">SLA Global 90 Hari: 99.98%</div>
+                            <div class="text-[11px] text-emerald-400/80 font-mono-code mt-0.5">
+                                SLA Global 90 Hari: {{ $overallUptime ?? '99.98' }}%
+                            </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -102,6 +122,91 @@
 
     <!-- Main Container -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+
+        {{-- PHASE 1 - Maintenance yang sedang berjalan dan yang akan datang.
+             Dibaca langsung dari tabel maintenance_windows. --}}
+        @if(!empty($runningWindows) && count($runningWindows) > 0)
+            <div class="bg-white rounded-xl border border-sky-200 p-5 mb-6 mt-10">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+                        Sedang Berlangsung
+                    </span>
+                    <h2 class="text-sm font-bold text-slate-900">Pemeliharaan Aktif</h2>
+                </div>
+                @foreach($runningWindows as $window)
+                    <div class="border border-slate-200 rounded-lg p-4 mb-2 last:mb-0">
+                        <div class="text-sm font-bold text-slate-900">{{ $window->title }}</div>
+                        @if($window->description)
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">{{ $window->description }}</p>
+                        @endif
+                        <div class="font-mono-code text-[11px] text-slate-500 mt-2">
+                            {{ $window->starts_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                            &ndash;
+                            {{ $window->ends_at->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if(!empty($upcomingWindows) && count($upcomingWindows) > 0)
+            <div class="bg-white rounded-xl border border-amber-200 p-5 mb-6 {{ (!empty($runningWindows) && count($runningWindows) > 0) ? '' : 'mt-10' }}">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                        Terjadwal
+                    </span>
+                    <h2 class="text-sm font-bold text-slate-900">Pemeliharaan Mendatang</h2>
+                </div>
+                @foreach($upcomingWindows as $window)
+                    <div class="border border-slate-200 rounded-lg p-4 mb-2 last:mb-0">
+                        <div class="text-sm font-bold text-slate-900">{{ $window->title }}</div>
+                        @if($window->description)
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">{{ $window->description }}</p>
+                        @endif
+                        <div class="font-mono-code text-[11px] text-slate-500 mt-2">
+                            {{ $window->starts_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                            &ndash;
+                            {{ $window->ends_at->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- PHASE 1 - Status per komponen, dibaca dari tabel system_components. --}}
+        @if(!empty($components) && count($components) > 0)
+            <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6 {{ ((!empty($runningWindows) && count($runningWindows) > 0) || (!empty($upcomingWindows) && count($upcomingWindows) > 0)) ? '' : 'mt-10' }}">
+                <h2 class="text-sm font-bold text-slate-900 mb-1">Status Komponen Layanan</h2>
+                <p class="text-xs text-slate-500 mb-4">Keadaan terkini tiap komponen inti platform.</p>
+
+                <div class="space-y-2">
+                    @foreach($components as $component)
+                        <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-slate-200">
+                            <div class="min-w-0">
+                                <div class="text-sm font-bold text-slate-900">{{ $component->name }}</div>
+                                <div class="text-[11px] text-slate-500">
+                                    {{ $component->status_note ?: $component->description }}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                @if($component->uptime_percent)
+                                    <span class="font-mono-code text-[11px] text-slate-500">
+                                        {{ number_format($component->uptime_percent, 2) }}%
+                                    </span>
+                                @endif
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold border {{ $component->status_classes }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $component->status_dot_class }}"></span>
+                                    {{ $component->status_label }}
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
 
         <!-- Executive KPI Ribbon (4 Metric Cards) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -129,6 +129,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'my-new-guest-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Calon Pelanggan Baru',
             'email' => 'pelangganbaru@student.id',
@@ -159,7 +160,7 @@ class ExampleTest extends TestCase
 
         // By email
         $response2 = $this->post('/login', [
-            'username' => 'vexahosttech@gmail.com',
+            'username' => 'vexahostcloudtech@gmail.com',
             'password' => '12345678',
         ]);
         $response2->assertRedirect(route('admin.index'));
@@ -274,7 +275,7 @@ class ExampleTest extends TestCase
 
     public function test_admin_panel_accessible_for_admin(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $response = $this->actingAs($admin)->get('/admin');
         $response->assertStatus(200);
         $response->assertSee('Ringkasan');
@@ -282,7 +283,7 @@ class ExampleTest extends TestCase
 
     public function test_admin_views_orders_instances_customers_tickets(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         $this->actingAs($admin)->get('/admin/orders')->assertStatus(200)->assertSee('Antrean & Manajemen Order');
         $this->actingAs($admin)->get('/admin/shopee')->assertStatus(200)->assertSee('Proses Pesanan Shopee');
@@ -293,7 +294,7 @@ class ExampleTest extends TestCase
 
     public function test_admin_can_provision_pending_order(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         [$customer] = $this->createCustomerWithVps();
 
         $pendingOrder = Order::create([
@@ -324,7 +325,7 @@ class ExampleTest extends TestCase
 
     public function test_shopee_order_processing_by_admin(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $spec = VpsSpec::first();
 
         $response = $this->actingAs($admin)->post('/admin/shopee/process', [
@@ -480,6 +481,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'startup-test-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Startup Customer Fail',
             'email' => 'startup.fail@customer.id',
@@ -502,6 +504,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'business-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Business Customer Success',
             'email' => 'biz.success@customer.id',
@@ -529,6 +532,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'student-fail-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Student Fail',
             'email' => 'student.fail@customer.id',
@@ -551,6 +555,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'student-ok-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Student OK',
             'email' => 'student.ok@customer.id',
@@ -577,6 +582,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'mhs-fail-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Mahasiswa Fail',
             'email' => 'mhs.fail@customer.id',
@@ -599,6 +605,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'mhs-ok-server',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Mahasiswa OK',
             'email' => 'mhs.ok@customer.id',
@@ -626,6 +633,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'std-fail',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Std Fail',
             'email' => 'std.fail@test.com',
@@ -642,6 +650,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'prem-fail',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Prem Fail',
             'email' => 'prem.fail@test.com',
@@ -663,6 +672,7 @@ class ExampleTest extends TestCase
             'os' => 'ubuntu2404',
             'hostname' => 'prem-ok',
             'root_password' => 'SecurePass@123',
+            'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'Prem OK',
             'email' => 'prem.ok@test.com',
@@ -691,7 +701,7 @@ class ExampleTest extends TestCase
 
     public function test_admin_packages_crud_and_core_protection(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         // 1. Index page view
         $indexRes = $this->actingAs($admin)->get('/admin/packages');

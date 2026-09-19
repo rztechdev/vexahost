@@ -49,6 +49,7 @@ class LynkCheckoutTest extends TestCase
             'billing_cycle' => 'monthly',
             'hostname' => 'vx-test-lynk',
             'root_password' => 'secret12345',
+            'terms_accepted' => 1,
             'payment_method' => 'lynk',
         ]);
 
@@ -94,6 +95,7 @@ class LynkCheckoutTest extends TestCase
             'billing_cycle' => 'monthly',
             'hostname' => 'vx-test-gateway',
             'root_password' => 'secret12345',
+            'terms_accepted' => 1,
             'payment_method' => 'lynk',
         ]);
 
@@ -136,6 +138,7 @@ class LynkCheckoutTest extends TestCase
             'billing_cycle' => 'monthly',
             'hostname' => 'vx-test-json',
             'root_password' => 'secret12345',
+            'terms_accepted' => 1,
             'payment_method' => 'lynk',
         ]);
 

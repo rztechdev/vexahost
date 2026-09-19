@@ -425,7 +425,8 @@ class AdminController extends Controller
                     default => 1,
                 };
                 $expiresAt = $startsAt->copy()->addMonths($months);
-                $graceEndsAt = $expiresAt->copy()->addDays(7);
+                // Tenggang mengikuti jenis produk dan selalu di bawah batas hapus Supplier.
+                $graceEndsAt = $expiresAt->copy()->addDays(app(\App\Services\RenewalService::class)->graceDaysForOrder($order));
 
                 // Parameter pesanan pelanggan yang terkunci (tidak diubah admin)
                 $hostname = $order->hostname ?: ('vps-' . $order->id);
@@ -557,6 +558,25 @@ class AdminController extends Controller
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('admin.provision.notify_failed', ['instance_id' => $instance->id, 'error' => $e->getMessage()]);
+        }
+
+        // PHASE 5 - tandai serah terima di papan fulfillment dan tautkan catatan
+        // pembelian Supplier ke instance yang baru dibuat. Dijalankan di luar
+        // transaksi provisioning agar kegagalan di sini tidak membatalkan provisioning.
+        try {
+            $order->update([
+                'fulfillment_stage' => 'delivered',
+                'delivered_at' => now(),
+            ]);
+
+            \App\Models\SupplierPurchase::where('order_id', $order->id)
+                ->whereNull('vps_instance_id')
+                ->update(['vps_instance_id' => $instance->id]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('admin.provision.fulfillment_mark_failed', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return back()->with('success',
@@ -871,7 +891,8 @@ class AdminController extends Controller
 
                     $startsAt = now();
                     $expiresAt = $startsAt->copy()->addMonth();
-                    $graceEndsAt = $expiresAt->copy()->addDays(7);
+                    // Tenggang mengikuti jenis produk dan selalu di bawah batas hapus Supplier.
+                    $graceEndsAt = $expiresAt->copy()->addDays(app(\App\Services\RenewalService::class)->graceDaysForOrder($order));
                     $rootPassword = !empty($validated['root_password'])
                         ? $validated['root_password']
                         : Str::password(16, true, true, false, false);
@@ -977,7 +998,7 @@ class AdminController extends Controller
 
         // Kirim notifikasi ke Admin
         try {
-            $adminEmail = config('mail.admin_address', 'vexahosttech@gmail.com');
+            $adminEmail = config('mail.admin_address', 'vexahostcloudtech@gmail.com');
             $adminUser = User::where('email', $adminEmail)->first();
             if ($adminUser) {
                 $order->loadMissing(['customer', 'vpsSpec']);

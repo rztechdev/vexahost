@@ -32,6 +32,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RequireRole::class,
             'org.context' => \App\Http\Middleware\EnsureOrganizationContext::class,
             'apikey' => \App\Http\Middleware\ApiKeyAuth::class,
+            // Tanpa parameter memeriksa maintenance global; dengan parameter
+            // memeriksa cakupan tertentu, mis. 'maintenance:checkout'.
+            'maintenance' => \App\Http\Middleware\MaintenanceMode::class,
+        ]);
+
+        // Maintenance global diperiksa untuk seluruh request web.
+        // Rute webhook dikecualikan di dalam MaintenanceService::EXEMPT_PATHS.
+        $middleware->web(append: [
+            \App\Http\Middleware\MaintenanceMode::class,
+            // PHASE 7 - selama admin masuk sebagai pelanggan, tolak semua
+            // permintaan yang mengubah data kecuali daftar putih.
+            \App\Http\Middleware\ImpersonationGuard::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

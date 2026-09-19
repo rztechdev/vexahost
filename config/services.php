@@ -43,7 +43,7 @@ return [
 
     // Provisioning provider config (Poin 4).
     // Default 'manual' = admin input IP/password sendiri (behavior existing).
-    // Provider real (mis. sumopod, biznetgio) tinggal ditambah adapter dan
+    // Provider real (mis. supplier, biznetgio) tinggal ditambah adapter dan
     // register di ProviderManager::createXxxDriver().
     'provisioning' => [
         'default' => env('PROVISIONING_DRIVER', 'manual'),

@@ -70,7 +70,9 @@
                     </div>
                     <div>
                         <span class="text-slate-400 block font-medium">Revisi Terakhir</span>
-                        <span class="font-semibold text-slate-800 mt-0.5 block">16 September 2026</span>
+                        <span class="font-semibold text-slate-800 mt-0.5 block">
+                            {{ \Carbon\Carbon::parse(config('legal.terms_effective_date'))->translatedFormat('d F Y') }}
+                        </span>
                     </div>
                     <div>
                         <span class="text-slate-400 block font-medium">Yurisdiksi Hukum</span>
@@ -78,7 +80,7 @@
                     </div>
                     <div>
                         <span class="text-slate-400 block font-medium">Identifikasi Versi</span>
-                        <span class="font-mono-code font-semibold text-slate-800 mt-0.5 block">TOS-2026-V2</span>
+                        <span class="font-mono-code font-semibold text-slate-800 mt-0.5 block">{{ config('legal.terms_version') }}</span>
                     </div>
                 </div>
             </div>
@@ -282,6 +284,29 @@
                                         <td class="p-3 border border-slate-200">Menjalankan masscan, zmap, atau vulnerability scanner terhadap jaringan publik tanpa otorisasi tertulis.</td>
                                         <td class="p-3 border border-slate-200 font-mono-code text-amber-700 font-semibold">Suspensi Jaringan</td>
                                     </tr>
+                                    {{-- Empat larangan berikut menyelaraskan ketentuan ini dengan Acceptable
+                                         Use Policy penyedia infrastruktur hulu. Pelanggaran atasnya berisiko
+                                         menjatuhkan seluruh akun, bukan hanya layanan yang bersangkutan. --}}
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Layanan VPN &amp; Proxy</td>
+                                        <td class="p-3 border border-slate-200">Menjalankan layanan VPN, proxy, SOCKS, atau relay anonimisasi trafik, baik untuk umum maupun tertutup.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Terminasi Instan</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Scraping &amp; Crawling</td>
+                                        <td class="p-3 border border-slate-200">Mengoperasikan layanan pengambilan data massal atau perayapan situs pihak ketiga tanpa izin pemiliknya.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Terminasi Instan</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Agregator Torrent</td>
+                                        <td class="p-3 border border-slate-200">Menjalankan tracker, seedbox, atau agregator torrent, termasuk distribusi berkas berhak cipta.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-rose-700 font-semibold">Terminasi Instan</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-semibold text-slate-900">Bot &amp; Skrip Otomatis</td>
+                                        <td class="p-3 border border-slate-200">Menjalankan bot atau skrip otomatis yang membebani jaringan atau menyalahi ketentuan layanan pihak ketiga.</td>
+                                        <td class="p-3 border border-slate-200 font-mono-code text-amber-700 font-semibold">Suspensi / Terminasi</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -289,6 +314,24 @@
                         <div class="p-4 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 leading-relaxed">
                             <strong class="block mb-1 font-bold">Ketentuan Nol Toleransi (Zero Tolerance Enforcement)</strong>
                             Pelanggaran berat terhadap Pasal 4 akan membatalkan hak jaminan uang kembali (no refund), mengakibatkan pemutusan instan seluruh instance terkait, dan data log trafik dapat diserahkan kepada pihak penegak hukum yang berwenang sesuai permintaan resmi.
+                        </div>
+
+                        {{-- Tiga klausul perlindungan. Tanpa pembatasan tanggung jawab, VexaHost
+                             menanggung kerugian Pelanggan tanpa batas sementara ganti rugi dari
+                             penyedia infrastruktur hulu dibatasi. --}}
+                        <div class="mt-4 p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-3">
+                            <div>
+                                <strong class="block mb-1 font-bold text-slate-900">4.1 Dampak Pelanggaran terhadap Infrastruktur Hulu</strong>
+                                Layanan VexaHost berjalan di atas infrastruktur penyedia pihak ketiga yang memiliki Ketentuan Penggunaan tersendiri. Pelanggaran oleh satu Pelanggan dapat mengakibatkan pembatasan atau pemutusan pada tingkat akun penyedia hulu, sehingga berdampak pada Pelanggan lain. VexaHost berhak melakukan suspensi atau terminasi segera, tanpa pemberitahuan sebelumnya, terhadap layanan yang berpotensi menimbulkan dampak tersebut.
+                            </div>
+                            <div>
+                                <strong class="block mb-1 font-bold text-slate-900">4.2 Tanggung Jawab Pencadangan Data</strong>
+                                Pencadangan data sepenuhnya merupakan tanggung jawab Pelanggan. VexaHost tidak menjamin ketersediaan salinan cadangan dan tidak bertanggung jawab atas kehilangan data akibat suspensi, terminasi, keterlambatan perpanjangan, maupun tindakan penyedia infrastruktur hulu. Data pada layanan yang telah melewati masa tenggang dihapus permanen dan tidak dapat dipulihkan.
+                            </div>
+                            <div>
+                                <strong class="block mb-1 font-bold text-slate-900">4.3 Pembatasan Tanggung Jawab</strong>
+                                Sepanjang diizinkan hukum yang berlaku, total tanggung jawab VexaHost atas seluruh klaim yang timbul dari Perjanjian ini dibatasi paling banyak sebesar jumlah yang telah dibayarkan Pelanggan kepada VexaHost dalam periode dua belas (12) bulan terakhir. VexaHost tidak bertanggung jawab atas kerugian tidak langsung, kehilangan keuntungan, kehilangan data, maupun gangguan usaha. Tidak ada pengembalian dana untuk terminasi yang disebabkan pelanggaran terhadap Pasal 4.
+                            </div>
                         </div>
                     </div>
                 </section>

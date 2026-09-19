@@ -14,7 +14,7 @@ use App\Services\Provisioning\Exceptions\ProviderException;
  * Semua operasi jadi placeholder yang menyalin dari task input ke instance
  * meta, tanpa memanggil API eksternal. Ini yang jadi behavior default.
  *
- * Untuk provider real (Sumopod, BiznetGio, Contabo), buat kelas baru yang
+ * Untuk provider real (Supplier, BiznetGio, Contabo), buat kelas baru yang
  * implement contract dan register di config/services.php.
  */
 class ManualProvider implements VpsProviderContract

@@ -45,6 +45,7 @@
                         <th class="px-5 py-3">VPS Aktif</th>
                         <th class="px-5 py-3">Total Order</th>
                         <th class="px-5 py-3">Terdaftar</th>
+                        <th class="px-5 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -82,10 +83,23 @@
                             <td class="px-5 py-3.5 text-slate-500 font-mono-code">
                                 {{ $customer->created_at->format('d/m/Y') }}
                             </td>
+                            <td class="px-5 py-3.5 text-right">
+                                @unless($customer->is_admin)
+                                    {{-- PHASE 7 - melihat panel persis seperti pelanggan, hanya baca. --}}
+                                    <form action="{{ route('admin.impersonate.start', $customer->id) }}" method="POST" class="inline"
+                                          onsubmit="return confirm('Masuk sebagai {{ addslashes($customer->full_name) }}? Mode ini hanya untuk melihat; semua aksi yang mengubah data akan diblokir.');">
+                                        @csrf
+                                        <button type="submit"
+                                                class="px-2.5 py-1 rounded text-[11px] font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 whitespace-nowrap">
+                                            Masuk sebagai
+                                        </button>
+                                    </form>
+                                @endunless
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-10 text-center text-slate-400">
+                            <td colspan="8" class="px-5 py-10 text-center text-slate-400">
                                 Tidak ada data pelanggan yang cocok dengan pencarian.
                             </td>
                         </tr>

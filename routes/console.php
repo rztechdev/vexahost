@@ -50,6 +50,42 @@ Schedule::command('billing:terminate-expired')
     ->description('Terminate subscription yang suspended > 30 hari.');
 
 // ============================================================
+// PHASE 1 - Maintenance terjadwal
+// ============================================================
+// Berjalan tiap 5 menit agar jendela maintenance mulai dan berakhir
+// mendekati waktu yang dijadwalkan admin.
+Schedule::command('maintenance:sync')
+    ->everyFiveMinutes()
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->description('Mulai/akhiri jendela maintenance terjadwal dan kirim pemberitahuannya.');
+
+// ============================================================
+// PHASE 3 - Pengingat perpanjangan instance
+// ============================================================
+// Dijalankan sekali sehari. Idempotensi dijamin indeks unik di
+// tabel renewal_reminders, sehingga aman bila terjadi pengulangan.
+Schedule::command('renewal:remind')
+    ->dailyAt('09:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->description('Kirim pengingat H-3/H-1/H-0 instance dan pindahkan status yang jatuh tempo.');
+
+// ============================================================
+// PHASE 5 - Peringatan waktu tanggap fulfillment
+// ============================================================
+// Tiap jam agar keterlambatan cepat diketahui. Tiap order hanya
+// diperingatkan sekali (orders.sla_alerted_at).
+Schedule::command('fulfillment:check-sla')
+    ->hourly()
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->description('Peringatkan admin tentang order dibayar yang belum diserahkan melewati ambang.');
+
+// ============================================================
 // Provisioning reconciliation scheduler (Poin 4)
 // ============================================================
 Schedule::command('provider:reconcile')

@@ -55,7 +55,7 @@
 
 ## Phase 1 Limitations (Manual)
 
-- **Provisioning:** Admin input VPS details manually dari Sumopod
+- **Provisioning:** Admin input VPS details manually dari Supplier
 - **Email:** Credentials dikirim manual (Brevo belum integrated)
 - **Payment:** Midtrans belum integrated (manual confirm)
 - **Shopee:** Order forward manual via Telegram, process lewat admin panel
@@ -66,7 +66,7 @@
 
 1. Midtrans SNAP integration
 2. Brevo SMTP setup (email automation)
-3. Sumopod API integration (auto-provision)
+3. Supplier API integration (auto-provision)
 4. Shopee API webhook
 5. Control panel auto-install script (Coolify/Dokploy)
 

@@ -86,7 +86,7 @@
 |---------|------|------------|
 | Midtrans SNAP | API key + webhook | Payment critical, need sandbox test |
 | Brevo SMTP | Credentials setup | Email at scale, not critical MVP |
-| Sumopod API integration | Auto-provision script | Automate admin manual work |
+| Supplier API integration | Auto-provision script | Automate admin manual work |
 | Shopee webhook | Order auto-forward | Manual forward ok for <10 orders/day |
 | Control panel auto-install | Shell script (Coolify/Dokploy) | Non-critical, setup guides ok Phase 1 |
 | 2FA | TOTP setup UI | Security nice-to-have |
@@ -136,7 +136,7 @@ vexahost/
 ❌ **No auto-provisioning** — Admin manually input VPS details  
 ❌ **No email send** — Shopee credentials logged in API response only  
 ❌ **No payments** — Midtrans not integrated  
-❌ **No Sumopod API** — Manual VPS buy from Sumopod dashboard  
+❌ **No Supplier API** — Manual VPS buy from Supplier dashboard  
 ❌ **No Shopee webhook** — Forward orders manually via Telegram  
 ❌ **No monitoring** — Uptime Kuma placeholder  
 
@@ -149,6 +149,6 @@ vexahost/
 **For Phase 2:** Pick ONE from below:
 1. Midtrans SNAP integration + payment webhook
 2. Brevo SMTP + email automation (register confirmation, credentials email)
-3. Sumopod API integration (auto-provision script)
+3. Supplier API integration (auto-provision script)
 
 Which first?

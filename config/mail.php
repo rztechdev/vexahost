@@ -115,4 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'admin_address' => env('VEXAHOST_ADMIN_EMAIL', env('ADMIN_EMAIL', 'vexahostcloudtech@gmail.com')),
+
 ];

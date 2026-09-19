@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
+use App\Models\PaymentGateway;
 use App\Models\PaymentTransaction;
+use App\Models\TermsAcceptance;
 use App\Models\User;
 use App\Models\VpsSpec;
 use App\Models\WebhookEvent;
@@ -26,7 +28,11 @@ class OrderController extends Controller
 
     public function checkout(Request $request, $spec_id = null)
     {
-        $specs = VpsSpec::where('is_active', true)->orderBy('sell_price', 'asc')->get();
+        // Harga modal disembunyikan: halaman ini mengirim data paket ke browser
+        // lewat Js::from(), sehingga seluruh atribut dapat dibaca dari view-source.
+        // Tidak disembunyikan di level model karena form edit paket admin membutuhkannya.
+        $specs = VpsSpec::where('is_active', true)->orderBy('sell_price', 'asc')->get()
+            ->each->makeHidden(['cost_price']);
         $selectedSpecId = $spec_id ?? $request->query('spec_id', $specs->first()->id ?? 1);
         $selectedSpec = $specs->firstWhere('id', $selectedSpecId) ?? $specs->first();
 
@@ -132,7 +138,25 @@ class OrderController extends Controller
             'phone' => 'nullable|string|max:25',
             'password' => 'nullable|string|min:8',
             'redirect_to_dashboard' => 'nullable',
+            // PHASE 2 - persetujuan ketentuan bersifat WAJIB (clickwrap).
+            // Divalidasi di sisi server agar tidak dapat dilewati dari peramban.
+            'terms_accepted' => 'accepted',
+        ], [
+            'terms_accepted.accepted' => 'Anda wajib menyetujui Ketentuan Layanan dan Ketentuan Penggunaan sebelum melanjutkan pemesanan.',
         ]);
+
+        // PHASE 4 - metode pembayaran wajib milik gateway yang aktif. UI checkout
+        // sudah mengunci metode nonaktif, pemeriksaan ini menutup jalur kirim langsung.
+        if (!PaymentGateway::isMethodActive($validated['payment_method'])) {
+            $methodMessage = 'Metode pembayaran ini sedang tidak tersedia. Silakan pilih metode lain.';
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $methodMessage,
+                    'errors' => ['payment_method' => [$methodMessage]],
+                ], 422);
+            }
+            return back()->withInput()->withErrors(['payment_method' => $methodMessage]);
+        }
 
         $spec = VpsSpec::findOrFail($validated['vps_spec_id']);
         if (!$spec->isProviderAllowed($validated['provider'])) {
@@ -228,8 +252,16 @@ class OrderController extends Controller
         $netAmount = (float) $spec->sell_price;
         $setupFee = 0;
 
+        // PHASE 2 - bukti persetujuan dicatat bersama order dalam satu transaksi.
+        $termsVersion = config('legal.terms_version');
+        $termsIp = $request->ip();
+        $termsAgent = $request->userAgent();
+
         // Bungkus dalam transaction agar order + invoice + status history atomic.
-        $order = DB::transaction(function () use ($user, $organization, $spec, $validated, $cycle, $netAmount, $setupFee) {
+        $order = DB::transaction(function () use (
+            $user, $organization, $spec, $validated, $cycle, $netAmount, $setupFee,
+            $termsVersion, $termsIp, $termsAgent
+        ) {
             $order = Order::create([
                 'customer_id' => $user->id,
                 'organization_id' => $organization->id,
@@ -262,6 +294,18 @@ class OrderController extends Controller
                 'starts_at' => null,
                 'expires_at' => null,
                 'last_status_change_at' => now(),
+                'terms_version' => $termsVersion,
+            ]);
+
+            // Baris ini adalah alat bukti. Tanpa versi yang tersimpan, kita tidak
+            // dapat membuktikan naskah mana yang disetujui bila isinya berubah.
+            TermsAcceptance::create([
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'terms_version' => $termsVersion,
+                'accepted_at' => now(),
+                'ip_address' => $termsIp,
+                'user_agent' => $termsAgent,
             ]);
 
             $invoiceNumber = 'INV-' . date('Ym') . '-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);

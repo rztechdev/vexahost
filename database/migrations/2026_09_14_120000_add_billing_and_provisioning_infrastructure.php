@@ -205,7 +205,7 @@ return new class extends Migration
             $table->string('name');                     // Jakarta, Indonesia
             $table->string('country', 2)->default('ID');
             $table->string('city')->nullable();
-            $table->string('provider', 40)->nullable(); // manual, sumopod, biznetgio, dst.
+            $table->string('provider', 40)->nullable(); // manual, supplier, biznetgio, dst.
             $table->string('provider_region_id')->nullable();
             $table->unsignedInteger('capacity')->nullable();       // total slot
             $table->unsignedInteger('capacity_used')->default(0);  // slot terpakai

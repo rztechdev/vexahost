@@ -26,7 +26,8 @@ class VpsInstance extends Model
 
     public function getProviderLabelAttribute(): string
     {
-        return Order::providerLabels()[$this->provider] ?? ucfirst((string) $this->provider);
+        // Nilai tak dikenal (mis. nama driver supplier) diganti label netral.
+        return Order::customerProviderLabel($this->provider);
     }
 
     public function getOsLabelAttribute(): string
@@ -186,6 +187,14 @@ class VpsInstance extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    /**
+     * Catatan pembelian di Supplier, satu baris per periode prepaid.
+     */
+    public function supplierPurchases()
+    {
+        return $this->hasMany(SupplierPurchase::class)->orderByDesc('purchased_at');
     }
 
     public function organization()

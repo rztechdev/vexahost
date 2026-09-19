@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Exceptions\InvalidStateTransitionException;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\PaymentGateway;
 use App\Models\PaymentTransaction;
 use App\Models\WebhookEvent;
 use App\Services\OrderStateMachine;
@@ -36,7 +37,8 @@ class PaymentWebhookController extends Controller
 
     public function handle(Request $request)
     {
-        $serverKey = config('services.midtrans.server_key');
+        // PHASE 4 - registry gateway lebih dulu, jatuh kembali ke .env.
+        $serverKey = PaymentGateway::credential('midtrans', 'server_key', config('services.midtrans.server_key'));
 
         // Guard 1: server key WAJIB dikonfigurasi.
         if (empty($serverKey)) {

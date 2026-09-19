@@ -22,7 +22,9 @@
             'dana' => ['DANA', 'dana.svg', 'Aplikasi DANA', 'E-Wallet'],
             'shopeepay' => ['ShopeePay', 'ewallet_shopeepay.svg', 'Scan & saldo ShopeePay', 'E-Wallet'],
         ] as $method => $details)
-            @php $isMethodActive = in_array($method, ['lynk', 'qris']); @endphp
+            {{-- PHASE 4 - status aktif dibaca dari registry payment gateway,
+                 sehingga metode baru dapat dibuka dari panel tanpa deploy. --}}
+            @php $isMethodActive = \App\Models\PaymentGateway::isMethodActive($method); @endphp
 
             @if($isMethodActive)
                 {{-- Active Method: QRIS --}}

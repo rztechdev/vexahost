@@ -23,7 +23,7 @@ class AdminReportsExportTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $this->admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         $this->customer = User::create([
             'username' => 'reportcustomer',

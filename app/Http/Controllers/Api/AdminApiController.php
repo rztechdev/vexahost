@@ -36,9 +36,9 @@ class AdminApiController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'sumopod_ip' => 'required|ip',
+            'server_ip' => 'required|ip',
             'private_ip' => 'nullable|ip',
-            'sumopod_root_password' => 'nullable|string',
+            'server_root_password' => 'nullable|string',
             'os' => 'required|string',
             'datacenter_location' => 'required|string',
             'control_panel' => 'required|string',
@@ -85,7 +85,8 @@ class AdminApiController extends Controller
                     default => 1,
                 };
                 $expiresAt = $startsAt->copy()->addMonths($months);
-                $graceEndsAt = $expiresAt->copy()->addDays(7);
+                // Tenggang mengikuti jenis produk dan selalu di bawah batas hapus Supplier.
+                $graceEndsAt = $expiresAt->copy()->addDays(app(\App\Services\RenewalService::class)->graceDaysForOrder($order));
 
                 $isDb = $order->isDatabasePackage();
                 $dbEngine = $order->db_engine ?: ($isDb ? 'postgres' : null);
@@ -97,8 +98,8 @@ class AdminApiController extends Controller
                     'vector' => 6333,
                     default => 5432,
                 } : null);
-                $dbPassword = $isDb ? ($order->db_password ?: ($validated['sumopod_root_password'] ?? null)) : null;
-                $appUrl = ($isDb && $dbManager === 'cloudbeaver') ? "https://{$validated['sumopod_ip']}:8080" : null;
+                $dbPassword = $isDb ? ($order->db_password ?: ($validated['server_root_password'] ?? null)) : null;
+                $appUrl = ($isDb && $dbManager === 'cloudbeaver') ? "https://{$validated['server_ip']}:8080" : null;
                 $appName = ($isDb && $dbManager === 'cloudbeaver') ? 'CloudBeaver Web GUI' : null;
 
                 $instance = VpsInstance::create([
@@ -106,10 +107,10 @@ class AdminApiController extends Controller
                     'order_id' => $order->id,
                     'organization_id' => $order->organization_id,
                     'hostname' => $validated['hostname'],
-                    'public_ip' => $validated['sumopod_ip'],
+                    'public_ip' => $validated['server_ip'],
                     'private_ip' => $validated['private_ip'] ?? null,
                     'ssh_port' => $validated['ssh_port'] ?? 22,
-                    'initial_root_password' => $validated['sumopod_root_password'] ?? null,
+                    'initial_root_password' => $validated['server_root_password'] ?? null,
                     'os' => $validated['os'],
                     'datacenter_location' => $validated['datacenter_location'],
                     'status' => 'provisioning',
@@ -379,7 +380,7 @@ class AdminApiController extends Controller
 
         // Kirim notifikasi ke Admin
         try {
-            $adminEmail = config('mail.admin_address', 'vexahosttech@gmail.com');
+            $adminEmail = config('mail.admin_address', 'vexahostcloudtech@gmail.com');
             $adminUser = User::where('email', $adminEmail)->first();
             if ($adminUser) {
                 $order->loadMissing(['customer', 'vpsSpec']);

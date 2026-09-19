@@ -120,6 +120,7 @@ class CheckoutQuickLoginTest extends TestCase
             'password' => 'BudiSecure123!',
             'hostname' => 'vx-node-budi',
             'root_password' => 'RootBudi123!',
+            'terms_accepted' => 1,
             'os' => 'ubuntu2404',
             'provider' => $spec->defaultProvider(),
             'datacenter_location' => 'indonesia',

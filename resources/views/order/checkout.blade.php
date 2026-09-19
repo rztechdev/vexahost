@@ -317,8 +317,11 @@
                             Lanjut ke Konfirmasi Pembayaran →
                         </button>
                     </div>
-                    <div x-show="currentSlide === 3" class="ml-auto">
-                        <button type="button" @click="submitCheckout()" :disabled="isSubmitting"
+                    <div x-show="currentSlide === 3" class="ml-auto flex flex-col items-end gap-1.5">
+                        <p x-show="!termsAccepted" x-cloak class="text-xs font-semibold text-slate-500">
+                            Centang persetujuan ketentuan untuk melanjutkan.
+                        </p>
+                        <button type="button" @click="submitCheckout()" :disabled="isSubmitting || !termsAccepted"
                                 class="px-7 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm">
                             <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -531,6 +534,8 @@ function checkoutState() {
     return {
         currentSlide: 0,
         isSubmitting: false,
+        // PHASE 2 - persetujuan ketentuan wajib dicentang sebelum pesanan dikirim.
+        termsAccepted: false,
         selectedSpec: {{ $selectedSpec ? $selectedSpec->id : 'null' }},
         specs: {{ Js::from($specs->keyBy('id')) }},
         billingCycle: 'monthly',
@@ -1055,7 +1060,14 @@ function checkoutState() {
                 showAlert('Silakan pilih metode pembayaran terlebih dahulu');
                 return;
             }
-            
+
+            // PHASE 2 - persetujuan ketentuan wajib. Server memvalidasi ulang,
+            // pemeriksaan di sini hanya agar pesannya muncul lebih cepat.
+            if (!this.termsAccepted) {
+                showAlert('Anda wajib menyetujui Ketentuan Layanan dan Ketentuan Penggunaan sebelum melanjutkan pemesanan');
+                return;
+            }
+
             if (this.isDatabasePackage) {
                 this.applyDatabaseDefaults();
             } else if (this.isAiPackage) {
@@ -1078,7 +1090,8 @@ function checkoutState() {
                     db_manager: this.isDatabasePackage ? this.dbManager : null,
                     hostname: this.vpsName,
                     root_password: this.rootPassword,
-                    phone: this.isLoggedIn 
+                    terms_accepted: this.termsAccepted ? 1 : 0,
+                    phone: this.isLoggedIn
                         ? (this.currentUser?.phone || '') 
                         : (this.registerPhone || ''),
                 };

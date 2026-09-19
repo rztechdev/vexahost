@@ -10,7 +10,7 @@ use Illuminate\Support\Manager;
  * Registry provider. Resolve provider berdasarkan nama.
  * Extend dengan provider baru:
  *
- *   $manager->extend('sumopod', fn($app) => new SumopodProvider($app['config']['services.sumopod']));
+ *   $manager->extend('supplier', fn($app) => new SupplierProvider($app['config']['services.supplier']));
  */
 class ProviderManager extends Manager
 {

@@ -1,5 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\AbuseController as AdminAbuseController;
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
+use App\Http\Controllers\Admin\BillingCenterController as AdminBillingCenterController;
+use App\Http\Controllers\Admin\BroadcastController as AdminBroadcastController;
+use App\Http\Controllers\Admin\FulfillmentController as AdminFulfillmentController;
+use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationController;
+use App\Http\Controllers\Admin\MaintenanceController as AdminMaintenanceController;
+use App\Http\Controllers\Admin\NotificationTemplateController as AdminTemplateController;
+use App\Http\Controllers\Admin\PaymentGatewayController as AdminPaymentGatewayController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\SupplierPurchaseController as AdminSupplierPurchaseController;
+use App\Http\Controllers\Admin\WebhookLogController as AdminWebhookLogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -8,6 +20,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\SecurityController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\TwoFactorController;
 use App\Models\VpsSpec;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +36,8 @@ Route::get('/', function () {
 
 // Public Content & Info Pages
 Route::view('/docs', 'pages.docs')->name('docs');
-Route::view('/status', 'pages.status')->name('status');
+// Halaman status membaca keadaan nyata dari system_components (Phase 1).
+Route::get('/status', StatusController::class)->name('status');
 Route::redirect('/kontak', '/#kontak')->name('contact');
 
 // Public Direct Package Section Routes
@@ -89,8 +103,12 @@ Route::get('/sitemap.xml', function () {
 })->name('sitemap');
 
 // Website Self-Serve Order Flow (PRD 7.1.1)
-Route::get('/checkout/{spec_id?}', [OrderController::class, 'checkout'])->name('checkout');
-Route::post('/checkout', [OrderController::class, 'store'])->name('order.store');
+// Cakupan 'checkout' dapat ditutup terpisah saat stok habis atau ada maintenance,
+// tanpa menutup seluruh situs.
+Route::get('/checkout/{spec_id?}', [OrderController::class, 'checkout'])
+    ->middleware('maintenance:checkout')->name('checkout');
+Route::post('/checkout', [OrderController::class, 'store'])
+    ->middleware('maintenance:checkout')->name('order.store');
 Route::post('/checkout/quick-login', [OrderController::class, 'quickLogin'])->name('checkout.quick-login');
 Route::get('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment')->middleware('auth');
 // Halaman polling status pembayaran (read-only, diotentikasi via controller & session order).
@@ -138,6 +156,11 @@ Route::post('/two-factor/challenge', [TwoFactorController::class, 'verifyChallen
 // Public invitation view (butuh login untuk accept)
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
 Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitations.accept')->middleware('auth');
+
+// PHASE 7 - kembali dari "masuk sebagai pelanggan". Hanya butuh 'auth' agar
+// admin selalu bisa keluar, apa pun keadaan middleware lain.
+Route::post('/impersonate/leave', [AdminImpersonationController::class, 'leave'])
+    ->middleware('auth')->name('impersonate.leave');
 
 // Authenticated User Routes
 // org.context middleware memastikan setiap user login punya currentOrganization.
@@ -192,11 +215,11 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/vps/{id}', [DashboardController::class, 'show'])->middleware('permission:vps.read')->name('vps.show');
         // Polling endpoint untuk progress provisioning (Poin 4).
         Route::get('/vps/{id}/provisioning-status.json', [DashboardController::class, 'provisioningStatus'])->middleware('permission:vps.read')->name('vps.provisioning-status');
-        Route::post('/vps/{id}/start', [DashboardController::class, 'start'])->middleware('permission:vps.manage')->name('vps.start');
-        Route::post('/vps/{id}/stop', [DashboardController::class, 'stop'])->middleware('permission:vps.manage')->name('vps.stop');
-        Route::post('/vps/{id}/reboot', [DashboardController::class, 'reboot'])->middleware('permission:vps.manage')->name('vps.reboot');
-        Route::post('/vps/{id}/force-reboot', [DashboardController::class, 'forceReboot'])->middleware('permission:vps.manage')->name('vps.force-reboot');
-        Route::post('/vps/{id}/reinstall', [DashboardController::class, 'reinstall'])->middleware('permission:vps.reinstall')->name('vps.reinstall');
+        Route::post('/vps/{id}/start', [DashboardController::class, 'start'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.start');
+        Route::post('/vps/{id}/stop', [DashboardController::class, 'stop'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.stop');
+        Route::post('/vps/{id}/reboot', [DashboardController::class, 'reboot'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.reboot');
+        Route::post('/vps/{id}/force-reboot', [DashboardController::class, 'forceReboot'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->name('vps.force-reboot');
+        Route::post('/vps/{id}/reinstall', [DashboardController::class, 'reinstall'])->middleware('permission:vps.reinstall')->middleware('maintenance:vps_actions')->name('vps.reinstall');
         Route::post('/vps/{id}/reveal-password', [DashboardController::class, 'revealPassword'])->middleware('permission:vps.credentials')->name('vps.reveal-password');
         Route::get('/billing', [DashboardController::class, 'billing'])->middleware('permission:billing.read')->name('billing');
         Route::post('/subscriptions/{id}/auto-renew', [DashboardController::class, 'toggleAutoRenew'])->middleware('permission:billing.read')->name('subscriptions.auto-renew');
@@ -204,7 +227,7 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::post('/subscriptions/{id}/resume', [DashboardController::class, 'resumeSubscription'])->middleware('permission:billing.read')->name('subscriptions.resume');
         Route::get('/invoices/{id}/print', [DashboardController::class, 'printInvoice'])->middleware('permission:billing.read')->name('invoice.print');
         Route::get('/support', [DashboardController::class, 'support'])->name('support');
-        Route::post('/support', [DashboardController::class, 'storeTicket'])->name('support.store');
+        Route::post('/support', [DashboardController::class, 'storeTicket'])->middleware('maintenance:support')->name('support.store');
         Route::get('/support/{id}', [DashboardController::class, 'showTicket'])->name('support.show');
         Route::post('/support/{id}/reply', [DashboardController::class, 'replyTicket'])->name('support.reply');
         Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
@@ -248,5 +271,89 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/tickets/{id}', [AdminController::class, 'showTicket'])->name('tickets.show');
         Route::post('/tickets/{id}/reply', [AdminController::class, 'replyTicket'])->name('tickets.reply');
         Route::post('/tickets/{id}/assign', [AdminController::class, 'assignTicket'])->name('tickets.assign');
+
+        // ============================================================
+        // PHASE 1 - Pengaturan Sistem, Branding, dan Maintenance
+        // ============================================================
+        Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings/brand', [AdminSettingsController::class, 'updateBrand'])->name('settings.brand');
+        Route::post('/settings/company', [AdminSettingsController::class, 'updateCompany'])->name('settings.company');
+        Route::post('/settings/support', [AdminSettingsController::class, 'updateSupport'])->name('settings.support');
+        Route::post('/settings/notification', [AdminSettingsController::class, 'updateNotification'])->name('settings.notification');
+        Route::post('/settings/maintenance', [AdminSettingsController::class, 'updateMaintenance'])->name('settings.maintenance');
+        Route::post('/settings/bypass-token', [AdminSettingsController::class, 'regenerateBypassToken'])->name('settings.bypass-token');
+        Route::post('/settings/components/{id}', [AdminSettingsController::class, 'updateComponent'])->name('settings.components.update');
+
+        Route::get('/maintenance', [AdminMaintenanceController::class, 'index'])->name('maintenance.index');
+        Route::post('/maintenance', [AdminMaintenanceController::class, 'store'])->name('maintenance.store');
+        Route::put('/maintenance/{id}', [AdminMaintenanceController::class, 'update'])->name('maintenance.update');
+        Route::post('/maintenance/{id}/start', [AdminMaintenanceController::class, 'start'])->name('maintenance.start');
+        Route::post('/maintenance/{id}/complete', [AdminMaintenanceController::class, 'complete'])->name('maintenance.complete');
+        Route::post('/maintenance/{id}/cancel', [AdminMaintenanceController::class, 'cancel'])->name('maintenance.cancel');
+        Route::post('/maintenance/{id}/notify', [AdminMaintenanceController::class, 'notify'])->name('maintenance.notify');
+
+        // ============================================================
+        // PHASE 2 - Legal, AUP, dan Notifikasi Insiden
+        // ============================================================
+        Route::get('/abuse', [AdminAbuseController::class, 'index'])->name('abuse.index');
+        Route::post('/abuse', [AdminAbuseController::class, 'store'])->name('abuse.store');
+        Route::post('/abuse/{id}/notify', [AdminAbuseController::class, 'notify'])->name('abuse.notify');
+        Route::post('/abuse/{id}/resolve', [AdminAbuseController::class, 'resolve'])->name('abuse.resolve');
+
+        Route::get('/templates', [AdminTemplateController::class, 'index'])->name('templates.index');
+        Route::put('/templates/{id}', [AdminTemplateController::class, 'update'])->name('templates.update');
+
+        Route::get('/broadcast', [AdminBroadcastController::class, 'index'])->name('broadcast.index');
+        Route::post('/broadcast', [AdminBroadcastController::class, 'send'])->name('broadcast.send');
+        Route::get('/broadcast/export-contacts', [AdminBroadcastController::class, 'exportContacts'])->name('broadcast.export');
+
+        // ============================================================
+        // PHASE 4 - Payment Gateway dan Webhook Log
+        // ============================================================
+        Route::get('/payment-gateways', [AdminPaymentGatewayController::class, 'index'])->name('gateways.index');
+        Route::put('/payment-gateways/{id}', [AdminPaymentGatewayController::class, 'update'])->name('gateways.update');
+        Route::get('/webhooks', [AdminWebhookLogController::class, 'index'])->name('webhooks.index');
+        Route::post('/webhooks/{id}/replay', [AdminWebhookLogController::class, 'replay'])
+            ->middleware('throttle:10,1')->name('webhooks.replay');
+
+        // ============================================================
+        // PHASE 5 - Fulfillment Workboard
+        // ============================================================
+        Route::get('/fulfillment', [AdminFulfillmentController::class, 'index'])->name('fulfillment.index');
+        Route::post('/fulfillment/{id}/purchase', [AdminFulfillmentController::class, 'recordPurchase'])->name('fulfillment.purchase');
+        Route::post('/fulfillment/{id}/stage', [AdminFulfillmentController::class, 'moveStage'])->name('fulfillment.stage');
+        Route::post('/fulfillment/{id}/steps/{step}', [AdminFulfillmentController::class, 'toggleStep'])
+            ->where('step', '[a-z_]+')->name('fulfillment.step');
+
+        // ============================================================
+        // PHASE 6 - Billing Center
+        // ============================================================
+        Route::get('/billing', [AdminBillingCenterController::class, 'index'])->name('billing.index');
+        Route::post('/billing/invoices/{id}/resend', [AdminBillingCenterController::class, 'resendInvoice'])
+            ->middleware('throttle:10,1')->name('billing.invoices.resend');
+        Route::post('/billing/subscriptions/{id}/auto-renew', [AdminBillingCenterController::class, 'toggleAutoRenew'])->name('billing.subscriptions.auto-renew');
+        Route::post('/billing/refunds', [AdminBillingCenterController::class, 'storeRefund'])->name('billing.refunds.store');
+        Route::post('/billing/refunds/{id}/approve', [AdminBillingCenterController::class, 'approveRefund'])->name('billing.refunds.approve');
+        Route::post('/billing/refunds/{id}/cancel', [AdminBillingCenterController::class, 'cancelRefund'])->name('billing.refunds.cancel');
+        Route::post('/billing/coupons', [AdminBillingCenterController::class, 'storeCoupon'])->name('billing.coupons.store');
+        Route::put('/billing/coupons/{id}', [AdminBillingCenterController::class, 'updateCoupon'])->name('billing.coupons.update');
+        Route::post('/billing/taxes', [AdminBillingCenterController::class, 'storeTaxRate'])->name('billing.taxes.store');
+        Route::put('/billing/taxes/{id}', [AdminBillingCenterController::class, 'updateTaxRate'])->name('billing.taxes.update');
+        Route::post('/billing/credits/adjust', [AdminBillingCenterController::class, 'adjustCredit'])->name('billing.credits.adjust');
+
+        // ============================================================
+        // PHASE 7 - Impersonation dan Audit Log
+        // ============================================================
+        Route::post('/customers/{id}/impersonate', [AdminImpersonationController::class, 'start'])
+            ->middleware('throttle:10,1')->name('impersonate.start');
+        Route::get('/audit-logs', [AdminAuditLogController::class, 'index'])->name('audit.index');
+
+        // ============================================================
+        // PHASE 8 - Catatan Pembelian Supplier
+        // ============================================================
+        Route::get('/supplier-purchases', [AdminSupplierPurchaseController::class, 'index'])->name('supplier.index');
+        Route::post('/supplier-purchases', [AdminSupplierPurchaseController::class, 'store'])->name('supplier.store');
+        Route::put('/supplier-purchases/{id}', [AdminSupplierPurchaseController::class, 'update'])->name('supplier.update');
+        Route::delete('/supplier-purchases/{id}', [AdminSupplierPurchaseController::class, 'destroy'])->name('supplier.destroy');
     });
 });

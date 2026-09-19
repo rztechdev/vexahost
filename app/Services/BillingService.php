@@ -330,6 +330,41 @@ class BillingService
     }
 
     /**
+     * PHASE 6 - Penyesuaian saldo manual oleh admin (tambah atau kurang).
+     *
+     * Baris user dikunci selama transaksi agar dua penyesuaian bersamaan
+     * tidak membaca saldo yang sama. Saldo tidak boleh menjadi negatif.
+     */
+    public function adjustCredit(User $customer, float $signedAmount, string $reason, ?int $actorId = null): CreditTransaction
+    {
+        if (round($signedAmount, 2) == 0.0) {
+            throw new \InvalidArgumentException('Nominal penyesuaian tidak boleh nol.');
+        }
+
+        return DB::transaction(function () use ($customer, $signedAmount, $reason, $actorId) {
+            User::whereKey($customer->id)->lockForUpdate()->first();
+
+            $balance = CreditTransaction::balanceFor($customer->id);
+            $newBalance = round($balance + $signedAmount, 2);
+
+            if ($newBalance < 0) {
+                throw new \RuntimeException(
+                    'Saldo tidak cukup untuk dikurangi. Saldo saat ini Rp ' . number_format($balance, 0, ',', '.') . '.'
+                );
+            }
+
+            return CreditTransaction::create([
+                'customer_id' => $customer->id,
+                'type' => 'adjustment',
+                'amount' => round($signedAmount, 2),
+                'balance_after' => $newBalance,
+                'reason' => $reason,
+                'actor_user_id' => $actorId,
+            ]);
+        });
+    }
+
+    /**
      * Renewal: buat invoice periode berikutnya untuk subscription.
      * Panggil ini dari scheduler harian. Return Invoice atau null kalau
      * subscription tidak eligible untuk renew.

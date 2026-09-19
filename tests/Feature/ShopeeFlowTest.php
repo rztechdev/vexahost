@@ -22,7 +22,7 @@ class ShopeeFlowTest extends TestCase
 
     public function test_shopee_admin_page_renders_with_specs_and_operating_systems(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         $response = $this->actingAs($admin)->get('/admin/shopee');
         $response->assertStatus(200);
@@ -33,7 +33,7 @@ class ShopeeFlowTest extends TestCase
 
     public function test_admin_can_process_shopee_order_with_windows_os(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $spec = VpsSpec::where('name', 'Standard')->first();
 
         $response = $this->actingAs($admin)->post('/admin/shopee/process', [
@@ -63,7 +63,7 @@ class ShopeeFlowTest extends TestCase
 
     public function test_admin_can_auto_provision_shopee_order(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $spec = VpsSpec::where('name', 'Student Basic')->first();
 
         $response = $this->actingAs($admin)->post('/admin/shopee/process', [
@@ -98,7 +98,7 @@ class ShopeeFlowTest extends TestCase
 
     public function test_admin_can_filter_shopee_orders(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $spec = VpsSpec::first();
 
         // Create 2 test orders

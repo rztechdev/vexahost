@@ -6,7 +6,7 @@ use App\Models\ProvisioningTask;
 use App\Models\VpsInstance;
 
 /**
- * Kontrak provider VPS. Setiap provider (manual, sumopod, biznetgio, dst.)
+ * Kontrak provider VPS. Setiap provider (manual, supplier, biznetgio, dst.)
  * meng-implement interface ini agar bisa di-swap tanpa mengubah code caller.
  *
  * SEMUA method boleh throw ProviderException untuk failure yang dapat di-retry.

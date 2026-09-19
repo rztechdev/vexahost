@@ -15,7 +15,7 @@ class CheckTicketSlaBreachCommand extends Command
 
     public function handle(): int
     {
-        $adminEmail = config('mail.admin_address', 'vexahosttech@gmail.com');
+        $adminEmail = config('mail.admin_address', 'vexahostcloudtech@gmail.com');
         $adminUser = User::where('email', $adminEmail)->first();
 
         if (!$adminUser) {

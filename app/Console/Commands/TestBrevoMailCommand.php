@@ -17,7 +17,7 @@ class TestBrevoMailCommand extends Command
 
     public function handle(): int
     {
-        $recipient = $this->argument('to') ?: env('VEXAHOST_ADMIN_EMAIL', 'vexahosttech@gmail.com');
+        $recipient = $this->argument('to') ?: env('VEXAHOST_ADMIN_EMAIL', 'vexahostcloudtech@gmail.com');
 
         $this->info("Menguji pengiriman email Brevo SMTP ke: {$recipient}");
         $this->info("Host: " . config('mail.mailers.smtp.host') . ":" . config('mail.mailers.smtp.port'));
@@ -25,16 +25,16 @@ class TestBrevoMailCommand extends Command
         $this->info("From: " . config('mail.from.address') . " (" . config('mail.from.name') . ")");
 
         try {
-            // Gunakan user admin / pelanggan yang valid di database
-            $user = User::where('email', $recipient)->first() ?? User::first();
+            // Gunakan user dengan email target penerima
+            $user = User::where('email', $recipient)->first();
             if (!$user) {
                 $user = User::create([
-                    'full_name' => 'Ryan Rizki (Admin Test)',
+                    'full_name' => 'Ryan Rizki (Test Recipient)',
                     'email' => $recipient,
-                    'username' => 'ryan_admin_test',
+                    'username' => 'test_' . substr(md5($recipient . time()), 0, 8),
                     'password' => bcrypt('12345678'),
                     'channel' => 'website',
-                    'is_admin' => true,
+                    'is_admin' => false,
                 ]);
             }
 

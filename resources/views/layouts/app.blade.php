@@ -129,6 +129,7 @@
 </head>
 <body class="bg-white text-slate-800 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
       x-data="{ mobileMenu: false, mobileProduk: false, mobileVps: false, mobileAi: false, mobileDb: false }">
+    @include('partials.impersonation-banner')
 
     @php
         $navVpsSpecs = $vpsSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'vps')->orderBy('sell_price', 'asc')->get();

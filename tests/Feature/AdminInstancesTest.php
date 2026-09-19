@@ -31,7 +31,7 @@ class AdminInstancesTest extends TestCase
 
     public function test_admin_instances_page_renders_with_category_stat_cards(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
         $response = $this->actingAs($admin)->get('/admin/instances');
         $response->assertStatus(200);
@@ -44,7 +44,7 @@ class AdminInstancesTest extends TestCase
 
     public function test_admin_can_filter_instances_by_ai_category(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $customer = $this->createTestCustomer();
 
         $aiInstance = VpsInstance::create([
@@ -83,7 +83,7 @@ class AdminInstancesTest extends TestCase
 
     public function test_admin_can_filter_instances_by_database_category(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $customer = $this->createTestCustomer();
 
         $dbInstance = VpsInstance::create([
@@ -123,7 +123,7 @@ class AdminInstancesTest extends TestCase
 
     public function test_admin_instances_page_has_no_emojis_or_non_monochrome_colors(): void
     {
-        $admin = User::where('email', 'vexahosttech@gmail.com')->first();
+        $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
         $customer = $this->createTestCustomer();
 
         VpsInstance::create([

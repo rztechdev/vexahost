@@ -50,10 +50,18 @@ class Order extends Model
         'provisioning_attempts',
         'grace_period_ends_at',
         'last_status_change_at',
+        // PHASE 2 - versi ketentuan yang disetujui saat pemesanan dibuat.
+        'terms_version',
+        // PHASE 5 - kemajuan kerja manual di papan fulfillment.
+        'fulfillment_stage',
+        'delivered_at',
+        'sla_alerted_at',
     ];
 
     protected $casts = [
         'paid_at' => 'datetime',
+        'delivered_at' => 'datetime',
+        'sla_alerted_at' => 'datetime',
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
         'grace_period_ends_at' => 'datetime',
@@ -144,9 +152,23 @@ class Order extends Model
         return array_merge(...array_values(self::operatingSystems()));
     }
 
+    /**
+     * Label infrastruktur yang tampil ke pelanggan (dasbor, faktur).
+     *
+     * Nilai yang tidak dikenal TIDAK boleh ditampilkan mentah: kolom provider
+     * dapat berisi nama driver internal (mis. supplier/reseller), dan nama itu
+     * tidak boleh sampai ke pelanggan.
+     */
+    public const NEUTRAL_PROVIDER_LABEL = 'VexaHost Cloud';
+
+    public static function customerProviderLabel(?string $provider): string
+    {
+        return self::providerLabels()[$provider ?? ''] ?? self::NEUTRAL_PROVIDER_LABEL;
+    }
+
     public function getProviderLabelAttribute(): string
     {
-        return self::providerLabels()[$this->provider] ?? ucfirst((string) $this->provider);
+        return self::customerProviderLabel($this->provider);
     }
 
     public function getOsLabelAttribute(): string
@@ -154,6 +176,22 @@ class Order extends Model
         return self::operatingSystems()[$this->provider][$this->os]
             ?? self::osLabels()[$this->os]
             ?? (string) $this->os;
+    }
+
+    /**
+     * PHASE 5 - butir daftar periksa setup.
+     */
+    public function fulfillmentChecklists()
+    {
+        return $this->hasMany(FulfillmentChecklist::class);
+    }
+
+    /**
+     * PHASE 5 - catatan pembelian di Supplier untuk order ini.
+     */
+    public function supplierPurchases()
+    {
+        return $this->hasMany(SupplierPurchase::class);
     }
 
     public function invoice()

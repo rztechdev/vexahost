@@ -108,17 +108,17 @@ Ulangi langkah berikut untuk setiap environment (`production`, `staging`, `devel
 5. **Periksa Cloudflare Turnstile:**
    ```env
    TURNSTILE_SITE_KEY="0x4AAAAAAE5Ryx_iTQzttsDQ"
-   TURNSTILE_SECRET_KEY="0x4AAAAAAE5Ry-YjnJW8ak61CLqjwkuW5Rc"
+   TURNSTILE_SECRET_KEY="<isi-di-coolify-jangan-ditulis-di-sini>"
    ```
 6. **Periksa Akun Admin Seeder:**
    ```env
    ADMIN_NAME="Ryan Rizki"
    ADMIN_USERNAME="mryanrizki11"
-   ADMIN_EMAIL="vexahosttech@gmail.com"
+   ADMIN_EMAIL="vexahostcloudtech@gmail.com"
    ADMIN_PASSWORD="12345678"
    ADMIN_PHONE="6285774410978"
    ADMIN_COMPANY="VexaHost Cloud Indonesia"
-   ADMIN_API_KEY="vx_sec_k9f83n2x9v1b7a6d8e4f5c2b0e9a1d3f"
+   ADMIN_API_KEY="<isi-di-coolify-jangan-ditulis-di-sini>"
    ```
 7. Klik **Save**.
 
@@ -179,7 +179,7 @@ Buka Google Cloud Console ➔ Credentials ➔ Edit OAuth 2.0 Client ID ➔ Tamba
 ### 2. Lynk.id Webhook (Dashboard Lynk)
 Buka pengaturan Webhook di Lynk.id ➔ Set Callback URL:
 - Production: `https://vexahostcloud.my.id/api/webhooks/lynk`
-- Pastikan secret merchant key sama dengan `LYNK_MERCHANT_KEY="Rn2cMXIRcuU2__YBe1s6uGz2UtrH2baX"`.
+- Pastikan secret merchant key sama dengan `LYNK_MERCHANT_KEY="<isi-di-coolify-jangan-ditulis-di-sini>"`.
 
 ### 3. Cloudflare Turnstile
 Buka Dashboard Cloudflare ➔ Turnstile ➔ Pilih Widget:
@@ -196,7 +196,7 @@ Buka Dashboard Cloudflare ➔ Turnstile ➔ Pilih Widget:
 - [ ] Domain utama `https://vexahostcloud.my.id` dapat diakses dengan HTTPS valid (SSL gembok hijau).
 - [ ] Tampilan halaman landing tampil sempurna dengan CSS Tailwind & aset JS (bukan plain HTML).
 - [ ] Widget Cloudflare Turnstile muncul di halaman login (`/login`) dan dapat diverifikasi.
-- [ ] Login admin menggunakan kredensial seeder (`vexahosttech@gmail.com` / `12345678`) berhasil masuk ke dashboard admin (`/admin`).
+- [ ] Login admin menggunakan kredensial seeder (`vexahostcloudtech@gmail.com` / `12345678`) berhasil masuk ke dashboard admin (`/admin`).
 - [ ] Tombol "Masuk dengan Google" membuka consent screen Google tanpa pesan `redirect_uri_mismatch`.
 - [ ] Pengiriman email notifikasi via Brevo SMTP berfungsi normal.
 

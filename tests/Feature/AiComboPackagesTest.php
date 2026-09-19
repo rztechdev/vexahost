@@ -62,6 +62,7 @@ class AiComboPackagesTest extends TestCase
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
             'root_password' => 'SecureRootPass123!',
+            'terms_accepted' => 1,
         ];
 
         $response = $this->post('/checkout', $payload);

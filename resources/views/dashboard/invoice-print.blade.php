@@ -49,7 +49,7 @@
                     <div>
                         <span class="text-xl font-black uppercase tracking-tight text-black block">VexaHost Cloud Infrastructure</span>
                         <p class="text-[11px] text-neutral-600 font-medium">Enterprise Cloud Hosting &amp; Infrastructure Services</p>
-                        <p class="text-[10px] text-neutral-500">Jakarta Data Center Hub &bull; billing@vexahostcloud.my.id &bull; https://vexahostcloud.my.id</p>
+                        <p class="text-[10px] text-neutral-500">Jakarta Data Center Hub &bull; {{ config('mail.from.address', 'vexahostcloudtech@gmail.com') }} &bull; https://vexahostcloud.my.id</p>
                     </div>
                 </div>
                 <div class="text-right">
@@ -77,12 +77,21 @@
             <!-- Parties Details Grid -->
             <div class="grid grid-cols-2 gap-8 py-6 border-b border-neutral-200 text-xs">
                 <div>
+                    {{-- Identitas penerbit dibaca dari pengaturan sistem (Phase 1),
+                         sehingga dapat diubah admin tanpa deploy ulang. --}}
+                    @php $vxSettings = app(\App\Services\SettingsService::class); @endphp
                     <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block border-b border-black pb-1 mb-2">Diterbitkan Oleh (Issuer):</span>
-                    <p class="font-bold text-black text-sm">VexaHost Cloud Indonesia</p>
+                    <p class="font-bold text-black text-sm">{{ $vxSettings->get('company_legal_name', 'VexaHost Cloud Indonesia') }}</p>
                     <p class="text-neutral-700">Divisi Penagihan & Komputasi Cloud</p>
                     <p class="text-neutral-700">Layanan Cloud VPS &amp; Dedicated Infrastructure</p>
-                    <p class="text-neutral-600">Email: admin@vexahostcloud.my.id &bull; billing@vexahostcloud.my.id</p>
-                    <p class="text-neutral-600">Website: https://vexahostcloud.my.id</p>
+                    @if($vxSettings->get('company_address'))
+                        <p class="text-neutral-600">{{ $vxSettings->get('company_address') }}{{ $vxSettings->get('company_city') ? ', ' . $vxSettings->get('company_city') : '' }}</p>
+                    @endif
+                    @if($vxSettings->get('company_npwp'))
+                        <p class="text-neutral-600">NPWP: {{ $vxSettings->get('company_npwp') }}</p>
+                    @endif
+                    <p class="text-neutral-600">Email: {{ $vxSettings->get('company_email') ?: config('mail.from.address', 'vexahostcloudtech@gmail.com') }}</p>
+                    <p class="text-neutral-600">Website: {{ $vxSettings->get('company_website', 'https://vexahostcloud.my.id') }}</p>
                 </div>
 
                 <div>
@@ -207,7 +216,7 @@
             <div class="mt-8 pt-4 border-t border-black text-center text-[10px] text-neutral-500 leading-relaxed">
                 <p class="font-semibold text-neutral-700">Faktur ini merupakan dokumen elektronik resmi yang diterbitkan otomatis oleh VexaHost Cloud Indonesia.</p>
                 <p>Sah dan mengikat secara hukum berdasarkan ketentuan UU ITE No. 11/2008 & PP No. 71/2019 tanpa memerlukan tanda tangan basah.</p>
-                <p class="mt-1 font-mono-code text-[9px] text-neutral-400">Dokumen ID: {{ strtoupper(hash('crc32b', $invoice->invoice_number . ($invoice->issued_at ?? $invoice->created_at))) }} &bull; https://vexahostcloud.my.id &bull; admin@vexahostcloud.my.id</p>
+                <p class="mt-1 font-mono-code text-[9px] text-neutral-400">Dokumen ID: {{ strtoupper(hash('crc32b', $invoice->invoice_number . ($invoice->issued_at ?? $invoice->created_at))) }} &bull; https://vexahostcloud.my.id &bull; {{ config('mail.from.address', 'vexahostcloudtech@gmail.com') }}</p>
             </div>
         </div>
     </div>

@@ -16,6 +16,7 @@
     @stack('head')
 </head>
 <body class="h-full bg-slate-50 text-slate-800 antialiased selection:bg-[#4A6FA5] selection:text-white">
+    @include('partials.impersonation-banner')
     @yield('content')
     @stack('scripts')
 </body>
