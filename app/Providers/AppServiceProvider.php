@@ -6,7 +6,9 @@ use App\Models\AbuseCase;
 use App\Models\MaintenanceWindow;
 use App\Models\Order;
 use App\Models\SupportTicket;
+use App\Models\User;
 use App\Models\WebhookEvent;
+use App\Observers\LinkedAccountObserver;
 use App\Services\ImpersonationService;
 use App\Services\MaintenanceService;
 use Illuminate\Auth\Events\Logout;
@@ -41,6 +43,13 @@ class AppServiceProvider extends ServiceProvider
         if (str_contains(request()->header('x-forwarded-proto', ''), 'https') || request()->isSecure()) {
             URL::forceScheme('https');
         }
+
+        // Terapkan pengaturan WhatsApp Gateway dari database jika ada
+        \App\Services\WhatsAppSettings::apply();
+
+        // Setiap perubahan identitas masuk ikut dikirim ke VexaHost WA Gateway,
+        // dari jalur mana pun perubahannya datang (akun tertaut, hanya auth).
+        User::observe(LinkedAccountObserver::class);
 
         // PHASE 7 - logout saat sedang masuk sebagai pelanggan tetap menutup
         // catatan sesi impersonation. Event Logout dipicu sebelum sesi dihapus,
@@ -121,7 +130,7 @@ class AppServiceProvider extends ServiceProvider
                     ? asset('storage/' . $settings->get('brand_favicon_path'))
                     : asset('images/logo.png'),
                 'accent' => $settings->get('brand_accent_color', '#4A6FA5'),
-                'support_email' => $settings->get('support_email', 'support@vexahostcloud.my.id'),
+                'support_email' => $settings->get('support_email', 'vexahostcloudtech@gmail.com'),
                 'support_whatsapp' => $settings->get('support_whatsapp', ''),
             ]);
         });

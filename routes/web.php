@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PaymentGatewayController as AdminPaymentGatewayCo
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SupplierPurchaseController as AdminSupplierPurchaseController;
 use App\Http\Controllers\Admin\WebhookLogController as AdminWebhookLogController;
+use App\Http\Controllers\Admin\WhatsAppController as AdminWhatsAppController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -310,6 +311,15 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/broadcast', [AdminBroadcastController::class, 'index'])->name('broadcast.index');
         Route::post('/broadcast', [AdminBroadcastController::class, 'send'])->name('broadcast.send');
         Route::get('/broadcast/export-contacts', [AdminBroadcastController::class, 'exportContacts'])->name('broadcast.export');
+
+        // ============================================================
+        // WhatsApp Gateway Management & Test
+        // ============================================================
+        Route::get('/whatsapp', [AdminWhatsAppController::class, 'index'])->name('whatsapp.index');
+        Route::post('/whatsapp/settings', [AdminWhatsAppController::class, 'updateSettings'])->name('whatsapp.settings');
+        Route::post('/whatsapp/settings/forget', [AdminWhatsAppController::class, 'forgetSetting'])->name('whatsapp.settings.forget');
+        Route::get('/whatsapp/status', [AdminWhatsAppController::class, 'status'])->name('whatsapp.status');
+        Route::post('/whatsapp/test', [AdminWhatsAppController::class, 'test'])->name('whatsapp.test');
 
         // ============================================================
         // PHASE 4 - Payment Gateway dan Webhook Log

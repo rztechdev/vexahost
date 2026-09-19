@@ -131,9 +131,9 @@
                             Konsultasikan kendala tagihan dan faktur Anda langsung ke tim finance:
                         </p>
                         <div class="space-y-1 font-mono-code text-[11px]">
-                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">billing@vexahostcloud.my.id</p>
-                            <a href="https://wa.me/{{ config('vexahost.whatsapp', '6285774410978') }}" target="_blank" class="text-[#25D366] block font-semibold hover:underline">
-                                WhatsApp Finance 085774410978
+                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">vexahostcloudtech@gmail.com</p>
+                            <a href="{{ \App\Support\NomorWhatsApp::tautan() }}" target="_blank" class="text-[#25D366] block font-semibold hover:underline">
+                                WhatsApp Finance {{ \App\Support\NomorWhatsApp::lokal() }}
                             </a>
                         </div>
                     </div>

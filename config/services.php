@@ -65,5 +65,26 @@ return [
         'secret' => env('TURNSTILE_SECRET_KEY'),
     ],
 
+    /*
+    | Akun tertaut dengan VexaHost WA Gateway — satu akun, dua aplikasi, HANYA
+    | autentikasi (email, kata sandi, status verifikasi). Tidak ada data lain
+    | yang dibagi. Protokolnya ditulis di docs/AKUN_TERTAUT.md milik repo
+    | vexahost-wa dan harus sama persis di kedua sisi.
+    |
+    | `url` alamat dasar WA Gateway di tahap yang sama; `secret` rahasia HMAC
+    | yang identik di kedua aplikasi dan berbeda tiap tahap. Salah satunya
+    | kosong = penautan mati di kedua arah: yang keluar tidak dikirim, yang
+    | masuk ditolak 503.
+    |
+    | Batas waktunya sengaja pendek: pengiriman pertama berjalan di ujung
+    | permintaan web (bukan di antrean), dan WA yang sedang lambat tidak boleh
+    | membuat halaman daftar di sini ikut menunggu lama.
+    */
+    'linked_accounts' => [
+        'url' => rtrim((string) env('LINKED_ACCOUNTS_URL', ''), '/'),
+        'secret' => env('LINKED_ACCOUNTS_SECRET'),
+        'timeout' => (int) env('LINKED_ACCOUNTS_TIMEOUT', 5),
+    ],
+
 ];
 

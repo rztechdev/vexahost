@@ -81,7 +81,7 @@
                          sehingga dapat diubah admin tanpa deploy ulang. --}}
                     @php $vxSettings = app(\App\Services\SettingsService::class); @endphp
                     <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block border-b border-black pb-1 mb-2">Diterbitkan Oleh (Issuer):</span>
-                    <p class="font-bold text-black text-sm">{{ $vxSettings->get('company_legal_name', 'VexaHost Cloud Indonesia') }}</p>
+                    <p class="font-bold text-black text-sm">{{ $vxSettings->get('company_legal_name', 'PT DESTINARA CHAKRAWALA ARTHA') }}</p>
                     <p class="text-neutral-700">Divisi Penagihan & Komputasi Cloud</p>
                     <p class="text-neutral-700">Layanan Cloud VPS &amp; Dedicated Infrastructure</p>
                     @if($vxSettings->get('company_address'))

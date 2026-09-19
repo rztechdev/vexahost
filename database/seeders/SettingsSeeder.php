@@ -91,7 +91,7 @@ class SettingsSeeder extends Seeder
 
             // ---------- Profil Perusahaan ----------
             'company_legal_name' => [
-                'value' => 'VexaHost Cloud', 'type' => 'string', 'group' => 'company',
+                'value' => 'PT DESTINARA CHAKRAWALA ARTHA', 'type' => 'string', 'group' => 'company',
                 'label' => 'Nama Badan Hukum', 'is_public' => true, 'sort_order' => 1,
             ],
             'company_address' => [
@@ -137,7 +137,7 @@ class SettingsSeeder extends Seeder
 
             // ---------- Kontak & Dukungan ----------
             'support_email' => [
-                'value' => 'support@vexahostcloud.my.id', 'type' => 'string', 'group' => 'support',
+                'value' => 'vexahostcloudtech@gmail.com', 'type' => 'string', 'group' => 'support',
                 'label' => 'Surel Dukungan', 'is_public' => true, 'sort_order' => 1,
             ],
             'support_whatsapp' => [
@@ -163,7 +163,7 @@ class SettingsSeeder extends Seeder
 
             // ---------- Notifikasi & Tenggang ----------
             'admin_notification_email' => [
-                'value' => 'admin@vexahostcloud.my.id', 'type' => 'string', 'group' => 'notification',
+                'value' => 'vexahostcloudtech@gmail.com', 'type' => 'string', 'group' => 'notification',
                 'label' => 'Surel Penerima Digest Admin', 'is_public' => false, 'sort_order' => 1,
             ],
             'digest_enabled' => [

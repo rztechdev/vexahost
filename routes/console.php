@@ -102,3 +102,14 @@ Schedule::command('fulfillment:check-sla')
 //     ->withoutOverlapping()
 //     ->onOneServer()
 //     ->description('Rekonsiliasi status VPS antara database dan provider.');
+
+// ============================================================
+// Akun tertaut: perubahan akun yang belum sampai ke VexaHost WA Gateway
+// dikirim ulang tiap menit. Percobaan pertamanya berjalan di ujung permintaan
+// web; yang ini menangkap sisanya saat WA Gateway sedang deploy — kalau tidak,
+// kata sandi yang diganti tepat saat itu tidak pernah sampai.
+// ============================================================
+Schedule::command('akun-tertaut:kirim')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->description('Kirim ulang perubahan akun ke VexaHost WA Gateway.');

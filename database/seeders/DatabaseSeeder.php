@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $adminUsername = env('ADMIN_USERNAME', env('SEED_ADMIN_USERNAME', 'mryanrizki11'));
         $adminName = env('ADMIN_NAME', env('SEED_ADMIN_NAME', 'Ryan Rizki'));
         $adminPassword = env('ADMIN_PASSWORD', env('SEED_ADMIN_PASSWORD', '12345678'));
-        $adminPhone = env('ADMIN_PHONE', env('SEED_ADMIN_PHONE', env('VEXAHOST_WHATSAPP', '6285774410978')));
+        $adminPhone = env('ADMIN_PHONE', env('SEED_ADMIN_PHONE', env('VEXAHOST_WHATSAPP', '6285808749131')));
         $adminCompany = env('ADMIN_COMPANY', env('SEED_ADMIN_COMPANY', 'VexaHost Cloud Indonesia'));
 
         $admin = User::where('email', $adminEmail)

@@ -13,13 +13,13 @@ return [
 
     // Nomor WhatsApp customer service (format internasional tanpa +)
     // Ganti dengan nomor WhatsApp Business real Anda
-    'whatsapp' => env('VEXAHOST_WHATSAPP', '6285774410978'),
+    'whatsapp' => env('VEXAHOST_WHATSAPP', '6285808749131'),
 
     // Email support
-    'support_email' => env('VEXAHOST_SUPPORT_EMAIL', 'support@vexahostcloud.my.id'),
+    'support_email' => env('VEXAHOST_SUPPORT_EMAIL', 'vexahostcloudtech@gmail.com'),
 
     // Email admin/billing
-    'admin_email' => env('VEXAHOST_ADMIN_EMAIL', 'admin@vexahostcloud.my.id'),
+    'admin_email' => env('VEXAHOST_ADMIN_EMAIL', 'vexahostcloudtech@gmail.com'),
 
     // Secret API Key untuk mengamankan endpoint /api/admin/*
     'admin_api_key' => env('ADMIN_API_KEY'),

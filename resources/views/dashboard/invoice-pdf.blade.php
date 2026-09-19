@@ -330,7 +330,7 @@
                      sehingga dapat diubah admin tanpa deploy ulang. --}}
                 @php $vxSettings = app(\App\Services\SettingsService::class); @endphp
                 <div class="section-title">Diterbitkan Oleh (Issuer):</div>
-                <div class="party-name">{{ $vxSettings->get('company_legal_name', 'VexaHost Cloud Indonesia') }}</div>
+                <div class="party-name">{{ $vxSettings->get('company_legal_name', 'PT DESTINARA CHAKRAWALA ARTHA') }}</div>
                 <div class="party-desc">
                     Divisi Penagihan &amp; Infrastruktur Komputasi Cloud<br>
                     Layanan Cloud VPS &amp; Dedicated Infrastructure<br>

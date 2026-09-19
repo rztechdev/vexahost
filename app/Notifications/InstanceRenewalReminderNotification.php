@@ -2,8 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Channels\WhatsAppChannel;
 use App\Models\RenewalReminder;
 use App\Models\VpsInstance;
+use App\Services\WhatsAppMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -29,7 +31,13 @@ class InstanceRenewalReminderNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['mail', 'database'];
+
+        if (config('whatsapp.enabled') && ! empty($notifiable->phone)) {
+            $channels[] = WhatsAppChannel::class;
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -110,5 +118,43 @@ class InstanceRenewalReminderNotification extends Notification
                 "Layanan {$name} akan jatuh tempo pada {$due}.",
             ],
         };
+    }
+
+    public function toWhatsApp(object $notifiable): ?WhatsAppMessage
+    {
+        $appUrl = rtrim(config('app.url', 'https://vexahostcloud.my.id'), '/');
+        $namaPelanggan = $notifiable->full_name ?? 'Pelanggan VexaHost';
+        $name = $this->instance->hostname ?: 'Layanan Cloud';
+        $due = $this->instance->expires_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y') ?? '-';
+        $graceEnd = $this->instance->grace_period_ends_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y') ?? '-';
+        $billingUrl = "{$appUrl}/dashboard/billing";
+
+        [$subject, $badge, $heading, $body] = $this->content($name, $due, $graceEnd);
+
+        $lines = [
+            "Halo *{$namaPelanggan}*,",
+            '',
+            "⚠️ *{$heading}*",
+            $body,
+            '',
+            "• *Server:* `{$name}`",
+            "• *IP Public:* `{$this->instance->public_ip}`",
+            "• *Jatuh Tempo:* {$due}",
+        ];
+
+        if ($this->stage === RenewalReminder::STAGE_H0) {
+            $lines[] = "• *Batas Masa Tenggang:* {$graceEnd} ({$this->graceDays} hari)";
+        }
+
+        if ($this->stage !== RenewalReminder::STAGE_GRACE_ENDED) {
+            $lines[] = '';
+            $lines[] = 'Perpanjang layanan Anda sekarang:';
+            $lines[] = $billingUrl;
+        }
+
+        $lines[] = '';
+        $lines[] = '_VexaHost Cloud Solutions_';
+
+        return WhatsAppMessage::create(implode("\n", $lines));
     }
 }

@@ -1505,9 +1505,9 @@
                         Konsultasikan kebutuhan server Anda secara langsung dengan customer service berbahasa Indonesia.
                     </p>
                     <div class="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 border border-emerald-200 text-xs text-slate-800 font-mono-code font-bold">
-                        <span>CS: 0857-7441-0978</span>
+                        <span>CS: {{ \App\Support\NomorWhatsApp::tampil() }}</span>
                     </div>
-                    <a href="https://wa.me/{{ config('vexahost.whatsapp', '6285774410978') }}?text=Halo%20VexaHost,%20saya%20ingin%20konsultasi%20seputar%20server%20VPS"
+                    <a href="https://wa.me/{{ \App\Support\NomorWhatsApp::internasional() }}?text=Halo%20VexaHost,%20saya%20ingin%20konsultasi%20seputar%20server%20VPS"
                        target="_blank"
                        rel="noopener"
                        class="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-colors shadow-xs">
@@ -1519,7 +1519,7 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs text-xs">
                     <div>
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Resmi</span>
-                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">{{ app(\App\Services\SettingsService::class)->get('support_email', 'support@vexahostcloud.my.id') }}</p>
+                        <p class="text-sm font-bold text-slate-900 font-mono-code mt-0.5">{{ app(\App\Services\SettingsService::class)->get('support_email', 'vexahostcloudtech@gmail.com') }}</p>
                         <p class="text-slate-500 mt-0.5">Untuk pertanyaan umum, pengajuan tiket &amp; kerjasama</p>
                     </div>
 

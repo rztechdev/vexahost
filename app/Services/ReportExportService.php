@@ -241,7 +241,7 @@ class ReportExportService
 
         $phpWord = new PhpWord();
         $phpWord->getDocInfo()->setCreator('VexaHost Platform');
-        $phpWord->getDocInfo()->setCompany('PT Vexa Media Host');
+        $phpWord->getDocInfo()->setCompany('PT DESTINARA CHAKRAWALA ARTHA');
         $phpWord->getDocInfo()->setTitle($data['reportTitle']);
         $phpWord->getDocInfo()->setDescription('Official VexaHost Enterprise Operations & Business Report');
 
@@ -277,7 +277,7 @@ class ReportExportService
         $cBrand = $headerTable->addCell(6500);
         $cBrand->addText('VEXAHOST INDONESIA', ['name' => 'Arial', 'size' => 13, 'bold' => true, 'color' => '0F172A']);
         $cBrand->addText('Cloud Infrastructure, Autonomous AI & Managed Database Platform', ['name' => 'Arial', 'size' => 8, 'bold' => true, 'color' => '475569']);
-        $cBrand->addText('Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta Selatan • support@vexahostcloud.my.id • vexahostcloud.my.id', ['name' => 'Arial', 'size' => 7.5, 'color' => '64748B']);
+        $cBrand->addText('vexahostcloudtech@gmail.com • vexahostcloud.my.id', ['name' => 'Arial', 'size' => 7.5, 'color' => '64748B']);
 
         $section->addTextBreak(1);
 
@@ -565,7 +565,7 @@ class ReportExportService
         $s2->addText('Disetujui & Diotorisasi oleh:', ['size' => 8, 'bold' => true, 'color' => '334155']);
         $s2->addTextBreak(2);
         $s2->addText('Direksi & Operations VexaHost', ['size' => 8.5, 'bold' => true, 'color' => '0F172A', 'underline' => 'single']);
-        $s2->addText('PT Vexa Media Host Indonesia', ['size' => 7.5, 'color' => '64748B']);
+        $s2->addText('PT DESTINARA CHAKRAWALA ARTHA', ['size' => 7.5, 'color' => '64748B']);
 
         $section->addTextBreak(1);
         $section->addText('* Laporan resmi ini dihasilkan secara otomatis oleh VexaHost Enterprise Reporting System. Dokumen ini dilindungi ketentuan kerahasiaan perusahaan (Strictly Confidential).', [

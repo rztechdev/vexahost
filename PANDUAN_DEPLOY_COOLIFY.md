@@ -116,7 +116,7 @@ Ulangi langkah berikut untuk setiap environment (`production`, `staging`, `devel
    ADMIN_USERNAME="mryanrizki11"
    ADMIN_EMAIL="vexahostcloudtech@gmail.com"
    ADMIN_PASSWORD="12345678"
-   ADMIN_PHONE="6285774410978"
+   ADMIN_PHONE="6285808749131"
    ADMIN_COMPANY="VexaHost Cloud Indonesia"
    ADMIN_API_KEY="<isi-di-coolify-jangan-ditulis-di-sini>"
    ```
@@ -176,6 +176,11 @@ Buka Google Cloud Console ➔ Credentials ➔ Edit OAuth 2.0 Client ID ➔ Tamba
 - `https://staging.vexahostcloud.my.id/auth/google/callback`
 - `https://dev.vexahostcloud.my.id/auth/google/callback`
 
+OAuth client yang sama dipakai VexaHost WA Gateway, jadi tambahkan juga:
+- `https://wa.vexahostcloud.my.id/auth/google/callback`
+- `https://wa-staging.vexahostcloud.my.id/auth/google/callback`
+- `https://wa-dev.vexahostcloud.my.id/auth/google/callback`
+
 ### 2. Lynk.id Webhook (Dashboard Lynk)
 Buka pengaturan Webhook di Lynk.id ➔ Set Callback URL:
 - Production: `https://vexahostcloud.my.id/api/webhooks/lynk`
@@ -188,6 +193,19 @@ Buka Dashboard Cloudflare ➔ Turnstile ➔ Pilih Widget:
   - `staging.vexahostcloud.my.id`
   - `dev.vexahostcloud.my.id`
   - `localhost` (untuk pengetesan lokal)
+
+### 4. Akun Tertaut dengan VexaHost WA Gateway
+Satu akun untuk dua aplikasi — **hanya autentikasi** (email, kata sandi, status verifikasi). Daftar atau ganti kata sandi di salah satunya ikut berlaku di yang lain. VPS, tagihan, organisasi, 2FA, dan peran admin tidak dibagi; akun admin tidak pernah diubah dari seberang.
+
+```env
+LINKED_ACCOUNTS_URL=https://wa.vexahostcloud.my.id   # staging: https://wa-staging.vexahostcloud.my.id, dev: https://wa-dev.vexahostcloud.my.id
+LINKED_ACCOUNTS_SECRET=<isi-di-coolify>             # IDENTIK dengan milik WA Gateway, BERBEDA tiap tahap
+```
+
+- Salah satunya kosong = penautan mati di kedua arah (endpoint `POST /api/internal/akun-tertaut` menjawab 503).
+- **Scheduler wajib jalan** — `akun-tertaut:kirim` tiap menit mengulang kiriman yang gagal saat WA Gateway sedang deploy.
+- Setelah pertama kali dinyalakan, jalankan sekali di kedua aplikasi: `php artisan akun-tertaut:tautkan`.
+- Protokol lengkapnya di `docs/AKUN_TERTAUT.md` milik repo `vexahost-wa`; kodenya harus sama persis di kedua sisi.
 
 ---
 

@@ -63,7 +63,7 @@
                 <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                     <div>
                         <span class="text-slate-400 block font-medium">Pengendali Data</span>
-                        <span class="font-normal text-slate-800 mt-0.5 block">VexaHost Cloud Indonesia</span>
+                        <span class="font-normal text-slate-800 mt-0.5 block">PT DESTINARA CHAKRAWALA ARTHA</span>
                     </div>
                     <div>
                         <span class="text-slate-400 block font-medium">Revisi Terakhir</span>
@@ -137,8 +137,7 @@
                             Permohonan hak akses, koreksi, atau penghapusan data akun (Right to Erasure) ditujukan ke:
                         </p>
                         <div class="space-y-1 font-mono-code text-[11px]">
-                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">privacy@vexahostcloud.my.id</p>
-                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">dpo@vexahostcloud.my.id</p>
+                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">vexahostcloudtech@gmail.com</p>
                         </div>
                     </div>
                 </div>
@@ -434,7 +433,7 @@
                         <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs space-y-1">
                             <p><strong class="text-slate-900">Data Protection Officer — VexaHost</strong></p>
                             <p class="text-slate-600">VexaHost Cloud Indonesia</p>
-                            <p class="text-slate-600">Alamat Surat Elektronik: <code class="font-mono-code bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-900">privacy@vexahostcloud.my.id</code></p>
+                            <p class="text-slate-600">Alamat Surat Elektronik: <code class="font-mono-code bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-900">vexahostcloudtech@gmail.com</code></p>
                             <p class="text-slate-600">Waktu Respons: Maksimal 3 (tiga) hari kerja operasional</p>
                         </div>
                     </div>

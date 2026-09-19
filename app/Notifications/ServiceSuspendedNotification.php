@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Channels\WhatsAppChannel;
 use App\Models\Subscription;
+use App\Services\WhatsAppMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -17,7 +19,13 @@ class ServiceSuspendedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['mail', 'database'];
+
+        if (config('whatsapp.enabled') && ! empty($notifiable->phone)) {
+            $channels[] = WhatsAppChannel::class;
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -39,5 +47,31 @@ class ServiceSuspendedNotification extends Notification
             'status' => 'suspended',
             'amount' => (float) $this->subscription->unit_amount,
         ];
+    }
+
+    public function toWhatsApp(object $notifiable): ?WhatsAppMessage
+    {
+        $this->subscription->loadMissing('vpsSpec');
+        $appUrl = rtrim(config('app.url', 'https://vexahostcloud.my.id'), '/');
+        $namaPelanggan = $notifiable->full_name ?? 'Pelanggan VexaHost';
+        $layanan = $this->subscription->vpsSpec?->name ?? 'Cloud VPS';
+        $nominal = number_format((float) $this->subscription->unit_amount, 0, ',', '.');
+        $billingUrl = "{$appUrl}/dashboard/billing";
+
+        $message = implode("\n", [
+            "Halo *{$namaPelanggan}*,",
+            '',
+            '🛑 *PEMBERITAHUAN PENANGGUHAN LAYANAN*',
+            'Layanan server VPS Anda telah ditangguhkan sementara karena tagihan melewati tanggal jatuh tempo.',
+            '',
+            "• *Layanan:* {$layanan}",
+            "• *Tagihan Tertunggak:* Rp {$nominal}",
+            "• *Status:* Suspended",
+            '',
+            'ℹ️ _Seluruh data server Anda masih aman tersimpan. Lunasi tagihan sekarang untuk mengaktifkan kembali server secara otomatis:_',
+            $billingUrl,
+        ]);
+
+        return WhatsAppMessage::create($message);
     }
 }

@@ -274,7 +274,7 @@
                         <td style="vertical-align: middle;">
                             <div class="brand-title">VEXAHOST INDONESIA</div>
                             <div class="brand-subtitle">Cloud Infrastructure, Autonomous AI & Database</div>
-                            <div class="brand-address">Cyber 2 Tower Lt. 18, Jl. H.R. Rasuna Said, Jakarta • support@vexahostcloud.my.id • vexahostcloud.my.id</div>
+                            <div class="brand-address">vexahostcloudtech@gmail.com • vexahostcloud.my.id</div>
                         </td>
                     </tr>
                 </table>
@@ -313,7 +313,7 @@
                 <div style="font-weight: 700; color: #334155; font-size: 7.8px; text-transform: uppercase;">Disetujui & Diotorisasi Oleh:</div>
                 <div class="sign-line"></div>
                 <div style="font-weight: 800; font-size: 8.5px; color: #0f172a; margin-top: 3px;">Direksi & Operations Lead</div>
-                <div style="color: #64748b; font-size: 7px;">PT Vexa Media Host Indonesia</div>
+                <div style="color: #64748b; font-size: 7px;">PT DESTINARA CHAKRAWALA ARTHA</div>
             </td>
         </tr>
     </table>

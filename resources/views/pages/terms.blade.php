@@ -63,7 +63,7 @@
                 <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                     <div>
                         <span class="text-slate-400 block font-medium">Entitas Penyedia</span>
-                        <span class="font-normal text-slate-800 mt-0.5 block">VexaHost Cloud Indonesia</span>
+                        <span class="font-normal text-slate-800 mt-0.5 block">PT DESTINARA CHAKRAWALA ARTHA</span>
                     </div>
                     <div>
                         <span class="text-slate-400 block font-medium">Revisi Terakhir</span>
@@ -139,8 +139,7 @@
                             Laporan pelanggaran siber, abuse, atau sengketa hak cipta dapat diajukan ke:
                         </p>
                         <div class="space-y-1 font-mono-code text-[11px]">
-                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">abuse@vexahostcloud.my.id</p>
-                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">legal@vexahostcloud.my.id</p>
+                            <p class="text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-100">vexahostcloudtech@gmail.com</p>
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Channels\WhatsAppChannel;
 use App\Models\User;
+use App\Services\WhatsAppMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -17,7 +19,13 @@ class WelcomeCredentialsNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['mail', 'database'];
+
+        if (config('whatsapp.enabled') && ! empty($notifiable->phone)) {
+            $channels[] = WhatsAppChannel::class;
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -37,5 +45,32 @@ class WelcomeCredentialsNotification extends Notification
             'username' => $notifiable->username,
             'email' => $notifiable->email,
         ];
+    }
+
+    public function toWhatsApp(object $notifiable): ?WhatsAppMessage
+    {
+        $appUrl = rtrim(config('app.url', 'https://vexahostcloud.my.id'), '/');
+        $namaPelanggan = $notifiable->full_name ?? 'Pelanggan VexaHost';
+
+        $passwordLine = $this->plainPassword
+            ? "• *Password Akun:* `{$this->plainPassword}`\n"
+            : '';
+
+        $message = implode("\n", [
+            "Halo *{$namaPelanggan}*,",
+            '',
+            '👋 *SELAMAT DATANG DI VEXAHOST!*',
+            'Akun pelanggan Anda telah berhasil didaftarkan. Anda dapat mulai mengelola layanan VPS dan cloud Anda.',
+            '',
+            "• *Username:* `{$notifiable->username}`",
+            "• *Email:* `{$notifiable->email}`",
+            $passwordLine,
+            'Masuk ke Dashboard:',
+            "{$appUrl}/login",
+            '',
+            '_Terima kasih telah bergabung bersama VexaHost._',
+        ]);
+
+        return WhatsAppMessage::create($message);
     }
 }
