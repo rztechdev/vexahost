@@ -57,7 +57,9 @@ class AkunTertautTest extends TestCase
             'name' => 'Budi Santoso',
             'phone' => '6281234567890',
             'password_hash' => Hash::make('sandi-rahasia-1'),
-            'email_verified_at' => null,
+            // Terverifikasi di asal: hanya kiriman seperti ini yang boleh mengubah
+            // akun yang sudah ada. Kasus belum terverifikasi diuji tersendiri.
+            'email_verified_at' => '2026-09-19T10:00:00+07:00',
         ], $timpa);
     }
 
@@ -140,6 +142,70 @@ class AkunTertautTest extends TestCase
 
         $this->kirimMasuk($this->isi(['email' => 'ani@contoh.id', 'previous_email' => 'budi@contoh.id']))
             ->assertStatus(409);
+    }
+
+    /**
+     * Pengambilalihan akun: seseorang mendaftar di WA Gateway memakai email
+     * pelanggan VPS (pendaftaran di sana tidak memverifikasi email), lalu
+     * penautan mengganti kata sandi akun asli pemiliknya di sini.
+     */
+    public function test_kiriman_belum_terverifikasi_tidak_mengubah_akun_yang_sudah_ada(): void
+    {
+        $this->kirimMasuk($this->isi())->assertOk()->assertJson(['action' => 'dibuat']);
+
+        $this->kirimMasuk($this->isi(['email_verified_at' => null, 'password_hash' => Hash::make('sandi-penyerang')]))
+            ->assertOk()->assertJson(['action' => 'dilindungi']);
+
+        $this->assertTrue(Hash::check('sandi-rahasia-1', User::first()->password));
+    }
+
+    public function test_kiriman_belum_terverifikasi_tetap_membuat_akun_baru(): void
+    {
+        $this->kirimMasuk($this->isi(['email_verified_at' => null]))->assertOk()->assertJson(['action' => 'dibuat']);
+
+        $this->assertNull(User::first()->email_verified_at);
+    }
+
+    private function cari(string $email, string $rahasia = self::RAHASIA)
+    {
+        $body = json_encode(['email' => $email]);
+        $waktu = (string) now()->getTimestamp();
+
+        return $this->call('POST', '/api/internal/akun-tertaut/cari', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_AKUN_TIMESTAMP' => $waktu,
+            'HTTP_X_AKUN_SIGNATURE' => hash_hmac('sha256', $waktu.'.'.$body, $rahasia),
+        ], $body);
+    }
+
+    public function test_cari_memberikan_hash_akun_untuk_dicocokkan_di_wa(): void
+    {
+        $user = $this->pengguna('gita@contoh.id', ['full_name' => 'Gita', 'password' => Hash::make('sandi-gita')]);
+
+        $jawaban = $this->cari('gita@contoh.id')->assertOk()->json('data');
+
+        $this->assertSame('gita@contoh.id', $jawaban['email']);
+        $this->assertSame('Gita', $jawaban['name']);
+        $this->assertNull($jawaban['previous_email']);
+        $this->assertTrue(Hash::check('sandi-gita', $jawaban['password_hash']));
+        $this->assertSame($user->fresh()->getRawOriginal('password'), $jawaban['password_hash']);
+    }
+
+    public function test_cari_email_tidak_ada_404_dan_admin_tidak_diberikan(): void
+    {
+        $this->cari('siapa@contoh.id')->assertStatus(404);
+
+        $admin = User::withoutEvents(fn () => $this->pengguna('admin@contoh.id'));
+        $admin->forceFill(['is_admin' => true])->saveQuietly();
+        $this->cari('admin@contoh.id')->assertStatus(403);
+    }
+
+    public function test_cari_tanpa_tanda_tangan_yang_benar_ditolak(): void
+    {
+        $this->pengguna('gita@contoh.id');
+
+        $this->cari('gita@contoh.id', 'rahasia-salah')->assertStatus(401);
     }
 
     public function test_admin_tidak_bisa_diubah_dari_seberang(): void

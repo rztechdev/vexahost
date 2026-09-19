@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\LinkedAccountController;
+use App\Http\Controllers\Api\LinkedAccountLookupController;
 use App\Http\Controllers\Api\LynkWebhookController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Middleware\VerifyLinkedAccountSignature;
@@ -24,3 +25,9 @@ Route::prefix('admin')->middleware('admin.api')->group(function () {
 Route::post('/internal/akun-tertaut', LinkedAccountController::class)
     ->middleware([VerifyLinkedAccountSignature::class, 'throttle:600,1'])
     ->name('api.akun-tertaut');
+
+// WA Gateway menjemput akun untuk satu email saat pemiliknya masuk di sana dan
+// akunnya belum sampai. Hanya hash yang diberikan; kata sandi dicocokkan di WA.
+Route::post('/internal/akun-tertaut/cari', LinkedAccountLookupController::class)
+    ->middleware([VerifyLinkedAccountSignature::class, 'throttle:120,1'])
+    ->name('api.akun-tertaut.cari');

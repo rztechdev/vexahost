@@ -203,6 +203,8 @@ LINKED_ACCOUNTS_SECRET=<isi-di-coolify>             # IDENTIK dengan milik WA Ga
 ```
 
 - Salah satunya kosong = penautan mati di kedua arah (endpoint `POST /api/internal/akun-tertaut` menjawab 503).
+- WA Gateway juga **menjemput** akun lewat `POST /api/internal/akun-tertaut/cari` saat pemiliknya login di sana dan akunnya belum sampai, jadi pelanggan lama tidak disuruh mendaftar ulang. Yang diberikan hanya hash kata sandi; akun admin tidak pernah diberikan.
+- Akun yang sudah ada hanya diubah oleh kiriman yang emailnya **terverifikasi** — pendaftaran memakai email orang lain tidak bisa mengambil alih akunnya.
 - **Scheduler wajib jalan** — `akun-tertaut:kirim` tiap menit mengulang kiriman yang gagal saat WA Gateway sedang deploy.
 - Setelah pertama kali dinyalakan, jalankan sekali di kedua aplikasi: `php artisan akun-tertaut:tautkan`.
 - Protokol lengkapnya di `docs/AKUN_TERTAUT.md` milik repo `vexahost-wa`; kodenya harus sama persis di kedua sisi.
