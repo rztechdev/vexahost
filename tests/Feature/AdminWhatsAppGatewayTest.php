@@ -85,6 +85,7 @@ class AdminWhatsAppGatewayTest extends TestCase
         $response->assertSee('Status Koneksi WhatsApp Gateway');
         $response->assertSee('Kredensial &amp; Konfigurasi Gateway', false);
         $response->assertSee('Uji Kirim Pesan WhatsApp');
+        $response->assertSee(json_encode(route('admin.whatsapp.status')), false);
     }
 
     public function test_admin_dapat_menyimpan_kredensial_dan_api_key_tersimpan_terenkripsi(): void

@@ -330,5 +330,6 @@
         </div>
     </div>
     @include('partials.invoice-modal')
+    @stack('scripts')
 </body>
 </html>
