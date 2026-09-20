@@ -16,14 +16,20 @@ use App\Http\Controllers\Admin\WhatsAppController as AdminWhatsAppController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\TwoFactorController;
 use App\Models\VpsSpec;
+use App\Services\QrisService;
+use App\Support\KatalogDokumentasi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
@@ -32,24 +38,35 @@ Route::get('/', function () {
     $aiSpecs = VpsSpec::where('is_active', true)->where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
     $dbSpecs = VpsSpec::where('is_active', true)->where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
     $specs = $vpsSpecs;
+
     return view('landing', compact('specs', 'vpsSpecs', 'aiSpecs', 'dbSpecs'));
 })->name('home');
 
 // Public Content & Info Pages
-Route::view('/docs', 'pages.docs')->name('docs');
+// Dokumentasi: satu indeks dan satu halaman per kelompok topik. Alasan
+// pemecahannya ada di App\Support\KatalogDokumentasi.
+Route::get('/docs', [DocsController::class, 'index'])->name('docs');
+Route::get('/docs/{slug}', [DocsController::class, 'kelompok'])
+    ->whereIn('slug', array_keys(KatalogDokumentasi::kelompok()))
+    ->name('docs.kelompok');
 // Halaman status membaca keadaan nyata dari system_components (Phase 1).
 Route::get('/status', StatusController::class)->name('status');
 Route::redirect('/kontak', '/#kontak')->name('contact');
 
 // Public Direct Package Section Routes
-Route::redirect('/vps', '/#pricing')->name('packages.vps');
-Route::redirect('/tambah-vps', '/#pricing');
-Route::redirect('/ai', '/#ai-packages')->name('packages.ai');
-Route::redirect('/ai-agent', '/#ai-packages');
-Route::redirect('/tambah-ai-agent', '/#ai-packages');
-Route::redirect('/database', '/#database-packages')->name('packages.db');
-Route::redirect('/db', '/#database-packages');
-Route::redirect('/tambah-database', '/#database-packages');
+// Halaman produk. Sebelumnya ketiganya cuma redirect ke anchor beranda —
+// bagi pengunjung berfungsi, bagi mesin pencari tidak ada halaman di sana sama
+// sekali. Alasan lengkapnya di App\Support\KatalogProduk.
+Route::get('/vps', ProdukController::class)->defaults('slug', 'vps')->name('packages.vps');
+Route::get('/ai', ProdukController::class)->defaults('slug', 'ai')->name('packages.ai');
+Route::get('/database', ProdukController::class)->defaults('slug', 'database')->name('packages.db');
+
+// Alamat lama tetap dijawab supaya tautan yang sudah tersebar tidak mati.
+Route::redirect('/tambah-vps', '/vps');
+Route::redirect('/ai-agent', '/ai');
+Route::redirect('/tambah-ai-agent', '/ai');
+Route::redirect('/db', '/database');
+Route::redirect('/tambah-database', '/database');
 
 // Public Legal Pages
 Route::view('/terms', 'pages.terms')->name('terms');
@@ -62,38 +79,57 @@ Route::view('/refund', 'pages.refund')->name('refund');
 // Public XML Sitemap (Google Search Console)
 Route::get('/sitemap.xml', function () {
     $baseUrl = rtrim(config('app.url', url('/')), '/');
+
+    // lastmod dibaca dari berkas view-nya, bukan now(). Sitemap yang menyebut
+    // setiap URL "baru saja berubah" pada setiap permintaan tidak dipercaya
+    // Google — tanggalnya harus benar-benar menandai perubahan.
+    $diubah = function (string $view): ?string {
+        $berkas = resource_path('views/'.str_replace('.', '/', $view).'.blade.php');
+
+        return is_file($berkas)
+            ? Carbon::createFromTimestamp(filemtime($berkas))->toAtomString()
+            : null;
+    };
+
+    // Halaman checkout sengaja tidak didaftarkan. Bagi perayap isinya formulir
+    // kosong, dan mendaftarkannya dengan prioritas tinggi membuatnya bersaing
+    // melawan beranda untuk pencarian nama merek — persis yang terjadi sebelumnya.
+    // Halamannya sendiri sudah bertanda noindex.
     $urls = [
-        ['loc' => $baseUrl . '/', 'changefreq' => 'daily', 'priority' => '1.0'],
-        ['loc' => $baseUrl . '/docs', 'changefreq' => 'weekly', 'priority' => '0.8'],
-        ['loc' => $baseUrl . '/status', 'changefreq' => 'hourly', 'priority' => '0.7'],
-        ['loc' => $baseUrl . '/terms', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['loc' => $baseUrl . '/privacy', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['loc' => $baseUrl . '/refund', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['loc' => $baseUrl . '/checkout', 'changefreq' => 'weekly', 'priority' => '0.9'],
+        ['loc' => $baseUrl.'/', 'changefreq' => 'daily', 'priority' => '1.0', 'lastmod' => $diubah('landing')],
+        ['loc' => $baseUrl.'/vps', 'changefreq' => 'weekly', 'priority' => '0.9', 'lastmod' => $diubah('pages.produk')],
+        ['loc' => $baseUrl.'/ai', 'changefreq' => 'weekly', 'priority' => '0.9', 'lastmod' => $diubah('pages.produk')],
+        ['loc' => $baseUrl.'/database', 'changefreq' => 'weekly', 'priority' => '0.9', 'lastmod' => $diubah('pages.produk')],
+        ['loc' => $baseUrl.'/docs', 'changefreq' => 'weekly', 'priority' => '0.9', 'lastmod' => $diubah('pages.docs.index')],
+        ['loc' => $baseUrl.'/status', 'changefreq' => 'hourly', 'priority' => '0.8', 'lastmod' => $diubah('pages.status')],
+        ['loc' => $baseUrl.'/terms', 'changefreq' => 'monthly', 'priority' => '0.3', 'lastmod' => $diubah('pages.terms')],
+        ['loc' => $baseUrl.'/privacy', 'changefreq' => 'monthly', 'priority' => '0.3', 'lastmod' => $diubah('pages.privacy')],
+        ['loc' => $baseUrl.'/refund', 'changefreq' => 'monthly', 'priority' => '0.3', 'lastmod' => $diubah('pages.refund')],
     ];
 
-    try {
-        $specs = \App\Models\VpsSpec::where('is_active', true)->get();
-        foreach ($specs as $spec) {
-            $urls[] = [
-                'loc' => $baseUrl . '/checkout/' . $spec->id,
-                'changefreq' => 'weekly',
-                'priority' => '0.8',
-            ];
-        }
-    } catch (\Throwable $e) {
-        // Fallback gracefully jika database belum dimigrate
+    // Tiap kelompok dokumentasi punya alamatnya sendiri sejak isinya dipecah;
+    // tanpa didaftarkan di sini, halaman-halaman itu hanya bisa ditemukan lewat
+    // sidebar — dan yang hanya bisa dicapai lewat sidebar mudah terlewat perayap.
+    foreach (array_keys(KatalogDokumentasi::kelompok()) as $slugKelompok) {
+        $urls[] = [
+            'loc' => $baseUrl.'/docs/'.$slugKelompok,
+            'changefreq' => 'weekly',
+            'priority' => '0.8',
+            'lastmod' => KatalogDokumentasi::diubahPada($slugKelompok),
+        ];
     }
 
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
     foreach ($urls as $u) {
         $xml .= "    <url>\n";
-        $xml .= "        <loc>" . htmlspecialchars($u['loc'], ENT_XML1) . "</loc>\n";
-        $xml .= "        <lastmod>" . now()->toAtomString() . "</lastmod>\n";
-        $xml .= "        <changefreq>" . $u['changefreq'] . "</changefreq>\n";
-        $xml .= "        <priority>" . $u['priority'] . "</priority>\n";
+        $xml .= '        <loc>'.htmlspecialchars($u['loc'], ENT_XML1)."</loc>\n";
+        if (! empty($u['lastmod'])) {
+            $xml .= '        <lastmod>'.$u['lastmod']."</lastmod>\n";
+        }
+        $xml .= '        <changefreq>'.$u['changefreq']."</changefreq>\n";
+        $xml .= '        <priority>'.$u['priority']."</priority>\n";
         $xml .= "    </url>\n";
     }
 
@@ -124,8 +160,9 @@ Route::post('/order/payment/{id}/dev-simulate', [OrderController::class, 'devSim
 Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success');
 Route::get('/order/callback', [OrderController::class, 'paymentCallback'])->name('order.callback');
 Route::get('/payment/callback', [OrderController::class, 'paymentCallback'])->name('payment.callback');
-Route::get('/qris/render', function (\Illuminate\Http\Request $request, \App\Services\QrisService $qrisService) {
+Route::get('/qris/render', function (Request $request, QrisService $qrisService) {
     $amount = max(1000, (float) $request->input('amount', 80000));
+
     return response()->json([
         'amount' => $amount,
         'payload' => $qrisService->generatePayload($amount),

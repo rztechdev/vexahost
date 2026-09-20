@@ -8,6 +8,7 @@ use App\Models\SupportTicket;
 use App\Models\User;
 use App\Models\VpsInstance;
 use App\Models\VpsSpec;
+use App\Support\KatalogDokumentasi;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -112,7 +113,7 @@ class ExampleTest extends TestCase
         $businessSpec = VpsSpec::where('name', 'Business')->first();
         $this->assertNotNull($businessSpec);
 
-        $responseBusiness = $this->get('/checkout/' . $businessSpec->id);
+        $responseBusiness = $this->get('/checkout/'.$businessSpec->id);
         $responseBusiness->assertStatus(200);
         $responseBusiness->assertSee('Business');
     }
@@ -137,7 +138,7 @@ class ExampleTest extends TestCase
             'password' => 'SecurePass@123',
         ]);
 
-        $order = Order::whereHas('customer', fn($q) => $q->where('email', 'pelangganbaru@student.id'))->first();
+        $order = Order::whereHas('customer', fn ($q) => $q->where('email', 'pelangganbaru@student.id'))->first();
         $this->assertNotNull($order);
         $response->assertRedirect(route('order.payment', $order->id));
 
@@ -178,7 +179,7 @@ class ExampleTest extends TestCase
     {
         [$user, $vps] = $this->createCustomerWithVps();
 
-        $response = $this->actingAs($user)->get('/dashboard/vps/' . $vps->id);
+        $response = $this->actingAs($user)->get('/dashboard/vps/'.$vps->id);
         $response->assertStatus(200);
         $response->assertSee($vps->hostname);
         $response->assertSee($vps->public_ip);
@@ -189,10 +190,10 @@ class ExampleTest extends TestCase
         [$user, $vps] = $this->createCustomerWithVps();
 
         // Panel tidak lagi berpura-pura me-reboot server (tanpa API supplier).
-        $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/reboot')->assertNotFound();
+        $this->actingAs($user)->post('/dashboard/vps/'.$vps->id.'/reboot')->assertNotFound();
 
         // Pelanggan diberi panduan reboot lewat SSH.
-        $this->actingAs($user)->get('/dashboard/vps/' . $vps->id)
+        $this->actingAs($user)->get('/dashboard/vps/'.$vps->id)
             ->assertOk()
             ->assertSee('sudo reboot');
     }
@@ -201,7 +202,7 @@ class ExampleTest extends TestCase
     {
         [$user, $vps] = $this->createCustomerWithVps();
 
-        $response = $this->actingAs($user)->post('/dashboard/vps/' . $vps->id . '/requests/reinstall', [
+        $response = $this->actingAs($user)->post('/dashboard/vps/'.$vps->id.'/requests/reinstall', [
             'os' => 'ubuntu2204',
             'control_panel' => 'dokploy',
             'confirm_hostname' => 'vps-testuser',
@@ -228,12 +229,12 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee($invoice->invoice_number);
 
-        $printResponse = $this->actingAs($user)->get('/dashboard/invoices/' . $invoice->id . '/print');
+        $printResponse = $this->actingAs($user)->get('/dashboard/invoices/'.$invoice->id.'/print');
         $printResponse->assertStatus(200);
         $printResponse->assertHeader('content-type', 'application/pdf');
         $this->assertStringStartsWith('%PDF-', $printResponse->getContent());
 
-        $htmlResponse = $this->actingAs($user)->get('/dashboard/invoices/' . $invoice->id . '/print?format=html');
+        $htmlResponse = $this->actingAs($user)->get('/dashboard/invoices/'.$invoice->id.'/print?format=html');
         $htmlResponse->assertStatus(200);
         $htmlResponse->assertSee($invoice->invoice_number);
         $htmlResponse->assertSee('FAKTUR / INVOICE');
@@ -254,7 +255,7 @@ class ExampleTest extends TestCase
         $this->assertNotNull($ticket);
 
         // Reply to ticket
-        $replyResponse = $this->actingAs($user)->post('/dashboard/support/' . $ticket->id . '/reply', [
+        $replyResponse = $this->actingAs($user)->post('/dashboard/support/'.$ticket->id.'/reply', [
             'message' => 'Terima kasih, mohon konfirmasinya ya.',
         ]);
         $replyResponse->assertSessionHas('success');
@@ -326,7 +327,7 @@ class ExampleTest extends TestCase
             'paid_at' => now(),
         ]);
 
-        $response = $this->actingAs($admin)->post('/admin/orders/' . $pendingOrder->id . '/provision', [
+        $response = $this->actingAs($admin)->post('/admin/orders/'.$pendingOrder->id.'/provision', [
             'public_ip' => '139.180.222.111',
             'app_url' => 'https://139.180.222.111:8000',
         ]);
@@ -381,7 +382,7 @@ class ExampleTest extends TestCase
         $orderId = (string) $order->id;
         $statusCode = '200';
         $grossAmount = '80000.00';
-        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         $response = $this->postJson('/api/webhooks/payment', [
             'order_id' => $orderId,
@@ -442,7 +443,7 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
-        
+
         $order = Order::where('shopee_order_id', 'SHOPEE-BIZ-2026')->first();
         $this->assertNotNull($order);
         $this->assertEquals('Business', $order->vpsSpec->name);
@@ -451,7 +452,7 @@ class ExampleTest extends TestCase
         $this->assertEquals(8, $order->vpsSpec->cpu);
         $this->assertEquals(16, $order->vpsSpec->ram);
         $this->assertEquals(80, $order->vpsSpec->disk);
-        $this->assertEquals(590000, (int)$order->vpsSpec->sell_price);
+        $this->assertEquals(590000, (int) $order->vpsSpec->sell_price);
     }
 
     public function test_api_contracts_shopee_process_order_mahasiswa_basic(): void
@@ -479,7 +480,7 @@ class ExampleTest extends TestCase
         $this->assertEquals(2, $order->vpsSpec->cpu);
         $this->assertEquals(2, $order->vpsSpec->ram);
         $this->assertEquals(40, $order->vpsSpec->disk);
-        $this->assertEquals(90000, (int)$order->vpsSpec->sell_price);
+        $this->assertEquals(90000, (int) $order->vpsSpec->sell_price);
     }
 
     public function test_startup_plan_order_fails_with_tencent_provider(): void
@@ -525,7 +526,7 @@ class ExampleTest extends TestCase
             'password' => 'SecurePass@123',
         ]);
 
-        $order = Order::whereHas('customer', fn($q) => $q->where('email', 'biz.success@customer.id'))->first();
+        $order = Order::whereHas('customer', fn ($q) => $q->where('email', 'biz.success@customer.id'))->first();
         $this->assertNotNull($order);
         $this->assertEquals('cloudeka', $order->provider);
         $this->assertEquals('indonesia', $order->datacenter_location);
@@ -576,7 +577,7 @@ class ExampleTest extends TestCase
             'password' => 'SecurePass@123',
         ]);
 
-        $order = Order::whereHas('customer', fn($q) => $q->where('email', 'student.ok@customer.id'))->first();
+        $order = Order::whereHas('customer', fn ($q) => $q->where('email', 'student.ok@customer.id'))->first();
         $this->assertNotNull($order);
         $this->assertEquals('cloudeka', $order->provider);
         $this->assertEquals('indonesia', $order->datacenter_location);
@@ -626,7 +627,7 @@ class ExampleTest extends TestCase
             'password' => 'SecurePass@123',
         ]);
 
-        $order = Order::whereHas('customer', fn($q) => $q->where('email', 'mhs.ok@customer.id'))->first();
+        $order = Order::whereHas('customer', fn ($q) => $q->where('email', 'mhs.ok@customer.id'))->first();
         $this->assertNotNull($order);
         $this->assertEquals('tencent', $order->provider);
         $this->assertEquals('singapore', $order->datacenter_location);
@@ -693,7 +694,7 @@ class ExampleTest extends TestCase
             'password' => 'SecurePass@123',
         ]);
         $res->assertSessionDoesntHaveErrors();
-        $order = Order::whereHas('customer', fn($q) => $q->where('email', 'prem.ok@test.com'))->first();
+        $order = Order::whereHas('customer', fn ($q) => $q->where('email', 'prem.ok@test.com'))->first();
         $this->assertNotNull($order);
         $this->assertEquals('tencent', $order->provider);
     }
@@ -704,7 +705,7 @@ class ExampleTest extends TestCase
         $adminKey = config('vexahost.admin_api_key', 'vx_sec_k9f83n2x9v1b7a6d8e4f5c2b0e9a1d3f');
 
         $response = $this->withHeader('X-Admin-Key', $adminKey)
-            ->getJson('/api/admin/vps/' . $vps->id . '/status');
+            ->getJson('/api/admin/vps/'.$vps->id.'/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -742,7 +743,7 @@ class ExampleTest extends TestCase
         $this->assertNotNull($customSpec);
 
         // 3. Update custom package
-        $updateRes = $this->actingAs($admin)->put('/admin/packages/' . $customSpec->id, [
+        $updateRes = $this->actingAs($admin)->put('/admin/packages/'.$customSpec->id, [
             'name' => 'Custom Developer Node v2',
             'cpu' => 8,
             'ram' => 16,
@@ -758,46 +759,82 @@ class ExampleTest extends TestCase
         // 4. Core plans protection against deletion
         $corePlan = VpsSpec::where('name', 'Startup')->first();
         $this->assertNotNull($corePlan);
-        $delCoreRes = $this->actingAs($admin)->delete('/admin/packages/' . $corePlan->id);
+        $delCoreRes = $this->actingAs($admin)->delete('/admin/packages/'.$corePlan->id);
         $delCoreRes->assertSessionHas('error');
         $this->assertDatabaseHas('vps_specs', ['id' => $corePlan->id]);
 
         // 5. Delete custom package without orders succeeds
         $customSpec->refresh();
-        $delCustomRes = $this->actingAs($admin)->delete('/admin/packages/' . $customSpec->id);
+        $delCustomRes = $this->actingAs($admin)->delete('/admin/packages/'.$customSpec->id);
         $delCustomRes->assertSessionHas('success');
         $this->assertDatabaseMissing('vps_specs', ['name' => 'Custom Developer Node v2']);
     }
 
-    public function test_docs_page_renders_enterprise_portal(): void
+    public function test_docs_pages_render_enterprise_portal(): void
     {
-        $response = $this->get('/docs');
-        $response->assertStatus(200);
-        $response->assertSee('Dokumentasi Teknis');
-        $response->assertSee('Pengenalan Arsitektur Cloud');
-        $response->assertSee('Coolify Platform Deployment');
-        $response->assertSee('Dokploy Modern PaaS');
-        $response->assertSee('aaPanel');
-        $response->assertSee('Traditional Stack');
-        $response->assertSee('Penyimpanan NVMe SSD');
-        // Klaim performa yang tidak bisa dibuktikan sudah dihapus.
-        $response->assertDontSee('Storage Durability');
-        $response->assertDontSee('Random Read IOPS');
-        $response->assertDontSee('siaga 24/7');
-        // Panduan operasional sesuai alur dashboard saat ini.
-        $response->assertSee('sudo reboot');
-        $response->assertSee('Ajukan Reinstall OS');
-        $response->assertDontSee('Graceful Shutdown');
-        $response->assertSee('/api/admin/vps/{id}/status');
-        $response->assertSee('/api/admin/shopee/process-order');
-        
-        // Assert no tacky emojis in the page content
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('🚀', $content);
-        $this->assertStringNotContainsString('⚙️', $content);
-        $this->assertStringNotContainsString('🛡️', $content);
-        $this->assertStringNotContainsString('🔌', $content);
-        $this->assertStringNotContainsString('❓', $content);
+        // Dokumentasi sekarang terpecah menjadi indeks + satu halaman per
+        // kelompok. Pemeriksaannya berjalan atas gabungan seluruhnya: yang
+        // dijaga di sini isinya, bukan di halaman mana ia kebetulan berada.
+        $halaman = ['/docs'];
+        foreach (array_keys(KatalogDokumentasi::kelompok()) as $slug) {
+            $halaman[] = "/docs/{$slug}";
+        }
+
+        $gabungan = '';
+        foreach ($halaman as $url) {
+            $response = $this->get($url);
+            $response->assertStatus(200);
+            $gabungan .= $response->getContent();
+        }
+
+        $this->get('/docs')->assertSee('Dokumentasi Teknis');
+
+        foreach ([
+            'Pengenalan Arsitektur Cloud',
+            'Coolify Platform Deployment',
+            'Dokploy Modern PaaS',
+            'aaPanel',
+            'Traditional Stack',
+            'Penyimpanan NVMe SSD',
+            // Panduan operasional sesuai alur dashboard saat ini.
+            'sudo reboot',
+            'Ajukan Reinstall OS',
+            '/api/admin/vps/{id}/status',
+            '/api/admin/shopee/process-order',
+        ] as $wajibAda) {
+            $this->assertStringContainsString($wajibAda, $gabungan);
+        }
+
+        foreach ([
+            // Klaim performa yang tidak bisa dibuktikan sudah dihapus.
+            'Storage Durability',
+            'Random Read IOPS',
+            'siaga 24/7',
+            'Graceful Shutdown',
+            // Tidak ada emoji di dokumentasi teknis.
+            "\u{1F680}",
+            "\u{2699}\u{FE0F}",
+            "\u{1F6E1}\u{FE0F}",
+            "\u{1F50C}",
+            "\u{2753}",
+        ] as $tidakBolehAda) {
+            $this->assertStringNotContainsString($tidakBolehAda, $gabungan);
+        }
+    }
+
+    /**
+     * Tautan lama berbentuk /docs#stack-coolify sudah tersebar di riwayat chat
+     * dan bookmark pelanggan. Anchor tidak dikirim ke server, jadi halaman
+     * indeks yang harus mengantarkannya — kalau petanya hilang, tautan itu
+     * berakhir di indeks tanpa penjelasan apa pun.
+     */
+    public function test_old_documentation_anchors_still_lead_somewhere(): void
+    {
+        $peta = KatalogDokumentasi::petaSeksi();
+
+        $this->assertSame('control-panel', $peta['stack-coolify']);
+        $this->assertCount(21, $peta);
+
+        $this->get('/docs')->assertSee('peta-seksi-dokumentasi', false);
     }
 }
-

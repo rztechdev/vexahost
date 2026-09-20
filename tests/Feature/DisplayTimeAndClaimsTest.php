@@ -8,6 +8,9 @@ use App\Models\TicketMessage;
 use App\Models\User;
 use App\Models\VpsInstance;
 use App\Models\VpsSpec;
+use App\Services\SettingsService;
+use App\Support\KatalogDokumentasi;
+use App\Support\KatalogProduk;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -139,7 +142,18 @@ class DisplayTimeAndClaimsTest extends TestCase
 
     public function test_public_pages_have_no_uptime_sla_claims(): void
     {
-        foreach (['/', '/terms', '/privacy', '/refund', '/status'] as $path) {
+        $paths = ['/', '/terms', '/privacy', '/refund', '/status', '/docs'];
+
+        // Halaman produk dan kelompok dokumentasi lahir belakangan; daftar yang
+        // tidak ikut tumbuh membuat penjaga ini diam-diam berhenti menjaga.
+        foreach (array_keys(KatalogProduk::semua()) as $slug) {
+            $paths[] = '/'.$slug;
+        }
+        foreach (array_keys(KatalogDokumentasi::kelompok()) as $slug) {
+            $paths[] = '/docs/'.$slug;
+        }
+
+        foreach ($paths as $path) {
             $this->get($path)
                 ->assertOk()
                 ->assertDontSee('SLA 99.9%')
@@ -176,7 +190,7 @@ class DisplayTimeAndClaimsTest extends TestCase
         }
 
         // Jam layanan di landing mengikuti pengaturan admin (sama dengan dashboard).
-        $response->assertSee(app(\App\Services\SettingsService::class)->get('support_hours'));
+        $response->assertSee(app(SettingsService::class)->get('support_hours'));
         $response->assertSee('Tencent Cloud');
     }
 

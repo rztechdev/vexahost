@@ -2,12 +2,14 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @php
         $seoTitle = $title ?? 'VexaHost — Cloud VPS NVMe KVM Indonesia Mulai Rp 80rb/bln';
         $seoDescription = $description ?? 'Cloud VPS KVM dengan datacenter Jakarta & Singapore. Penyimpanan NVMe SSD, akses root penuh, Managed DB, & AI Stack siap pakai mulai Rp 80rb.';
-        $seoKeywords = $keywords ?? 'cloud vps indonesia, sewa vps murah, vps nvme jakarta, vps mahasiswa, vps kvm murah, managed database postgresql mysql, vps ai server, vexahost';
         $seoImage = asset('images/promo-banner.webp');
+        // Halaman transaksi (checkout) mengirim 'noindex, follow' lewat @extends:
+        // formulir kosong tidak boleh bersaing dengan beranda untuk pencarian merek.
+        $seoRobots = $robots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
         $canonicalUrl = url()->current();
         $googleSiteVerification = config('services.google.site_verification');
     @endphp
@@ -15,9 +17,8 @@
     <title>{{ $seoTitle }}</title>
     <meta name="title" content="{{ $seoTitle }}">
     <meta name="description" content="{{ $seoDescription }}">
-    <meta name="keywords" content="{{ $seoKeywords }}">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="author" content="VexaHost — RZ Digital Creative">
+    <meta name="robots" content="{{ $seoRobots }}">
+    <meta name="author" content="VexaHost">
     <link rel="canonical" href="{{ $canonicalUrl }}">
 
     @if(!empty($googleSiteVerification))
@@ -38,8 +39,8 @@
     <meta property="og:description" content="{{ $seoDescription }}">
     <meta property="og:image" content="{{ $seoImage }}">
     <meta property="og:image:alt" content="VexaHost Cloud Infrastructure">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="560">
     <meta property="og:locale" content="id_ID">
 
     <!-- Twitter Card -->
@@ -51,6 +52,30 @@
 
     <!-- Schema.org JSON-LD Structured Data -->
     @php
+        // Entitas VexaHost untuk mesin pencari.
+        //
+        // `sameAs` sengaja belum ada: menautkan profil yang belum dibuat tidak
+        // menambah sinyal apa pun, dan tautan mati justru melemahkannya. Isi
+        // begitu profil resminya benar-benar hidup — itulah yang paling
+        // menentukan apakah Google memisahkan kita dari penyedia bernama mirip.
+        //
+        // `parentOrganization` sengaja TIDAK menyebut vendor pengembang: itu
+        // pernyataan relasi entitas yang mengikat, bukan kredit. Kreditnya tetap
+        // tampil sebagai teks biasa di footer dan halaman auth.
+        $waGatewayUrl = rtrim(config('whatsapp.url', 'https://wa.vexahostcloud.my.id'), '/');
+
+        // Harga dibaca dari paket yang benar-benar aktif; angka mati di sini akan
+        // diam-diam berbeda dari halaman harga begitu katalog berubah.
+        try {
+            $hargaAktif = \App\Models\VpsSpec::where('is_active', true)->pluck('sell_price');
+            $hargaTerendah = (int) ($hargaAktif->min() ?: 80000);
+            $hargaTertinggi = (int) ($hargaAktif->max() ?: 350000);
+            $jumlahPaket = max(1, $hargaAktif->count());
+        } catch (\Throwable $e) {
+            // Halaman tetap harus terkirim walau database belum siap.
+            [$hargaTerendah, $hargaTertinggi, $jumlahPaket] = [80000, 350000, 10];
+        }
+
         $schemaData = [
             '@context' => 'https://schema.org',
             '@graph' => [
@@ -58,13 +83,30 @@
                     '@type' => 'Organization',
                     '@id' => url('/') . '#organization',
                     'name' => 'VexaHost',
+                    'alternateName' => [
+                        'VexaHost Cloud',
+                        'VexaHost Indonesia',
+                        'VexaHost Cloud VPS',
+                        'vexahostcloud',
+                    ],
                     'url' => url('/'),
                     'logo' => [
                         '@type' => 'ImageObject',
-                        'url' => asset('images/logo.png'),
-                        'caption' => 'VexaHost Logo',
+                        'url' => asset('images/favicon-512x512.png'),
+                        'width' => 512,
+                        'height' => 512,
+                        'caption' => 'VexaHost',
                     ],
+                    'image' => asset('images/favicon-512x512.png'),
                     'description' => 'Penyedia infrastruktur Cloud VPS NVMe KVM, AI Hub, dan Managed Database berkinerja tinggi di Indonesia.',
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'addressCountry' => 'ID',
+                    ],
+                    'areaServed' => [
+                        '@type' => 'Country',
+                        'name' => 'Indonesia',
+                    ],
                     'contactPoint' => [
                         '@type' => 'ContactPoint',
                         'telephone' => '+'.\App\Support\NomorWhatsApp::internasional(),
@@ -73,9 +115,15 @@
                         'areaServed' => 'ID',
                         'availableLanguage' => ['Indonesian', 'English'],
                     ],
-                    'parentOrganization' => [
+                    // WA Gateway berjalan di subdomain terpisah. Tanpa relasi ini
+                    // Google membacanya sebagai situs asing yang kebetulan bernama
+                    // mirip. `@id`-nya wajib sama persis dengan yang ditulis repo
+                    // WA Gateway — beda satu garis miring, relasinya tidak terbaca.
+                    'subOrganization' => [
                         '@type' => 'Organization',
-                        'name' => 'RZ Digital Creative',
+                        '@id' => $waGatewayUrl . '#organization',
+                        'name' => 'VexaHost WA Gateway',
+                        'url' => $waGatewayUrl,
                     ],
                 ],
                 [
@@ -83,6 +131,10 @@
                     '@id' => url('/') . '#website',
                     'url' => url('/'),
                     'name' => 'VexaHost',
+                    'alternateName' => [
+                        'VexaHost Cloud',
+                        'VexaHost Indonesia',
+                    ],
                     'description' => 'Infrastruktur Cloud VPS Cepat, Andal, & Transparan',
                     'publisher' => [
                         '@id' => url('/') . '#organization',
@@ -92,7 +144,7 @@
                 [
                     '@type' => 'Product',
                     'name' => 'VexaHost Cloud VPS KVM Indonesia',
-                    'image' => asset('images/logo.png'),
+                    'image' => asset('images/favicon-512x512.png'),
                     'description' => 'Server Virtual Private Server (VPS) berbasis KVM dengan penyimpanan 100% NVMe dan Datacenter Jakarta.',
                     'brand' => [
                         '@type' => 'Brand',
@@ -101,9 +153,9 @@
                     'offers' => [
                         '@type' => 'AggregateOffer',
                         'priceCurrency' => 'IDR',
-                        'lowPrice' => '80000',
-                        'highPrice' => '350000',
-                        'offerCount' => '10',
+                        'lowPrice' => (string) $hargaTerendah,
+                        'highPrice' => (string) $hargaTertinggi,
+                        'offerCount' => (string) $jumlahPaket,
                         'priceValidUntil' => '2028-12-31',
                         'availability' => 'https://schema.org/InStock',
                         'url' => route('packages.vps'),
@@ -111,12 +163,55 @@
                 ],
             ],
         ];
+
+        // Tanya jawab. Google membatasi rich result FAQ ke situs pemerintah dan
+        // kesehatan sejak Agustus 2023, jadi ini tidak dipasang untuk mendapat
+        // kotak lipat di hasil pencarian. Yang membacanya AI Overview dan mesin
+        // jawab lain — dan di sanalah merek kita paling sering tertukar dengan
+        // penyedia asing bernama mirip. Tanya jawab terstruktur jauh lebih sulit
+        // disalahartikan daripada paragraf bebas.
+        if (! empty($faq ?? [])) {
+            $schemaData['@graph'][] = [
+                '@type' => 'FAQPage',
+                '@id' => $canonicalUrl . '#faq',
+                'mainEntity' => collect($faq)->values()
+                    ->map(fn (array $butir) => [
+                        '@type' => 'Question',
+                        'name' => $butir['tanya'],
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text' => $butir['jawab'],
+                        ],
+                    ])->all(),
+            ];
+        }
+
+        // Remah jejak. Halaman yang mengirim $breadcrumbs mendapat jalur navigasi
+        // di hasil pencarian menggantikan URL mentah; butir terakhir sengaja tanpa
+        // 'item' karena itu halaman yang sedang dibuka.
+        if (! empty($breadcrumbs ?? [])) {
+            $schemaData['@graph'][] = [
+                '@type' => 'BreadcrumbList',
+                '@id' => $canonicalUrl . '#breadcrumb',
+                'itemListElement' => collect($breadcrumbs)->values()
+                    ->map(fn (array $remah, int $i) => array_filter([
+                        '@type' => 'ListItem',
+                        'position' => $i + 1,
+                        'name' => $remah['name'],
+                        'item' => $remah['url'] ?? null,
+                    ]))->all(),
+            ];
+        }
     @endphp
     <script type="application/ld+json">
     {!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
     </script>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('images/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/favicon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -695,8 +790,8 @@
                             <span>Status Sistem</span>
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         </a></li>
-                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Panduan SSH &amp; Security</a></li>
-                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'keamanan') }}" class="hover:text-white transition-colors">Panduan SSH &amp; Security</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'control-panel') }}" class="hover:text-white transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
                         <li><a href="{{ route('home') }}#faq" class="hover:text-white transition-colors">Pertanyaan Umum (FAQ)</a></li>
                         <li><a href="{{ route('home') }}#kontak" class="hover:text-white transition-colors">Kontak Dukungan</a></li>
                     </ul>

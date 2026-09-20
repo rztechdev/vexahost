@@ -1,4 +1,8 @@
-@extends('layouts.app', ['title' => 'Checkout Layanan — VexaHost'])
+@extends('layouts.app', [
+    'title' => 'Checkout Layanan — VexaHost',
+    'description' => 'Selesaikan pemesanan layanan VexaHost.',
+    'robots' => 'noindex, follow',
+])
 
 @section('content')
 <div class="py-10 bg-white min-h-screen" x-data="checkoutState()" x-init="init()">
