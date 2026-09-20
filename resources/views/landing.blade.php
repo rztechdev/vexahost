@@ -36,12 +36,12 @@
          x-transition:leave="ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-         class="relative w-full max-w-2xl bg-[#0B0F19] rounded-xl shadow-2xl overflow-hidden z-10 border border-slate-700/60">
+         class="relative w-full max-w-md z-10 flex flex-col items-end">
 
-        <!-- Close 'X' Button -->
+        <!-- Close 'X' Button (Outside Image) -->
         <button type="button"
                 @click="closePromo()"
-                class="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-black/60 hover:bg-black/90 text-white/90 hover:text-white flex items-center justify-center transition-colors shadow-md backdrop-blur-xs cursor-pointer"
+                class="mb-2.5 z-30 w-8 h-8 rounded-full bg-black/60 hover:bg-black text-white/90 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg backdrop-blur-xs hover:scale-105"
                 aria-label="Tutup Iklan">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
@@ -49,35 +49,37 @@
         </button>
 
         <!-- Pure Image Banner (Click to explore VPS pricing) -->
-        <a href="#pricing"
-           @click="closePromo()"
-           class="block relative w-full aspect-[800/560] overflow-hidden cursor-pointer"
-           title="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost">
-            <picture>
-                <source srcset="{{ asset('images/promo-banner.webp') }}" type="image/webp">
-                <img src="{{ asset('images/promo-banner.jpg') }}"
-                     alt="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost"
-                     width="800"
-                     height="560"
-                     loading="eager"
-                     decoding="async"
-                     class="w-full h-full object-cover">
-            </picture>
-        </a>
+        <div class="w-full bg-[#0B0F19] rounded-xl shadow-2xl overflow-hidden border border-slate-700/60">
+            <a href="#pricing"
+               @click="closePromo()"
+               class="block relative w-full aspect-[800/560] overflow-hidden cursor-pointer"
+               title="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost">
+                <picture>
+                    <source srcset="{{ asset('images/promo-banner.webp') }}" type="image/webp">
+                    <img src="{{ asset('images/promo-banner.jpg') }}"
+                         alt="Deploy Cloud VPS KVM Cepat &amp; Andal — VexaHost"
+                         width="800"
+                         height="560"
+                         loading="eager"
+                         decoding="async"
+                         class="w-full h-full object-cover">
+                </picture>
+            </a>
+        </div>
     </div>
 </div>
 
-<!-- Hero Section (Hostinger Enterprise VPS Style) -->
-<section class="bg-[#0B0F19] text-white pt-20 pb-16 border-b border-slate-800">
+<!-- Hero Section (Clean Enterprise VPS Style) -->
+<section class="bg-white text-slate-900 pt-16 sm:pt-20 pb-12 sm:pb-16">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
         <!-- Headline -->
-        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.15]">
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.15]">
             Cloud VPS andal.<br class="hidden sm:inline"> Performa enterprise, harga mahasiswa.
         </h1>
 
         <!-- Subtitle -->
-        <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+        <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
             Deploy portfolio, bot Telegram 24 jam, REST API, hingga container Docker dengan akses root SSH penuh, storage NVMe SSD, dan pilihan 1-click control panel siap pakai.
         </p>
 
@@ -86,28 +88,28 @@
             <a href="#pricing" class="w-full sm:w-auto px-8 py-3.5 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-bold rounded-lg shadow-md transition-all hover:scale-[1.02]">
                 Pilih Paket VPS &rarr;
             </a>
-            <a href="{{ route('docs') }}" class="w-full sm:w-auto px-6 py-3.5 text-slate-400 hover:text-white text-sm font-medium transition-colors">
+            <a href="{{ route('docs') }}" class="w-full sm:w-auto px-6 py-3.5 border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg transition-colors">
                 Baca Dokumentasi
             </a>
         </div>
 
         <!-- Stats Bar -->
-        <div class="mt-14 pt-10 border-t border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="mt-14 pt-10 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">Rp 80.000</p>
-                <p class="text-xs text-slate-400 mt-1">Mulai per bulan flat</p>
+                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">Rp 80.000</p>
+                <p class="text-xs text-slate-500 mt-1">Mulai per bulan flat</p>
             </div>
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">Full Root</p>
-                <p class="text-xs text-slate-400 mt-1">Akses penuh ke server Anda</p>
+                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">Full Root</p>
+                <p class="text-xs text-slate-500 mt-1">Akses penuh ke server Anda</p>
             </div>
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">1–2 Jam</p>
-                <p class="text-xs text-slate-400 mt-1">Aktivasi di jam kerja setelah bayar</p>
+                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">1–2 Jam</p>
+                <p class="text-xs text-slate-500 mt-1">Aktivasi di jam kerja setelah bayar</p>
             </div>
             <div>
-                <p class="text-2xl sm:text-3xl font-bold text-white font-mono-code">100% ID</p>
-                <p class="text-xs text-slate-400 mt-1">Dukungan Bahasa Indonesia</p>
+                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">100% ID</p>
+                <p class="text-xs text-slate-500 mt-1">Dukungan Bahasa Indonesia</p>
             </div>
         </div>
     </div>
@@ -115,12 +117,12 @@
 
 <!-- RUNNING STACK & ECOSYSTEM TICKER (Hero Section) -->
 <section aria-label="Ekosistem Cloud & Stack Teknologi yang Didukung"
-         class="relative overflow-hidden border-b border-slate-800 bg-[#0B0F19] py-3.5 sm:py-4">
+         class="relative overflow-hidden bg-white py-4 sm:py-5">
     <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
         <!-- Track Marquee -->
         <div class="flustra-stack-marquee relative flex-1 overflow-hidden">
-            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
-            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-white via-white/80 to-transparent"></div>
 
             <div class="flustra-stack-track flex w-max items-center gap-3 sm:gap-4">
                 @php
@@ -162,12 +164,12 @@
 
                 @for ($i = 0; $i < 2; $i++)
                     @foreach ($ecosystemLogos as $logo)
-                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-slate-800 bg-white px-3 sm:px-3.5 shadow-xs transition-all duration-200 hover:scale-105 select-none"
+                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white px-3 sm:px-3.5 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
                              title="{{ $logo['label'] }}">
                             <img src="{{ asset($logo['file']) }}"
                                  alt="{{ $logo['label'] }}"
                                  class="h-4 w-4 sm:h-5 sm:w-5 shrink-0 object-contain">
-                            <span class="text-xs font-bold text-slate-900 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
+                            <span class="text-xs font-bold text-slate-800 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
                         </div>
                     @endforeach
                 @endfor
