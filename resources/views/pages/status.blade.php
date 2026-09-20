@@ -1,4 +1,11 @@
-@extends('layouts.app', ['title' => 'Status Layanan — VexaHost'])
+@extends('layouts.app', [
+    'title' => 'Status Layanan — VexaHost',
+    'description' => 'Status realtime layanan VexaHost: ketersediaan node VPS Jakarta & Singapore, Managed Database, dan dashboard pelanggan.',
+    'breadcrumbs' => [
+        ['name' => 'Beranda', 'url' => url('/')],
+        ['name' => 'Status Layanan'],
+    ],
+])
 
 @section('content')
 {{--

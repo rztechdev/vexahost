@@ -1,4 +1,11 @@
-@extends('layouts.app', ['title' => 'Ketentuan Layanan (Terms of Service) — VexaHost'])
+@extends('layouts.app', [
+    'title' => 'Ketentuan Layanan (Terms of Service) — VexaHost',
+    'description' => 'Ketentuan Layanan VexaHost: hak dan kewajiban pengguna, batas penggunaan wajar, prosedur penangguhan, serta tanggung jawab penyedia infrastruktur.',
+    'breadcrumbs' => [
+        ['name' => 'Beranda', 'url' => url('/')],
+        ['name' => 'Ketentuan Layanan'],
+    ],
+])
 
 @section('content')
 <div x-data="{

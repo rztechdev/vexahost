@@ -1,4 +1,11 @@
-@extends('layouts.app', ['title' => 'Kebijakan Privasi (Privacy Policy) — VexaHost'])
+@extends('layouts.app', [
+    'title' => 'Kebijakan Privasi (Privacy Policy) — VexaHost',
+    'description' => 'Kebijakan Privasi VexaHost: data apa yang kami simpan, berapa lama disimpan, untuk apa dipakai, dan bagaimana Anda meminta penghapusannya.',
+    'breadcrumbs' => [
+        ['name' => 'Beranda', 'url' => url('/')],
+        ['name' => 'Kebijakan Privasi'],
+    ],
+])
 
 @section('content')
 <div x-data="{

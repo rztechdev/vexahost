@@ -1,4 +1,11 @@
-@extends('layouts.app', ['title' => 'Kebijakan Pengembalian Dana (Refund Policy) — VexaHost'])
+@extends('layouts.app', [
+    'title' => 'Kebijakan Pengembalian Dana (Refund Policy) — VexaHost',
+    'description' => 'Kebijakan pengembalian dana VexaHost: syarat refund, jangka waktu pengajuan, layanan yang memenuhi syarat, dan cara mengajukannya.',
+    'breadcrumbs' => [
+        ['name' => 'Beranda', 'url' => url('/')],
+        ['name' => 'Kebijakan Refund'],
+    ],
+])
 
 @section('content')
 <div x-data="{
