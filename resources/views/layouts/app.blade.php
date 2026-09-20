@@ -223,17 +223,24 @@
     </style>
 </head>
 <body class="bg-white text-slate-800 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
-      x-data="{ mobileMenu: false, mobileProduk: false, mobileVps: false, mobileAi: false, mobileDb: false }">
+      x-data="{ isScrolled: false, mobileMenu: false, mobileProduk: false, mobileVps: false, mobileAi: false, mobileDb: false }"
+      x-init="isScrolled = (window.pageYOffset > 20)"
+      @scroll.window="isScrolled = (window.pageYOffset > 20)">
     @include('partials.impersonation-banner')
 
     @php
+        $isHome = request()->routeIs('home');
         $navVpsSpecs = $vpsSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'vps')->orderBy('sell_price', 'asc')->get();
         $navAiSpecs = $aiSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
         $navDbSpecs = $dbSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
     @endphp
 
     <!-- Enterprise Navbar -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header :class="{
+                'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs': isScrolled || mobileMenu || !{{ $isHome ? 'true' : 'false' }},
+                'bg-transparent border-transparent shadow-none': !isScrolled && !mobileMenu && {{ $isHome ? 'true' : 'false' }}
+            }"
+            class="sticky top-0 z-50 transition-all duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
@@ -275,7 +282,7 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
                                  style="display: none;">
                                 
                                 <a href="{{ route('home') }}#pricing" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
@@ -336,7 +343,7 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
                                  style="display: none;">
                                 <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
                                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilihan Paket VPS</p>
@@ -383,7 +390,7 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
                                  style="display: none;">
                                 <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
                                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Paket AI Coding &amp; Automation</p>
@@ -430,7 +437,7 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
                                  style="display: none;">
                                 <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
                                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dedicated Database VPS</p>
@@ -464,7 +471,7 @@
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('docs') ? 'w-full' : 'w-0' }}"></span>
                             </span>
                             <svg class="w-3 h-3 text-slate-400 group-hover:text-[#4A6FA5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                             </svg>
                         </a>
 
@@ -475,7 +482,7 @@
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
                             </span>
                             <svg class="w-3 h-3 text-slate-400 group-hover:text-[#4A6FA5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                             </svg>
                         </a>
 
@@ -845,8 +852,8 @@
             </div>
 
             <!-- Bottom Copyright -->
-            <div class="pt-6 border-t border-slate-800/80 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by <span class="text-slate-400 font-normal">RZ Digital Creative</span>.</p>
+            <div class="pt-6 border-t border-slate-800/80 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by RZ Digital Creative.</p>
                 <div class="flex items-center space-x-5 text-[11px]">
                     <a href="{{ route('terms') }}" class="hover:text-slate-300 transition-colors">Terms of Service</a>
                     <span>&bull;</span>
