@@ -358,7 +358,7 @@
         </div>
 
         @php
-            $aiPackages = $aiSpecs ?? \App\Models\VpsSpec::where('category', 'ai_combo')->where('is_active', true)->orderBy('sell_price', 'asc')->get();
+            $aiPackages = $aiSpecs ?? \App\Models\VpsSpec::where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
         @endphp
 
         <!-- Relative Carousel Container with Left & Right Side Buttons -->
@@ -502,7 +502,7 @@
         </div>
 
         @php
-            $dbPackages = $dbSpecs ?? \App\Models\VpsSpec::where('category', 'managed_db')->where('is_active', true)->orderBy('sell_price', 'asc')->get();
+            $dbPackages = $dbSpecs ?? \App\Models\VpsSpec::where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
         @endphp
 
         <!-- 3-Column Grid for DB Packages -->

@@ -202,7 +202,6 @@ class KatalogProduk
     public static function paket(string $slug): Collection
     {
         return VpsSpec::query()
-            ->where('is_active', true)
             ->where('category', self::ambil($slug)['kategori'])
             ->orderBy('sell_price')
             ->get();

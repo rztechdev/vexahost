@@ -34,9 +34,9 @@ use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
 Route::get('/', function () {
-    $vpsSpecs = VpsSpec::where('is_active', true)->where('category', 'vps')->orderBy('sell_price', 'asc')->get();
-    $aiSpecs = VpsSpec::where('is_active', true)->where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
-    $dbSpecs = VpsSpec::where('is_active', true)->where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
+    $vpsSpecs = VpsSpec::where('category', 'vps')->orderBy('sell_price', 'asc')->get();
+    $aiSpecs = VpsSpec::where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
+    $dbSpecs = VpsSpec::where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
     $specs = $vpsSpecs;
 
     return view('landing', compact('specs', 'vpsSpecs', 'aiSpecs', 'dbSpecs'));

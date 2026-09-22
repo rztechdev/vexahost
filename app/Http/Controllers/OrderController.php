@@ -31,10 +31,11 @@ class OrderController extends Controller
         // Harga modal disembunyikan: halaman ini mengirim data paket ke browser
         // lewat Js::from(), sehingga seluruh atribut dapat dibaca dari view-source.
         // Tidak disembunyikan di level model karena form edit paket admin membutuhkannya.
-        $specs = VpsSpec::where('is_active', true)->orderBy('sell_price', 'asc')->get()
+        $specs = VpsSpec::orderBy('sell_price', 'asc')->get()
             ->each->makeHidden(['cost_price']);
-        $selectedSpecId = $spec_id ?? $request->query('spec_id', $specs->first()->id ?? 1);
-        $selectedSpec = $specs->firstWhere('id', $selectedSpecId) ?? $specs->first();
+        $defaultSpec = $specs->firstWhere('is_active', true) ?? $specs->first();
+        $selectedSpecId = $spec_id ?? $request->query('spec_id', $defaultSpec->id ?? 1);
+        $selectedSpec = $specs->firstWhere('id', $selectedSpecId) ?? $defaultSpec;
 
         return view('order.checkout', compact('specs', 'selectedSpec'));
     }
@@ -159,6 +160,17 @@ class OrderController extends Controller
         }
 
         $spec = VpsSpec::findOrFail($validated['vps_spec_id']);
+        if (!$spec->is_active) {
+            $inactiveMessage = 'Paket layanan ini sedang dinonaktifkan sementara oleh tim VexaHost untuk pemeliharaan sistem.';
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $inactiveMessage,
+                    'errors' => ['vps_spec_id' => [$inactiveMessage]],
+                ], 422);
+            }
+            return back()->withInput()->withErrors(['vps_spec_id' => $inactiveMessage]);
+        }
+
         if (!$spec->isProviderAllowed($validated['provider'])) {
             $msg = in_array('cloudeka', $spec->allowedProviders(), true)
                 ? "Paket {$spec->name} hanya tersedia di provider Cloudeka by Lintasarta (Datacenter Indonesia)."

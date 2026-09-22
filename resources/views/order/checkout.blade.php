@@ -17,6 +17,25 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Left: Configuration Slides --}}
             <div class="lg:col-span-2">
+                {{-- Banner Peringatan: Paket Dinonaktifkan Sementara (Maintenance) --}}
+                <div x-show="isPackageInactive" @if(!$selectedSpec || $selectedSpec->is_active) x-cloak @endif
+                     class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 shadow-xs flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 class="text-sm font-bold text-amber-900">Paket Sementara Dinonaktifkan</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-200/80 text-amber-900 border border-amber-300">Maintenance</span>
+                        </div>
+                        <p class="text-xs text-amber-800 leading-relaxed">
+                            Paket layanan ini sementara waktu dinonaktifkan karena tim VexaHost sedang melakukan pemeliharaan infrastruktur hingga batas waktu yang belum dapat ditentukan. Pemesanan untuk paket ini ditangguhkan sementara.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="relative overflow-hidden">
                     {{-- Slide 1: Konfigurasi VPS (Khusus VPS biasa, dilewati untuk AI & DB) --}}
                     <div x-show="!isDirectCheckout && currentSlide === 0" x-transition:enter="transition ease-out duration-300"
@@ -304,28 +323,49 @@
 
                     {{-- Tombol Lanjut / Submit --}}
                     <div x-show="!isDirectCheckout && currentSlide === 0" class="ml-auto">
-                        <button type="button" @click="nextSlide()"
-                                class="px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-sm font-bold transition-colors">
-                            Lanjut ke Informasi Akun →
+                        <button type="button" @click="isPackageInactive ? null : nextSlide()"
+                                :disabled="isPackageInactive"
+                                :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
+                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                            <span x-show="!isPackageInactive">Lanjut ke Informasi Akun →</span>
+                            <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                Pemesanan Dikunci
+                            </span>
                         </button>
                     </div>
                     <div x-show="currentSlide === 1" class="ml-auto">
-                        <button type="button" @click="nextSlide()"
-                                class="px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-sm font-bold transition-colors">
-                            Lanjut ke Pilih Pembayaran →
+                        <button type="button" @click="isPackageInactive ? null : nextSlide()"
+                                :disabled="isPackageInactive"
+                                :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
+                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                            <span x-show="!isPackageInactive">Lanjut ke Pilih Pembayaran →</span>
+                            <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                Pemesanan Dikunci
+                            </span>
                         </button>
                     </div>
                     <div x-show="currentSlide === 2" class="ml-auto">
-                        <button type="button" @click="nextSlide()"
-                                class="px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-sm font-bold transition-colors">
-                            Lanjut ke Konfirmasi Pembayaran →
+                        <button type="button" @click="isPackageInactive ? null : nextSlide()"
+                                :disabled="isPackageInactive"
+                                :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
+                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                            <span x-show="!isPackageInactive">Lanjut ke Konfirmasi Pembayaran →</span>
+                            <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                Pemesanan Dikunci
+                            </span>
                         </button>
                     </div>
                     <div x-show="currentSlide === 3" class="ml-auto flex flex-col items-end gap-1.5">
-                        <p x-show="!termsAccepted" x-cloak class="text-xs font-semibold text-slate-500">
+                        <p x-show="!termsAccepted && !isPackageInactive" x-cloak class="text-xs font-semibold text-slate-500">
                             Centang persetujuan ketentuan untuk melanjutkan.
                         </p>
-                        <button type="button" @click="submitCheckout()" :disabled="isSubmitting || !termsAccepted"
+                        <p x-show="isPackageInactive" x-cloak class="text-xs font-semibold text-amber-600">
+                            Paket dinonaktifkan sementara untuk pemeliharaan sistem.
+                        </p>
+                        <button type="button" @click="isPackageInactive ? null : submitCheckout()" :disabled="isSubmitting || !termsAccepted || isPackageInactive"
                                 class="px-7 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm">
                             <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -334,7 +374,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : (paymentMethod === 'lynk' ? 'Bayar Sekarang via Lynk.id' : 'Bayar Sekarang')"></span>
+                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : (isPackageInactive ? 'Paket Dinonaktifkan' : (paymentMethod === 'lynk' ? 'Bayar Sekarang via Lynk.id' : 'Bayar Sekarang'))"></span>
                         </button>
                     </div>
                 </div>
@@ -618,6 +658,9 @@ function checkoutState() {
         },
         get currentSpec() {
             return this.specs[this.selectedSpec] || null;
+        },
+        get isPackageInactive() {
+            return Boolean(this.currentSpec && !this.currentSpec.is_active);
         },
         get isAiPackage() {
             const s = this.currentSpec;
@@ -948,6 +991,14 @@ function checkoutState() {
         },
         
         async nextSlide() {
+            if (this.isPackageInactive) {
+                showAlert('Paket layanan ini sedang dinonaktifkan sementara untuk pemeliharaan sistem.', {
+                    icon: 'warning',
+                    title: 'Pemesanan Ditangguhkan'
+                });
+                return;
+            }
+
             if (this.isDirectCheckout) {
                 if (this.currentSlide === 1) {
                     if (!this.vpsName || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(this.vpsName)) {
@@ -1060,6 +1111,14 @@ function checkoutState() {
         },
         
         async submitCheckout() {
+            if (this.isPackageInactive) {
+                showAlert('Paket layanan ini sedang dinonaktifkan sementara untuk pemeliharaan sistem.', {
+                    icon: 'warning',
+                    title: 'Pemesanan Ditangguhkan'
+                });
+                return;
+            }
+
             if (!this.paymentMethod) {
                 showAlert('Silakan pilih metode pembayaran terlebih dahulu');
                 return;

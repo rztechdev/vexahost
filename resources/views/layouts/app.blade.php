@@ -230,9 +230,9 @@
 
     @php
         $isHome = request()->routeIs('home');
-        $navVpsSpecs = $vpsSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'vps')->orderBy('sell_price', 'asc')->get();
-        $navAiSpecs = $aiSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
-        $navDbSpecs = $dbSpecs ?? \App\Models\VpsSpec::where('is_active', true)->where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
+        $navVpsSpecs = $vpsSpecs ?? \App\Models\VpsSpec::where('category', 'vps')->orderBy('sell_price', 'asc')->get();
+        $navAiSpecs = $aiSpecs ?? \App\Models\VpsSpec::where('category', 'ai_combo')->orderBy('sell_price', 'asc')->get();
+        $navDbSpecs = $dbSpecs ?? \App\Models\VpsSpec::where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
     @endphp
 
     <!-- Enterprise Navbar -->
