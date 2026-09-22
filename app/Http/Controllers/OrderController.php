@@ -34,10 +34,11 @@ class OrderController extends Controller
         $specs = VpsSpec::orderBy('sell_price', 'asc')->get()
             ->each->makeHidden(['cost_price']);
         $defaultSpec = $specs->firstWhere('is_active', true) ?? $specs->first();
+        $hasExplicitSpec = !empty($spec_id) || $request->has('spec_id');
         $selectedSpecId = $spec_id ?? $request->query('spec_id', $defaultSpec->id ?? 1);
         $selectedSpec = $specs->firstWhere('id', $selectedSpecId) ?? $defaultSpec;
 
-        return view('order.checkout', compact('specs', 'selectedSpec'));
+        return view('order.checkout', compact('specs', 'selectedSpec', 'hasExplicitSpec'));
     }
 
     public function quickLogin(Request $request)

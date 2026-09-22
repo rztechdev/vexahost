@@ -580,6 +580,7 @@ function checkoutState() {
         isSubmitting: false,
         // PHASE 2 - persetujuan ketentuan wajib dicentang sebelum pesanan dikirim.
         termsAccepted: false,
+        hasExplicitSpec: {{ (!empty($hasExplicitSpec)) ? 'true' : 'false' }},
         selectedSpec: {{ $selectedSpec ? $selectedSpec->id : 'null' }},
         specs: {{ Js::from($specs->keyBy('id')) }},
         billingCycle: 'monthly',
@@ -790,8 +791,15 @@ function checkoutState() {
                     this.applyAiPackageDefaults();
                 }
             } else {
+                if (this.controlPanel === 'managed_database') {
+                    this.controlPanel = 'none';
+                    this.stackType = 'none';
+                }
                 this.syncProviderWithSpec();
             }
+
+            // Segera sinkronkan draft aktif dengan paket yang sedang dibuka
+            this.saveDraft();
 
             this.$watch('selectedSpec', () => {
                 this.refreshQris();
@@ -803,6 +811,10 @@ function checkoutState() {
                         this.applyAiPackageDefaults();
                     }
                 } else {
+                    if (this.controlPanel === 'managed_database') {
+                        this.controlPanel = 'none';
+                        this.stackType = 'none';
+                    }
                     this.syncProviderWithSpec();
                 }
                 this.saveDraft();
@@ -855,18 +867,52 @@ function checkoutState() {
                 const raw = localStorage.getItem('vx_checkout_draft');
                 if (!raw) return;
                 const draft = JSON.parse(raw);
-                if (draft.selectedSpec && this.specs[draft.selectedSpec]) {
+
+                // Prioritaskan pilihan paket dari URL/tombol yang diklik user.
+                // Draft hanya boleh menimpa selectedSpec jika user membuka /checkout tanpa parameter spesifik.
+                if (!this.hasExplicitSpec && draft.selectedSpec && this.specs[draft.selectedSpec]) {
                     this.selectedSpec = draft.selectedSpec;
                 }
+
                 if (draft.billingCycle) this.billingCycle = draft.billingCycle;
                 if (draft.provider && this.canUseProvider(draft.provider)) this.provider = draft.provider;
-                if (draft.vpsName) this.vpsName = draft.vpsName;
+
+                // Pastikan draft hostname tidak tertukar antar jenis paket
+                if (draft.vpsName) {
+                    const isDraftDb = draft.vpsName.startsWith('vx-db-');
+                    const isDraftAi = draft.vpsName.startsWith('vx-ai-');
+                    if (this.isDatabasePackage && !isDraftDb) {
+                        // Biarkan generate default nama database
+                    } else if (this.isAiPackage && !isDraftAi) {
+                        // Biarkan generate default nama AI
+                    } else if (!this.isDatabasePackage && !this.isAiPackage && (isDraftDb || isDraftAi)) {
+                        // Reset jika sebelumnya draft DB/AI tapi sekarang memilih VPS biasa
+                        this.vpsName = '';
+                    } else {
+                        this.vpsName = draft.vpsName;
+                    }
+                }
+
                 if (draft.rootPassword) this.rootPassword = draft.rootPassword;
-                if (draft.controlPanel) this.controlPanel = draft.controlPanel;
+                if (draft.controlPanel && !this.isDirectCheckout) {
+                    if (draft.controlPanel === 'managed_database') {
+                        this.controlPanel = 'none';
+                        this.stackType = 'none';
+                    } else {
+                        this.controlPanel = draft.controlPanel;
+                        if (draft.controlPanel === 'none') {
+                            this.stackType = 'none';
+                        } else if (['coolify', 'dokploy', 'aapanel', 'cloudpanel', 'cyberpanel', 'hestiacp'].includes(draft.controlPanel)) {
+                            this.stackType = 'control_panel';
+                        } else {
+                            this.stackType = 'app';
+                        }
+                    }
+                }
                 if (draft.datacenter) this.datacenter = draft.datacenter;
-                if (draft.os) this.os = draft.os;
-                if (draft.dbEngine) this.dbEngine = draft.dbEngine;
-                if (draft.dbManager) this.dbManager = draft.dbManager;
+                if (draft.os && !this.isDirectCheckout) this.os = draft.os;
+                if (draft.dbEngine && this.isDatabasePackage) this.dbEngine = draft.dbEngine;
+                if (draft.dbManager && this.isDatabasePackage) this.dbManager = draft.dbManager;
                 if (draft.paymentMethod) this.paymentMethod = draft.paymentMethod;
                 if (!this.isLoggedIn) {
                     if (draft.registerFullName) this.registerFullName = draft.registerFullName;
