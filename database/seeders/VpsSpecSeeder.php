@@ -306,13 +306,26 @@ class VpsSpecSeeder extends Seeder
         ];
 
         foreach ($specs as $spec) {
-            DB::table('vps_specs')->updateOrInsert(
-                ['id' => $spec['id']],
-                array_merge($spec, [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ])
-            );
+            $existing = DB::table('vps_specs')->where('id', $spec['id'])->first();
+
+            if (! $existing) {
+                DB::table('vps_specs')->insert(
+                    array_merge($spec, [
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ])
+                );
+            } else {
+                // Jangan menimpa is_active jika paket sudah ada, agar status
+                // nonaktif yang diatur admin di database/panel tidak ter-reset saat deploy / db:seed.
+                unset($spec['is_active']);
+
+                DB::table('vps_specs')->where('id', $spec['id'])->update(
+                    array_merge($spec, [
+                        'updated_at' => now(),
+                    ])
+                );
+            }
         }
     }
 }

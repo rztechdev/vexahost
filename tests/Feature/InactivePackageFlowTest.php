@@ -166,4 +166,17 @@ class InactivePackageFlowTest extends TestCase
             'hostname' => 'vx-active-srv',
         ]);
     }
+
+    public function test_seeder_does_not_reactivate_inactive_package_on_redeploy(): void
+    {
+        $spec = VpsSpec::first();
+        $spec->update(['is_active' => false]);
+        $this->assertFalse($spec->fresh()->is_active);
+
+        // Simulate deployment command: php artisan db:seed --force
+        $this->seed(\Database\Seeders\VpsSpecSeeder::class);
+
+        // Package must still remain inactive, NOT reset to true!
+        $this->assertFalse($spec->fresh()->is_active);
+    }
 }
