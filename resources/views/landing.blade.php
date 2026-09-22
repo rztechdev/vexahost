@@ -3,10 +3,7 @@
 @section('content')
 <!-- Promo Ad Popup Banner Modal (Center, Closable) -->
 <div x-data="{
-        showPromo: false,
-        init() {
-            setTimeout(() => { this.showPromo = true; }, 500);
-        },
+        showPromo: true,
         closePromo() {
             this.showPromo = false;
         }
@@ -41,7 +38,7 @@
         <!-- Close 'X' Button (Outside Image) -->
         <button type="button"
                 @click="closePromo()"
-                class="mb-2.5 z-30 w-8 h-8 rounded-full bg-black/60 hover:bg-black text-white/90 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg backdrop-blur-xs hover:scale-105"
+                class="mb-2.5 z-30 w-8 h-8 rounded-full bg-slate-900/80 hover:bg-[#4A6FA5] text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg backdrop-blur-xs hover:scale-110 active:scale-95"
                 aria-label="Tutup Iklan">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
@@ -49,7 +46,7 @@
         </button>
 
         <!-- Pure Image Banner (Click to explore VPS pricing) -->
-        <div class="w-full bg-[#0B0F19] rounded-xl shadow-2xl overflow-hidden border border-slate-700/60">
+        <div class="w-full bg-[#0B0F19] rounded-2xl shadow-2xl overflow-hidden border-4 border-[#4A6FA5] shadow-[0_20px_50px_rgba(74,111,165,0.35)]">
             <a href="#pricing"
                @click="closePromo()"
                class="block relative w-full aspect-[800/560] overflow-hidden cursor-pointer"
@@ -69,113 +66,329 @@
     </div>
 </div>
 
-<!-- Hero Section (Clean Enterprise VPS Style) -->
-<section class="bg-white text-slate-900 pt-16 sm:pt-20 pb-12 sm:pb-16">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+<!-- Hero Section (Seamless Full-Bleed Showcase Integrated with Header) -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] -mt-16 pt-20 sm:pt-24 lg:pt-24 pb-4 sm:pb-5 border-b border-slate-200/50 min-h-screen lg:min-h-dvh flex flex-col justify-between">
 
-        <!-- Headline -->
-        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.15]">
-            Cloud VPS andal.<br class="hidden sm:inline"> Performa enterprise, harga mahasiswa.
-        </h1>
+    <!-- Ambient 3D Floating Orbs (Bokeh & Clay Depth across Full Hero Background) -->
+    <!-- Top-Left Large Orb (Extends behind Header) -->
+    <div class="pointer-events-none absolute -top-8 -left-12 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-40 filter blur-2xl"></div>
+    <!-- Top-Center Subtle Orb (Extends behind Header) -->
+    <div class="pointer-events-none absolute -top-12 left-1/3 w-48 sm:w-60 h-48 sm:h-60 rounded-full bg-gradient-to-b from-[#A5C6EE] to-transparent opacity-35 filter blur-3xl"></div>
+    <!-- Bottom-Left Orb -->
+    <div class="pointer-events-none absolute -bottom-16 left-10 w-60 sm:w-72 h-60 sm:h-72 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-45 filter blur-2xl"></div>
+    <!-- Right Orb Behind Organic Blob -->
+    <div class="pointer-events-none absolute top-1/2 -right-16 -translate-y-1/2 w-80 sm:w-96 h-80 sm:h-96 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-35 filter blur-3xl"></div>
+    <!-- Bottom-Center Orb -->
+    <div class="pointer-events-none absolute -bottom-10 right-1/3 w-52 sm:w-64 h-52 sm:h-64 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 filter blur-2xl"></div>
 
-        <!-- Subtitle -->
-        <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-            Deploy portfolio, bot Telegram 24 jam, REST API, hingga container Docker dengan akses root SSH penuh, storage NVMe SSD, dan pilihan 1-click control panel siap pakai.
-        </p>
+    <!-- Subtle Decorative Speed Slashes (Slanted Lines in Background) -->
+    <div class="pointer-events-none absolute top-20 left-1/4 w-16 sm:w-24 h-0.5 bg-white/70 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute top-1/2 left-8 w-12 sm:w-16 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute top-28 right-1/3 w-20 sm:w-28 h-0.5 bg-white/50 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute bottom-32 right-1/4 w-14 sm:w-20 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
 
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="#pricing" class="w-full sm:w-auto px-8 py-3.5 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-bold rounded-lg shadow-md transition-all hover:scale-[1.02]">
-                Pilih Paket VPS &rarr;
-            </a>
-            <a href="{{ route('docs') }}" class="w-full sm:w-auto px-6 py-3.5 border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg transition-colors">
-                Baca Dokumentasi
-            </a>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-4 sm:py-6">
+
+        <!-- 2-Column Responsive Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+
+            <!-- Left Column: Typography & Action (Cols 1-6) -->
+            <div class="lg:col-span-6 flex flex-col items-start text-left">
+
+                <!-- Main Display Headline (Bold, All Caps, Tight Tracking) -->
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-[4.75rem] font-black text-slate-900 tracking-tight leading-none uppercase">
+                    CLOUD VPS
+                </h1>
+
+                <!-- Highlight Pill Badge (Without Dash) -->
+                <div class="mt-3 sm:mt-4">
+                    <span class="inline-flex items-center px-4 py-1.5 rounded-lg bg-[#4A6FA5] text-white font-extrabold text-sm sm:text-base tracking-wider uppercase shadow-xs">
+                        LAYANAN TERBAIK
+                    </span>
+                </div>
+
+                <!-- Dynamic Editorial Subheadline (Italic) -->
+                <p class="mt-4 sm:mt-5 text-2xl sm:text-3xl lg:text-[2.05rem] xl:text-4xl italic font-semibold text-slate-800 leading-snug">
+                    Menghadirkan Solusi Kreatif &amp; Andal
+                </p>
+
+                <!-- Short Modern Body Copy -->
+                <p class="mt-3.5 sm:mt-4 text-sm sm:text-base text-slate-600 max-w-lg leading-relaxed font-normal">
+                    Solusi Cloud VPS KVM NVMe andal dengan infrastruktur enterprise kelas dunia, aktivasi cepat, dan performa tinggi untuk mendukung pertumbuhan bisnis digital Anda.
+                </p>
+
+                <!-- Single CTA Button ('Lihat Paket' with Standard Rounded-lg Corner) -->
+                <div class="mt-7 sm:mt-9">
+                    <a href="#pricing"
+                       class="inline-flex items-center justify-center px-8 sm:px-10 py-3.5 rounded-lg bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer">
+                        Lihat Paket
+                    </a>
+                </div>
+
+                <!-- Bottom-Left URL Link -->
+                <div class="mt-8 sm:mt-12">
+                    <a href="{{ route('home') }}"
+                       class="text-xs sm:text-sm font-bold text-slate-700 hover:text-[#4A6FA5] transition-colors tracking-tight">
+                        www.vexahostcloud.my.id
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Organic Fluid Blob Wave + Vector Rocket Centerpiece (Cols 7-12) -->
+            <div class="lg:col-span-6 relative flex flex-col items-center justify-center">
+
+                <!-- High-Resolution Vector Visual Art (Pure Scalable SVG) -->
+                <svg viewBox="0 0 500 560"
+                     class="w-full h-auto max-w-[400px] sm:max-w-[500px] lg:max-w-[560px] xl:max-w-[620px] mx-auto filter drop-shadow-[0_25px_40px_rgba(74,111,165,0.28)]"
+                     fill="none"
+                     xmlns="http://www.w3.org/2000/svg"
+                     role="img"
+                     aria-label="VexaHost High-Performance Cloud Rocket Launch">
+                    <defs>
+                        <!-- Organic Wave Blob Gradient -->
+                        <linearGradient id="vhBlobGrad" x1="150" y1="50" x2="450" y2="520" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#5E85BC" />
+                            <stop offset="50%" stop-color="#4A6FA5" />
+                            <stop offset="100%" stop-color="#345480" />
+                        </linearGradient>
+
+                        <!-- Rocket Fuselage Body Gradient -->
+                        <linearGradient id="vhRocketBodyGrad" x1="210" y1="150" x2="290" y2="350" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#FFFFFF" />
+                            <stop offset="35%" stop-color="#EBF1FA" />
+                            <stop offset="70%" stop-color="#D4E2F3" />
+                            <stop offset="100%" stop-color="#B8CEE8" />
+                        </linearGradient>
+
+                        <!-- Rocket 3D Right Shadow -->
+                        <linearGradient id="vhRocketShadow" x1="250" y1="150" x2="290" y2="150" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="rgba(0,0,0,0)" />
+                            <stop offset="100%" stop-color="rgba(30,50,80,0.22)" />
+                        </linearGradient>
+
+                        <!-- Left Fin Gradient -->
+                        <linearGradient id="vhFinGradLeft" x1="180" y1="280" x2="225" y2="360" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#3A5B8A" />
+                            <stop offset="100%" stop-color="#243D61" />
+                        </linearGradient>
+
+                        <!-- Right Fin Gradient -->
+                        <linearGradient id="vhFinGradRight" x1="320" y1="280" x2="275" y2="360" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#3A5B8A" />
+                            <stop offset="100%" stop-color="#243D61" />
+                        </linearGradient>
+
+                        <!-- Window Radial Glow -->
+                        <radialGradient id="vhWindowGlow" cx="50%" cy="40%" r="60%">
+                            <stop offset="0%" stop-color="#2D466E" />
+                            <stop offset="70%" stop-color="#14243B" />
+                            <stop offset="100%" stop-color="#0A1422" />
+                        </radialGradient>
+
+                        <!-- Smoke Plume Gradient -->
+                        <linearGradient id="vhSmokeGrad" x1="250" y1="360" x2="250" y2="530" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#3B5F90" stop-opacity="0.8" />
+                            <stop offset="40%" stop-color="#345480" stop-opacity="0.95" />
+                            <stop offset="100%" stop-color="#29446B" />
+                        </linearGradient>
+
+                        <!-- Thrust Engine Flame Gradient -->
+                        <linearGradient id="vhFlameGrad" x1="250" y1="355" x2="250" y2="385" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#FFFFFF" />
+                            <stop offset="35%" stop-color="#93C5FD" />
+                            <stop offset="75%" stop-color="#3B82F6" stop-opacity="0.85" />
+                            <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- 1. Background Organic Blob (Breathing / Counter-Float Parallax Animation) -->
+                    <g class="vh-blob-group">
+                        <!-- Dynamic Fluid Organic Wave Blob Backdrop (Matching Reference Shape) -->
+                        <path d="M 230,80 
+                                 C 340,65 460,110 470,220 
+                                 C 480,310 440,360 455,440 
+                                 C 468,505 400,535 340,530 
+                                 C 270,525 220,535 150,520 
+                                 C 80,505 105,430 140,370 
+                                 C 180,300 130,220 150,150 
+                                 C 168,88 190,85 230,80 Z" 
+                              fill="url(#vhBlobGrad)" />
+
+                        <!-- Inner Organic Highlight Curve for 3D Surface Depth -->
+                        <path d="M 250,95 
+                                 C 335,82 435,125 448,220 
+                                 C 458,300 422,345 435,420 
+                                 C 438,435 432,450 420,465 
+                                 C 380,400 405,300 395,225 
+                                 C 382,130 305,98 250,95 Z" 
+                              fill="white" opacity="0.12" />
+                    </g>
+
+                    <!-- 2. Ambient Flying Sparkles / Stars -->
+                    <g class="vh-sparkle pointer-events-none" style="animation-delay: 0s;">
+                        <circle cx="170" cy="220" r="2.5" fill="#FFFFFF" opacity="0.75" />
+                    </g>
+                    <g class="vh-sparkle pointer-events-none" style="animation-delay: 1.2s;">
+                        <circle cx="335" cy="175" r="3" fill="#FFFFFF" opacity="0.85" />
+                    </g>
+                    <g class="vh-sparkle pointer-events-none" style="animation-delay: 0.6s;">
+                        <circle cx="315" cy="385" r="2.2" fill="#93C5FD" opacity="0.75" />
+                    </g>
+
+                    <!-- 3. Rocket Flight Unit (Smooth Floating Up & Down + Hover Lift) -->
+                    <g class="vh-rocket-group">
+                        <g transform="translate(-37.5, -42) scale(1.15)">
+
+                        <!-- Rocket Exhaust Smoke Plume (Pulsing Thrust) -->
+                        <g class="vh-smoke-group">
+                            <path d="M 235,370 
+                                     C 230,400 215,420 220,450 
+                                     C 225,480 200,510 240,525 
+                                     C 255,530 265,515 275,510 
+                                     C 290,525 310,490 290,460 
+                                     C 275,435 270,400 265,370 Z" 
+                                  fill="url(#vhSmokeGrad)" />
+                        </g>
+
+                        <!-- Thrust Engine Flame Pulse / Energy Glow -->
+                        <g class="vh-flame-group">
+                            <ellipse cx="250" cy="365" rx="13" ry="18" fill="url(#vhFlameGrad)" filter="drop-shadow(0 0 8px rgba(96,165,250,0.85))" />
+                            <ellipse cx="250" cy="362" rx="6" ry="10" fill="#FFFFFF" opacity="0.95" />
+                        </g>
+
+                        <!-- Rocket Left Fin -->
+                        <path d="M 218,295 
+                                 C 195,310 180,345 178,368 
+                                 C 195,365 210,350 220,338 Z" 
+                              fill="url(#vhFinGradLeft)" />
+                        <path d="M 218,295 C 195,310 180,345 178,368 C 188,366 200,358 208,348 Z" fill="black" opacity="0.15" />
+
+                        <!-- Rocket Right Fin -->
+                        <path d="M 282,295 
+                                 C 305,310 320,345 322,368 
+                                 C 305,365 290,350 280,338 Z" 
+                              fill="url(#vhFinGradRight)" />
+                        <path d="M 282,295 C 305,310 320,345 322,368 C 312,366 300,358 292,348 Z" fill="black" opacity="0.2" />
+
+                        <!-- Rocket Main Fuselage Body -->
+                        <path d="M 250,150 
+                                 C 230,195 218,255 218,340 
+                                 C 232,348 268,348 282,340 
+                                 C 282,255 270,195 250,150 Z" 
+                              fill="url(#vhRocketBodyGrad)" 
+                              filter="drop-shadow(0 6px 12px rgba(0,0,0,0.18))" />
+
+                        <!-- Fuselage 3D Curvature Shadow (Right Half) -->
+                        <path d="M 250,150 
+                                 C 260,195 275,255 282,340 
+                                 C 265,345 250,345 250,345 
+                                 C 250,255 250,195 250,150 Z" 
+                              fill="url(#vhRocketShadow)" />
+
+                        <!-- Nose Cone Specular Highlight -->
+                        <path d="M 250,150 
+                                 C 246,162 242,180 240,200 
+                                 C 244,198 252,198 256,200 
+                                 C 255,180 252,162 250,150 Z" 
+                                  fill="white" opacity="0.55" />
+
+                        <!-- Upper Horizontal White Band / Stripe -->
+                        <path d="M 221,245 
+                                 C 236,252 264,252 279,245 
+                                 L 278,258 
+                                 C 263,265 237,265 222,258 Z" 
+                              fill="white" />
+
+                        <!-- Lower Horizontal White Band / Stripe -->
+                        <path d="M 218,285 
+                                 C 235,293 265,293 282,285 
+                                 L 282,298 
+                                 C 265,306 235,306 218,298 Z" 
+                              fill="white" />
+
+                        <!-- Porthole 1 (Top Circular Window) -->
+                        <circle cx="250" cy="222" r="16" fill="white" />
+                        <circle cx="250" cy="222" r="12" fill="url(#vhWindowGlow)" />
+                        <path d="M 243,215 A 8 8 0 0 1 257 215 A 8 8 0 0 0 243 215 Z" fill="white" opacity="0.45" />
+
+                        <!-- Porthole 2 (Bottom Circular Window) -->
+                        <circle cx="250" cy="268" r="16" fill="white" />
+                        <circle cx="250" cy="268" r="12" fill="url(#vhWindowGlow)" />
+                        <path d="M 243,261 A 8 8 0 0 1 257 261 A 8 8 0 0 0 243 261 Z" fill="white" opacity="0.45" />
+
+                        <!-- Rocket Bottom Engine Exhaust Nozzle -->
+                        <path d="M 238,344 
+                                 L 235,358 
+                                 C 245,362 255,362 265,358 
+                                 L 262,344 Z" 
+                              fill="#233B5E" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
         </div>
 
-        <!-- Stats Bar -->
-        <div class="mt-14 pt-10 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">Rp 80.000</p>
-                <p class="text-xs text-slate-500 mt-1">Mulai per bulan flat</p>
-            </div>
-            <div>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">Full Root</p>
-                <p class="text-xs text-slate-500 mt-1">Akses penuh ke server Anda</p>
-            </div>
-            <div>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">1–2 Jam</p>
-                <p class="text-xs text-slate-500 mt-1">Aktivasi di jam kerja setelah bayar</p>
-            </div>
-            <div>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 font-mono-code">100% ID</p>
-                <p class="text-xs text-slate-500 mt-1">Dukungan Bahasa Indonesia</p>
-            </div>
-        </div>
     </div>
-</section>
 
-<!-- RUNNING STACK & ECOSYSTEM TICKER (Hero Section) -->
-<section aria-label="Ekosistem Cloud & Stack Teknologi yang Didukung"
-         class="relative overflow-hidden bg-white py-4 sm:py-5">
-    <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
-        <!-- Track Marquee -->
-        <div class="flustra-stack-marquee relative flex-1 overflow-hidden">
-            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
-            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-white via-white/80 to-transparent"></div>
+    <!-- Integrated Running Stack & Ecosystem Marquee (Full Screen Width / Edge-to-Edge) -->
+    <div class="w-full relative z-10 mt-auto pt-5 sm:pt-6 border-t border-slate-200/50 overflow-hidden">
+        <div class="flustra-stack-marquee relative w-full overflow-hidden">
+            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 to-transparent"></div>
 
             <div class="flustra-stack-track flex w-max items-center gap-3 sm:gap-4">
-                @php
-                    $ecosystemLogos = [
-                        ['label' => 'Tencent Cloud', 'file' => 'images/logos/providers/tencent.svg'],
-                        ['label' => 'Lintasarta Cloudeka', 'file' => 'images/logos/providers/cloudeka.svg'],
-                        ['label' => 'Coolify', 'file' => 'images/logos/panels/coolify.svg'],
-                        ['label' => 'Dokploy', 'file' => 'images/logos/panels/dokploy.svg'],
-                        ['label' => 'Docker', 'file' => 'images/logos/panels/docker.svg'],
-                        ['label' => 'aaPanel', 'file' => 'images/logos/panels/aapanel.svg'],
-                        ['label' => 'CloudPanel', 'file' => 'images/logos/panels/cloudpanel.svg'],
-                        ['label' => 'CyberPanel', 'file' => 'images/logos/panels/cyberpanel.svg'],
-                        ['label' => 'HestiaCP', 'file' => 'images/logos/panels/hestiacp.svg'],
-                        ['label' => 'Ollama AI', 'file' => 'images/logos/apps/ollama.svg'],
-                        ['label' => 'AnythingLLM', 'file' => 'images/logos/apps/anythingllm.svg'],
-                        ['label' => 'LibreChat', 'file' => 'images/logos/apps/librechat.svg'],
-                        ['label' => 'n8n Automation', 'file' => 'images/logos/apps/n8n.svg'],
-                        ['label' => 'VS Code Server', 'file' => 'images/logos/apps/vscode_server.svg'],
-                        ['label' => 'Gitea', 'file' => 'images/logos/apps/gitea_forgejo.svg'],
-                        ['label' => 'Uptime Kuma', 'file' => 'images/logos/apps/uptime_kuma.svg'],
-                        ['label' => 'Netdata', 'file' => 'images/logos/apps/netdata_beszel.svg'],
-                        ['label' => 'WordPress', 'file' => 'images/logos/apps/wordpress.svg'],
-                        ['label' => 'Ghost CMS', 'file' => 'images/logos/apps/ghost.svg'],
-                        ['label' => 'Strapi', 'file' => 'images/logos/apps/strapi_directus.svg'],
-                        ['label' => 'PrestaShop', 'file' => 'images/logos/apps/prestashop_bagisto.svg'],
-                        ['label' => 'PostgreSQL', 'file' => 'images/logos/databases/postgres.svg'],
-                        ['label' => 'MySQL', 'file' => 'images/logos/databases/mysql.svg'],
-                        ['label' => 'Redis', 'file' => 'images/logos/databases/redis.svg'],
-                        ['label' => 'MongoDB', 'file' => 'images/logos/databases/mongodb.svg'],
-                        ['label' => 'Qdrant Vector DB', 'file' => 'images/logos/databases/qdrant.svg'],
-                        ['label' => 'CloudBeaver', 'file' => 'images/logos/databases/cloudbeaver.svg'],
-                        ['label' => 'OpenClaw', 'file' => 'images/logos/apps/openclaw.svg'],
-                        ['label' => 'Hermes Agent', 'file' => 'images/logos/apps/hermes_agent.svg'],
-                        ['label' => 'Agent Zero', 'file' => 'images/logos/apps/agent_zero.svg'],
-                        ['label' => '9Router', 'file' => 'images/logos/apps/9router.svg'],
-                        ['label' => 'OmniRoute', 'file' => 'images/logos/apps/omniroute.svg'],
-                    ];
-                @endphp
+                    @php
+                        $ecosystemLogos = [
+                            ['label' => 'Tencent Cloud', 'file' => 'images/logos/providers/tencent.svg'],
+                            ['label' => 'Lintasarta Cloudeka', 'file' => 'images/logos/providers/cloudeka.svg'],
+                            ['label' => 'Coolify', 'file' => 'images/logos/panels/coolify.svg'],
+                            ['label' => 'Dokploy', 'file' => 'images/logos/panels/dokploy.svg'],
+                            ['label' => 'Docker', 'file' => 'images/logos/panels/docker.svg'],
+                            ['label' => 'aaPanel', 'file' => 'images/logos/panels/aapanel.svg'],
+                            ['label' => 'CloudPanel', 'file' => 'images/logos/panels/cloudpanel.svg'],
+                            ['label' => 'CyberPanel', 'file' => 'images/logos/panels/cyberpanel.svg'],
+                            ['label' => 'HestiaCP', 'file' => 'images/logos/panels/hestiacp.svg'],
+                            ['label' => 'Ollama AI', 'file' => 'images/logos/apps/ollama.svg'],
+                            ['label' => 'AnythingLLM', 'file' => 'images/logos/apps/anythingllm.svg'],
+                            ['label' => 'LibreChat', 'file' => 'images/logos/apps/librechat.svg'],
+                            ['label' => 'n8n Automation', 'file' => 'images/logos/apps/n8n.svg'],
+                            ['label' => 'VS Code Server', 'file' => 'images/logos/apps/vscode_server.svg'],
+                            ['label' => 'Gitea', 'file' => 'images/logos/apps/gitea_forgejo.svg'],
+                            ['label' => 'Uptime Kuma', 'file' => 'images/logos/apps/uptime_kuma.svg'],
+                            ['label' => 'Netdata', 'file' => 'images/logos/apps/netdata_beszel.svg'],
+                            ['label' => 'WordPress', 'file' => 'images/logos/apps/wordpress.svg'],
+                            ['label' => 'Ghost CMS', 'file' => 'images/logos/apps/ghost.svg'],
+                            ['label' => 'Strapi', 'file' => 'images/logos/apps/strapi_directus.svg'],
+                            ['label' => 'PrestaShop', 'file' => 'images/logos/apps/prestashop_bagisto.svg'],
+                            ['label' => 'PostgreSQL', 'file' => 'images/logos/databases/postgres.svg'],
+                            ['label' => 'MySQL', 'file' => 'images/logos/databases/mysql.svg'],
+                            ['label' => 'Redis', 'file' => 'images/logos/databases/redis.svg'],
+                            ['label' => 'MongoDB', 'file' => 'images/logos/databases/mongodb.svg'],
+                            ['label' => 'Qdrant Vector DB', 'file' => 'images/logos/databases/qdrant.svg'],
+                            ['label' => 'CloudBeaver', 'file' => 'images/logos/databases/cloudbeaver.svg'],
+                            ['label' => 'OpenClaw', 'file' => 'images/logos/apps/openclaw.svg'],
+                            ['label' => 'Hermes Agent', 'file' => 'images/logos/apps/hermes_agent.svg'],
+                            ['label' => 'Agent Zero', 'file' => 'images/logos/apps/agent_zero.svg'],
+                            ['label' => '9Router', 'file' => 'images/logos/apps/9router.svg'],
+                            ['label' => 'OmniRoute', 'file' => 'images/logos/apps/omniroute.svg'],
+                        ];
+                    @endphp
 
-                @for ($i = 0; $i < 2; $i++)
-                    @foreach ($ecosystemLogos as $logo)
-                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white px-3 sm:px-3.5 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
-                             title="{{ $logo['label'] }}">
-                            <img src="{{ asset($logo['file']) }}"
-                                 alt="{{ $logo['label'] }}"
-                                 class="h-4 w-4 sm:h-5 sm:w-5 shrink-0 object-contain">
-                            <span class="text-xs font-bold text-slate-800 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
-                        </div>
-                    @endforeach
-                @endfor
+                    @for ($i = 0; $i < 2; $i++)
+                        @foreach ($ecosystemLogos as $logo)
+                            <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-white/80 bg-white/75 backdrop-blur-xs hover:bg-white px-3 sm:px-3.5 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
+                                 title="{{ $logo['label'] }}">
+                                <img src="{{ asset($logo['file']) }}"
+                                     alt="{{ $logo['label'] }}"
+                                     class="h-4 w-4 sm:h-5 sm:w-5 shrink-0 object-contain">
+                                <span class="text-xs font-bold text-slate-800 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
+                            </div>
+                        @endforeach
+                    @endfor
+                </div>
             </div>
         </div>
-    </div>
 </section>
 
 <!-- Pricing Section (3 cards prominent + 4th card peeking with side slide buttons) -->
@@ -637,12 +850,12 @@
 
 <!-- RUNNING PAYMENT METHOD TICKER (Pindah ke Bawah Database Pricing) -->
 <section aria-label="Metode Pembayaran yang Didukung"
-         class="relative overflow-hidden border-y border-slate-800 bg-[#0B0F19] py-3.5 sm:py-4">
+         class="relative overflow-hidden border-y border-slate-200/70 bg-gradient-to-r from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] py-4 sm:py-5">
     <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
         <!-- Track Marquee -->
         <div class="flustra-pay-marquee relative flex-1 overflow-hidden">
-            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
-            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 to-transparent"></div>
 
             <div class="flustra-pay-track flex w-max items-center gap-3 sm:gap-4">
                 @php
@@ -668,7 +881,7 @@
 
                 @for ($i = 0; $i < 2; $i++)
                     @foreach ($marqueePayments as $payment)
-                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-white px-3 sm:px-4 shadow-xs transition-all duration-200 hover:scale-105"
+                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center rounded-xl border border-white/80 bg-white/85 backdrop-blur-xs hover:bg-white px-3 sm:px-4 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
                              title="{{ $payment['label'] }}">
                             <img src="{{ asset('images/payments/' . $payment['file']) }}"
                                  alt="{{ $payment['label'] }}"
@@ -1375,18 +1588,25 @@
     </div>
 </section>
 
-<!-- Bottom CTA (Hostinger-inspired solid banner) -->
-<section class="py-16 bg-[#0B0F19] text-white border-b border-slate-800">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-3xl font-bold mb-3">Siap Meluncurkan Server Cloud Anda?</h2>
-        <p class="text-sm text-slate-400 max-w-lg mx-auto mb-8">
+<!-- Bottom CTA (Showcase Style Inspired by Hero) -->
+<section class="relative overflow-hidden py-16 sm:py-20 bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] border-b border-slate-200/70">
+
+    <!-- Ambient 3D Floating Orbs -->
+    <div class="pointer-events-none absolute -top-12 -left-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-35 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -right-12 w-72 h-72 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute top-8 right-1/4 w-20 h-0.5 bg-white/70 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute bottom-8 left-1/4 w-16 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-3 tracking-tight">Siap Meluncurkan Server Cloud Anda?</h2>
+        <p class="text-sm sm:text-base text-slate-600 max-w-lg mx-auto mb-8 leading-relaxed">
             Dapatkan performa server cloud andal dengan harga bersahabat. Tanpa setup fee, tanpa kontrak mengikat. Didukung penuh oleh tim VexaHost Cloud.
         </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="{{ route('checkout') }}" class="w-full sm:w-auto px-7 py-3 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-semibold rounded-lg transition-colors">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <a href="{{ route('checkout') }}" class="w-full sm:w-auto px-8 py-3.5 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
                 Pesan VPS Sekarang
             </a>
-            <a href="{{ route('login') }}" class="w-full sm:w-auto px-7 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-sm font-semibold rounded-lg transition-colors">
+            <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 text-sm font-semibold rounded-lg shadow-2xs transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
                 Masuk ke Dashboard
             </a>
         </div>
@@ -1466,7 +1686,7 @@
                         </div>
 
                         <button type="submit"
-                                class="w-full py-3 px-5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs sm:text-sm font-bold transition-colors shadow-xs">
+                                class="w-full py-3.5 px-6 rounded-lg bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 cursor-pointer">
                             Kirim Pesan Sekarang &rarr;
                         </button>
                     </form>

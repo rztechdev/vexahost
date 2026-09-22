@@ -98,3 +98,133 @@ input, select, textarea, button, a {
     .flustra-pay-track,
     .flustra-stack-track { animation: none; }
 }
+
+/* Rocket Launch & Hero Floating Animations */
+@keyframes vh-rocket-flight {
+    0% {
+        transform: translateY(0px) rotate(-1deg);
+    }
+    50% {
+        transform: translateY(-16px) rotate(1.5deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(-1deg);
+    }
+}
+
+@keyframes vh-blob-breathe {
+    0%, 100% {
+        transform: scale(1) translateY(0px);
+    }
+    50% {
+        transform: scale(1.025) translateY(6px);
+    }
+}
+
+@keyframes vh-smoke-pulse {
+    0%, 100% {
+        transform: scaleY(0.95) scaleX(0.97);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scaleY(1.08) scaleX(1.03);
+        opacity: 1;
+    }
+}
+
+@keyframes vh-flame-flicker {
+    0%, 100% {
+        transform: scaleY(0.85) scaleX(0.92);
+        opacity: 0.75;
+    }
+    50% {
+        transform: scaleY(1.22) scaleX(1.08);
+        opacity: 1;
+    }
+}
+
+.vh-rocket-group {
+    animation: vh-rocket-flight 3.8s ease-in-out infinite;
+    transform-origin: 250px 280px;
+    transform-box: view-box;
+    will-change: transform;
+    transition: transform 0.4s ease;
+}
+
+.vh-blob-group {
+    animation: vh-blob-breathe 7s ease-in-out infinite;
+    transform-origin: 250px 275px;
+    transform-box: view-box;
+    will-change: transform;
+}
+
+.vh-smoke-group {
+    animation: vh-smoke-pulse 2.2s ease-in-out infinite;
+    transform-origin: 250px 370px;
+    transform-box: view-box;
+    will-change: transform, opacity;
+}
+
+.vh-flame-group {
+    animation: vh-flame-flicker 0.4s ease-in-out infinite alternate;
+    transform-origin: 250px 355px;
+    transform-box: view-box;
+    will-change: transform, opacity;
+}
+
+@keyframes vh-sparkle-float {
+    0%, 100% {
+        transform: translateY(0px) scale(0.8);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translateY(-10px) scale(1.2);
+        opacity: 0.9;
+    }
+}
+
+.vh-sparkle {
+    animation: vh-sparkle-float 3s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes vh-float-slow {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes vh-float-delay {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+.animate-float-slow {
+    animation: vh-float-slow 4s ease-in-out infinite;
+    will-change: transform;
+}
+
+.animate-float-delay {
+    animation: vh-float-delay 4.5s ease-in-out infinite 0.75s;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vh-rocket-group,
+    .vh-blob-group,
+    .vh-smoke-group,
+    .vh-flame-group,
+    .vh-sparkle,
+    .animate-float-slow,
+    .animate-float-delay {
+        animation: none !important;
+    }
+}
+

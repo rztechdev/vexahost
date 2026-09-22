@@ -516,7 +516,7 @@
                                 </button>
                             </form>
                         @else
-                            <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors shadow-xs">
+                            <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#4A6FA5] hover:bg-[#3D5E8C] transition-colors shadow-xs">
                                 Masuk
                             </a>
                         @endauth
@@ -526,7 +526,7 @@
                 <!-- Mobile Hamburger Button -->
                 <div class="flex md:hidden items-center gap-2">
                     @guest
-                        <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-black">
+                        <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#4A6FA5] hover:bg-[#3D5E8C]">
                             Masuk
                         </a>
                     @else
@@ -644,7 +644,7 @@
                             <button type="submit" class="block w-full text-left px-3 py-2 text-sm font-medium text-rose-600">Keluar</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="block text-center py-2.5 text-sm font-bold text-white bg-black rounded-lg">Masuk</a>
+                        <a href="{{ route('login') }}" class="block text-center py-2.5 text-sm font-bold text-white bg-[#4A6FA5] hover:bg-[#3D5E8C] rounded-lg shadow-xs">Masuk</a>
                         <div class="text-center pt-1">
                             <a href="{{ route('register') }}" class="text-xs font-medium text-slate-500 hover:text-slate-800">Belum punya akun? Daftar</a>
                         </div>
@@ -755,72 +755,77 @@
 
     <!-- Enterprise 4-Column Footer -->
     @unless(request()->routeIs('checkout'))
-    <footer class="bg-[#0B0F19] text-slate-400 pt-16 pb-12 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] text-slate-600 pt-16 pb-12 border-t border-slate-200/70">
+
+        <!-- Ambient 3D Floating Orbs for Footer -->
+        <div class="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-30 filter blur-3xl"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
 
                 <!-- Column 1: Brand & Identity -->
                 <div class="lg:col-span-2 space-y-4">
                     <div class="flex items-center space-x-3">
                         <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-9 w-auto object-contain">
-                        <span class="text-xl font-bold tracking-tight text-white">Vexa<span class="text-[#6588BC]">Host</span></span>
+                        <span class="text-xl font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
                     </div>
-                    <p class="text-sm leading-relaxed text-slate-400 max-w-sm">
+                    <p class="text-sm leading-relaxed text-slate-600 max-w-sm">
                         Platform cloud VPS KVM di Indonesia dengan akses root penuh, storage NVMe SSD, dan kemudahan 1-click control panel.
                     </p>
-                    <div class="space-y-1 text-xs text-slate-400">
-                        <p class="text-slate-400 font-normal">Created by <span class="text-slate-300 font-normal">RZ Digital Creative</span></p>
+                    <div class="space-y-1 text-xs text-slate-500">
+                        <p class="text-slate-500 font-normal">Created by <span class="text-slate-800 font-medium">RZ Digital Creative</span></p>
                         <p>Infrastruktur: Tencent Cloud &amp; Lintasarta Cloudeka (Jakarta &amp; Singapore)</p>
                     </div>
                 </div>
 
                 <!-- Column 2: PRODUK -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Produk Cloud</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Produk Cloud</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Cloud VPS KVM</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Student Basic (Rp 80rb)</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Mahasiswa Basic (Rp 90rb)</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">Standard Production</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="hover:text-white transition-colors">AI &amp; Automation Stack</a></li>
-                        <li><span class="text-slate-500">Managed VPS (Segera)</span></li>
-                        <li><span class="text-slate-500">Bare Metal Server (Segera)</span></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Cloud VPS KVM</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Student Basic (Rp 80rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Mahasiswa Basic (Rp 90rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Standard Production</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">AI &amp; Automation Stack</a></li>
+                        <li><span class="text-slate-400">Managed VPS (Segera)</span></li>
+                        <li><span class="text-slate-400">Bare Metal Server (Segera)</span></li>
                     </ul>
                 </div>
 
                 <!-- Column 3: DUKUNGAN & DOKUMENTASI -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Dukungan</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Dukungan</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('docs') }}" class="hover:text-white transition-colors">Dokumentasi Hub</a></li>
-                        <li><a href="{{ route('status') }}" class="hover:text-white transition-colors flex items-center gap-1.5">
+                        <li><a href="{{ route('docs') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Dokumentasi Hub</a></li>
+                        <li><a href="{{ route('status') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors flex items-center gap-1.5">
                             <span>Status Sistem</span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         </a></li>
-                        <li><a href="{{ route('docs.kelompok', 'keamanan') }}" class="hover:text-white transition-colors">Panduan SSH &amp; Security</a></li>
-                        <li><a href="{{ route('docs.kelompok', 'control-panel') }}" class="hover:text-white transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
-                        <li><a href="{{ route('home') }}#faq" class="hover:text-white transition-colors">Pertanyaan Umum (FAQ)</a></li>
-                        <li><a href="{{ route('home') }}#kontak" class="hover:text-white transition-colors">Kontak Dukungan</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'keamanan') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Panduan SSH &amp; Security</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'control-panel') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Pertanyaan Umum (FAQ)</a></li>
+                        <li><a href="{{ route('home') }}#kontak" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kontak Dukungan</a></li>
                     </ul>
                 </div>
 
                 <!-- Column 4: LEGAL & KEBIJAKAN -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Legal &amp; Kebijakan</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Legal &amp; Kebijakan</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('terms') }}" class="hover:text-white transition-colors">Ketentuan Layanan (ToS)</a></li>
-                        <li><a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Kebijakan Privasi</a></li>
-                        <li><a href="{{ route('refund') }}" class="hover:text-white transition-colors">Kebijakan Refund</a></li>
-                        <li><a href="{{ route('terms') }}#aup" class="hover:text-white transition-colors">Acceptable Use (AUP)</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Ketentuan Layanan (ToS)</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="{{ route('refund') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kebijakan Refund</a></li>
+                        <li><a href="{{ route('terms') }}#aup" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Acceptable Use (AUP)</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Payment Methods Banner -->
-            <div class="pt-8 pb-8 border-t border-slate-800">
+            <div class="pt-8 pb-8 border-t border-slate-200/80">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div>
-                        <p class="text-xs font-semibold text-slate-300">Metode Pembayaran Resmi</p>
+                        <p class="text-xs font-semibold text-slate-800">Metode Pembayaran Resmi</p>
                         <p class="text-[11px] text-slate-500">Mendukung otomatisasi instan QRIS, Virtual Account Bank, &amp; Toko Shopee</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
@@ -839,7 +844,7 @@
                             ];
                         @endphp
                         @foreach ($footerPayments as $pay)
-                            <div class="flex h-7 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-white px-2 shadow-2xs"
+                            <div class="flex h-7 shrink-0 items-center justify-center rounded-lg border border-white/80 bg-white/85 backdrop-blur-xs px-2 shadow-2xs hover:bg-white transition-all"
                                  title="{{ $pay['label'] }}">
                                 <img src="{{ asset('images/payments/' . $pay['file']) }}"
                                      alt="{{ $pay['label'] }}"
@@ -852,14 +857,14 @@
             </div>
 
             <!-- Bottom Copyright -->
-            <div class="pt-6 border-t border-slate-800/80 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="pt-6 border-t border-slate-200/80 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by RZ Digital Creative.</p>
                 <div class="flex items-center space-x-5 text-[11px]">
-                    <a href="{{ route('terms') }}" class="hover:text-slate-300 transition-colors">Terms of Service</a>
+                    <a href="{{ route('terms') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Terms of Service</a>
                     <span>&bull;</span>
-                    <a href="{{ route('privacy') }}" class="hover:text-slate-300 transition-colors">Privacy Policy</a>
+                    <a href="{{ route('privacy') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Privacy Policy</a>
                     <span>&bull;</span>
-                    <a href="{{ route('refund') }}" class="hover:text-slate-300 transition-colors">Refund Policy</a>
+                    <a href="{{ route('refund') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Refund Policy</a>
                 </div>
             </div>
         </div>

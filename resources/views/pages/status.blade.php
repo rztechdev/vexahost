@@ -22,24 +22,28 @@
 <div class="bg-slate-50 min-h-screen pb-20">
 
     <!-- Hero Header Banner -->
-    <section class="bg-[#0B0F19] text-white border-b border-slate-800 pt-12 pb-14 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
-             style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;"></div>
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] border-b border-slate-200/70 pt-10 sm:pt-12 pb-12 sm:pb-14">
+
+        <!-- Ambient 3D Floating Orbs -->
+        <div class="pointer-events-none absolute -top-10 -left-10 w-64 h-64 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-35 filter blur-2xl"></div>
+        <div class="pointer-events-none absolute -bottom-12 -right-10 w-72 h-72 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 filter blur-2xl"></div>
+        <div class="pointer-events-none absolute top-6 right-1/4 w-20 h-0.5 bg-white/70 rotate-[-40deg] rounded-full"></div>
+        <div class="pointer-events-none absolute bottom-6 left-1/4 w-16 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
 
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
-            <nav class="flex items-center space-x-2 text-xs text-slate-400 mb-6 font-mono-code">
-                <a href="{{ route('home') }}" class="hover:text-white transition-colors">Beranda</a>
-                <span class="text-slate-600">/</span>
-                <span class="text-[#6588BC]">Status Layanan</span>
+            <nav class="flex items-center space-x-2 text-xs text-slate-500 mb-6 font-mono-code">
+                <a href="{{ route('home') }}" class="hover:text-[#4A6FA5] transition-colors">Beranda</a>
+                <span class="text-slate-400">/</span>
+                <span class="text-[#4A6FA5] font-semibold">Status Layanan</span>
             </nav>
 
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900">
                         Status Layanan VexaHost
                     </h1>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
+                    <p class="text-slate-600 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
                         Keadaan terkini komponen layanan dan jadwal pemeliharaan. Status diperbarui oleh tim VexaHost.
                     </p>
                 </div>
@@ -47,23 +51,30 @@
                 <!-- Ringkasan status keseluruhan -->
                 <div class="shrink-0">
                     @if(!($allOperational ?? true) || ($globalMaintenance ?? false))
-                        <div class="inline-flex items-center gap-3.5 px-5 py-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400">
-                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-sky-500 shrink-0"></span>
-                            <div class="text-sm font-bold text-sky-300 tracking-wide">
+                        <div class="inline-flex items-center gap-3 px-4.5 py-3 rounded-xl bg-white/85 backdrop-blur-xs border border-amber-300/80 text-amber-800 shadow-2xs">
+                            <span class="relative flex h-3 w-3 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                            </span>
+                            <div class="text-xs sm:text-sm font-bold text-amber-800 tracking-tight">
                                 {{ ($globalMaintenance ?? false) ? 'Sistem Dalam Pemeliharaan' : 'Sebagian Layanan Terganggu' }}
                             </div>
                         </div>
                     @else
-                        <div class="inline-flex items-center gap-3.5 px-5 py-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 shrink-0"></span>
-                            <div class="text-sm font-bold text-emerald-300 tracking-wide">Semua Sistem Beroperasi Normal</div>
+                        <div class="inline-flex items-center gap-3 px-4.5 py-3 rounded-xl bg-white/85 backdrop-blur-xs border border-emerald-300/80 text-emerald-800 shadow-2xs">
+                            <span class="relative flex h-3 w-3 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                            <div class="text-xs sm:text-sm font-bold text-emerald-800 tracking-tight">Semua Sistem Beroperasi Normal</div>
                         </div>
                     @endif
                 </div>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-slate-800/80 text-[11px] text-slate-400 font-mono-code">
-                Zona Waktu: Asia/Jakarta (WIB) &bull; UTC+7
+            <div class="mt-8 pt-5 border-t border-slate-200/70 text-[11px] text-slate-500 font-mono-code flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Zona Waktu: Asia/Jakarta (WIB) &bull; UTC+7</span>
             </div>
         </div>
     </section>
@@ -161,7 +172,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
                     <a href="{{ auth()->check() ? route('dashboard.support') : route('home') . '#kontak' }}"
-                       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-colors">
+                       class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
                         Buka Tiket Bantuan
                     </a>
                     <a href="{{ route('docs') }}"

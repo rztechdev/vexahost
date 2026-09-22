@@ -9,54 +9,154 @@
     $avatar = old('avatar', $googlePrefill['avatar'] ?? '');
 @endphp
 
-<div class="h-screen w-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-white">
+<div class="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC] p-3 sm:p-4 lg:p-5 xl:p-6 overflow-y-auto lg:overflow-hidden">
 
-    <!-- Left Column: Black Enterprise Branding (60% width) -->
-    <div class="hidden lg:flex lg:w-3/5 bg-black text-white p-8 xl:p-14 flex-col justify-between relative overflow-hidden h-full select-none border-r border-neutral-800">
-        <!-- Ambient Grid Background Pattern -->
-        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
-             style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;"></div>
+    <!-- Left Column: Midtrans-style Floating Card (Prominent Wide Card, rocket-focused) -->
+    <div class="hidden lg:flex lg:w-[48%] xl:w-[48%] 2xl:w-[48%] rounded-[2rem] bg-gradient-to-br from-[#1E3B66] via-[#2A5086] to-[#142846] text-white p-6 xl:p-10 flex-col items-center justify-center relative overflow-hidden shadow-2xl border border-slate-700/30 select-none">
+        <!-- Ambient 3D Glowing Orbs -->
+        <div class="pointer-events-none absolute -top-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-20 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-12 -translate-y-1/2 w-64 h-64 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-20 filter blur-3xl"></div>
 
-        <!-- Left Top: Logo only (Badge removed) -->
-        <div class="relative z-10 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
-                <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-8 w-auto object-contain">
-                <span class="text-xl font-bold tracking-tight text-white">Vexa<span class="text-[#6588BC]">Host</span></span>
-            </a>
-        </div>
-
-        <!-- Left Center: Giant Massive Typography (Pure White, Full Width) -->
-        <div class="relative z-10 my-auto w-full">
-            <h2 class="text-4xl sm:text-5xl lg:text-[2.75rem] xl:text-[3.5rem] 2xl:text-[4.25rem] font-black tracking-tight text-white leading-[1.08] space-y-1 sm:space-y-2">
-                <span class="block">Infrastruktur Cloud</span>
-                <span class="block">VPS Cepat,</span>
-                <span class="block">Andal, &amp; Transparan.</span>
+        <!-- Headline above rocket -->
+        <div class="relative z-10 text-center mb-4 sm:mb-6 px-4">
+            <h2 class="text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-md uppercase">
+                CLOUD VPS
             </h2>
+            <p class="text-xl sm:text-2xl xl:text-3xl 2xl:text-4xl font-black tracking-tight text-white leading-tight drop-shadow-md mt-2 sm:mt-3 uppercase">
+                PERFORMA ENTERPRISE HARGA MAHASISWA
+            </p>
         </div>
 
-        <!-- Left Bottom: Spacer to maintain flex justify-between -->
-        <div class="relative z-10"></div>
+        <!-- Centerpiece: Animated Rocket Art (Enlarged) -->
+        <div class="relative z-10 w-full flex items-center justify-center py-2">
+
+            <!-- Vector Rocket Art with Animations (Adapted from Hero) -->
+            <svg viewBox="0 0 500 520"
+                 class="w-full h-auto max-w-[320px] lg:max-w-[360px] xl:max-w-[420px] 2xl:max-w-[460px] mx-auto filter drop-shadow-[0_25px_45px_rgba(0,0,0,0.4)]"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+                 role="img">
+                <defs>
+                    <linearGradient id="vhBlobGradAuthReg" x1="150" y1="50" x2="450" y2="520" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#4A6FA5" />
+                        <stop offset="50%" stop-color="#3A5D8E" />
+                        <stop offset="100%" stop-color="#233E65" />
+                    </linearGradient>
+
+                    <linearGradient id="vhRocketBodyGradAuthReg" x1="210" y1="150" x2="290" y2="350" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#FFFFFF" />
+                        <stop offset="35%" stop-color="#F0F4FA" />
+                        <stop offset="70%" stop-color="#DCE6F5" />
+                        <stop offset="100%" stop-color="#C2D6EE" />
+                    </linearGradient>
+
+                    <linearGradient id="vhRocketShadowAuthReg" x1="250" y1="150" x2="290" y2="150" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="rgba(0,0,0,0)" />
+                        <stop offset="100%" stop-color="rgba(20,40,70,0.25)" />
+                    </linearGradient>
+
+                    <linearGradient id="vhFinGradLeftAuthReg" x1="180" y1="280" x2="225" y2="360" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#3A5B8A" />
+                        <stop offset="100%" stop-color="#1E3658" />
+                    </linearGradient>
+
+                    <linearGradient id="vhFinGradRightAuthReg" x1="320" y1="280" x2="275" y2="360" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#3A5B8A" />
+                        <stop offset="100%" stop-color="#1E3658" />
+                    </linearGradient>
+
+                    <radialGradient id="vhWindowGlowAuthReg" cx="50%" cy="40%" r="60%">
+                        <stop offset="0%" stop-color="#2D466E" />
+                        <stop offset="70%" stop-color="#14243B" />
+                        <stop offset="100%" stop-color="#0A1422" />
+                    </radialGradient>
+
+                    <linearGradient id="vhSmokeGradAuthReg" x1="250" y1="360" x2="250" y2="530" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#3B5F90" stop-opacity="0.8" />
+                        <stop offset="40%" stop-color="#2D4C75" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#1A3353" />
+                    </linearGradient>
+
+                    <linearGradient id="vhFlameGradAuthReg" x1="250" y1="355" x2="250" y2="385" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#FFFFFF" />
+                        <stop offset="35%" stop-color="#93C5FD" />
+                        <stop offset="75%" stop-color="#3B82F6" stop-opacity="0.85" />
+                        <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <!-- 1. Background Blob (Breathing Parallax) -->
+                <g class="vh-blob-group">
+                    <path d="M 230,80 C 340,65 460,110 470,220 C 480,310 440,360 455,440 C 468,505 400,535 340,530 C 270,525 220,535 150,520 C 80,505 105,430 140,370 C 180,300 130,220 150,150 C 168,88 190,85 230,80 Z" fill="url(#vhBlobGradAuthReg)" />
+                    <path d="M 250,95 C 335,82 435,125 448,220 C 458,300 422,345 435,420 C 438,435 432,450 420,465 C 380,400 405,300 395,225 C 382,130 305,98 250,95 Z" fill="white" opacity="0.12" />
+                </g>
+
+                <!-- 2. Sparkles -->
+                <g class="vh-sparkle pointer-events-none" style="animation-delay: 0s;">
+                    <circle cx="170" cy="220" r="2.5" fill="#FFFFFF" opacity="0.75" />
+                </g>
+                <g class="vh-sparkle pointer-events-none" style="animation-delay: 1.2s;">
+                    <circle cx="335" cy="175" r="3" fill="#FFFFFF" opacity="0.85" />
+                </g>
+
+                <!-- 3. Rocket Flight Unit -->
+                <g class="vh-rocket-group">
+                    <g class="vh-smoke-group">
+                        <path d="M 235,370 C 230,400 215,420 220,450 C 225,480 200,510 240,525 C 255,530 265,515 275,510 C 290,525 310,490 290,460 C 275,435 270,400 265,370 Z" fill="url(#vhSmokeGradAuthReg)" />
+                    </g>
+
+                    <g class="vh-flame-group">
+                        <ellipse cx="250" cy="365" rx="13" ry="18" fill="url(#vhFlameGradAuthReg)" filter="drop-shadow(0 0 8px rgba(96,165,250,0.85))" />
+                        <ellipse cx="250" cy="362" rx="6" ry="10" fill="#FFFFFF" opacity="0.95" />
+                    </g>
+
+                    <!-- Left Fin -->
+                    <path d="M 218,295 C 195,310 180,345 178,368 C 195,365 210,350 220,338 Z" fill="url(#vhFinGradLeftAuthReg)" />
+                    <!-- Right Fin -->
+                    <path d="M 282,295 C 305,310 320,345 322,368 C 305,365 290,350 280,338 Z" fill="url(#vhFinGradRightAuthReg)" />
+                    <!-- Fuselage Body -->
+                    <path d="M 250,150 C 230,195 218,255 218,340 C 232,348 268,348 282,340 C 282,255 270,195 250,150 Z" fill="url(#vhRocketBodyGradAuthReg)" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.18))" />
+                    <path d="M 250,150 C 260,195 275,255 282,340 C 265,345 250,345 250,345 C 250,255 250,195 250,150 Z" fill="url(#vhRocketShadowAuthReg)" />
+                    <path d="M 250,150 C 246,162 242,180 240,200 C 244,198 252,198 256,200 C 255,180 252,162 250,150 Z" fill="white" opacity="0.55" />
+
+                    <!-- Stripes -->
+                    <path d="M 221,245 C 236,252 264,252 279,245 L 278,258 C 263,265 237,265 222,258 Z" fill="white" />
+                    <path d="M 218,285 C 235,293 265,293 282,285 L 282,298 C 265,306 235,306 218,298 Z" fill="white" />
+
+                    <!-- Portholes -->
+                    <circle cx="250" cy="222" r="16" fill="white" />
+                    <circle cx="250" cy="222" r="12" fill="url(#vhWindowGlowAuthReg)" />
+                    <path d="M 243,215 A 8 8 0 0 1 257 215 A 8 8 0 0 0 243 215 Z" fill="white" opacity="0.45" />
+
+                    <circle cx="250" cy="268" r="16" fill="white" />
+                    <circle cx="250" cy="268" r="12" fill="url(#vhWindowGlowAuthReg)" />
+                    <path d="M 243,261 A 8 8 0 0 1 257 261 A 8 8 0 0 0 243 261 Z" fill="white" opacity="0.45" />
+
+                    <!-- Nozzle -->
+                    <path d="M 238,344 L 235,358 C 245,362 255,362 265,358 L 262,344 Z" fill="#233B5E" />
+                </g>
+            </svg>
+        </div>
     </div>
 
-    <!-- Right Column: Registration Form (40% width) -->
-    <div class="w-full lg:w-2/5 bg-white px-6 py-6 sm:px-8 lg:px-8 xl:px-12 flex flex-col justify-between h-full overflow-y-auto">
+    <!-- Right Column: Registration Form -->
+    <div class="w-full lg:w-[52%] xl:w-[52%] 2xl:w-[52%] flex flex-col justify-between px-6 py-4 sm:px-10 lg:px-8 xl:px-12 h-full overflow-y-auto">
 
-        <!-- Mobile Top Brand Bar (Hidden on desktop) -->
-        <div class="lg:hidden flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
-                <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-7 w-auto object-contain">
-                <span class="text-lg font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+        <!-- Top Header: Logo VexaHost centered & aligned with top of the card -->
+        <div class="flex justify-center pt-2 sm:pt-3 xl:pt-4 shrink-0">
+            <a href="{{ route('home') }}" class="inline-flex items-center gap-3 group">
+                <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105">
+                <span class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
             </a>
-            <a href="{{ route('home') }}" class="text-xs text-slate-500 hover:text-slate-900 font-medium">Beranda</a>
         </div>
 
-        <!-- Center: Form Box -->
-        <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto my-auto py-2">
+        <!-- Center: Form Box (Compact & Clean Size) -->
+        <div class="w-full max-w-[460px] sm:max-w-[490px] mx-auto my-auto py-2">
 
-            <!-- Title & Subtitle -->
-            <div class="mb-3.5 text-left">
+            <!-- Title -->
+            <div class="mb-4 text-center">
                 <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Buat Akun Baru</h1>
-                <p class="text-xs text-slate-500 mt-1">Mulai deploy server VPS KVM berkinerja tinggi dalam hitungan menit</p>
             </div>
 
             <!-- Flash Alerts -->
@@ -85,7 +185,7 @@
 
             <!-- Google OAuth Button -->
             <a href="{{ route('auth.google') }}"
-               class="w-full flex items-center justify-center gap-2.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold border border-slate-300 rounded-lg shadow-2xs transition-all">
+               class="w-full flex items-center justify-center gap-2.5 px-4 py-2 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold border border-slate-300 rounded-lg shadow-2xs hover:shadow-xs transition-all">
                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
                     <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.4 7.34 24 12 24z"/>
@@ -96,17 +196,17 @@
             </a>
 
             <!-- Divider -->
-            <div class="relative my-2.5">
+            <div class="relative my-3 sm:my-3.5">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t border-slate-200"></div>
                 </div>
                 <div class="relative flex justify-center text-xs uppercase tracking-wider">
-                    <span class="bg-white px-2 text-slate-400 font-medium text-[10px]">atau lengkapi formulir pendaftaran</span>
+                    <span class="bg-[#F8FAFC] px-2.5 text-slate-400 font-medium text-[11px]">atau lengkapi formulir pendaftaran</span>
                 </div>
             </div>
 
             <!-- Register Form with Alpine State -->
-            <form action="{{ route('register') }}" method="POST" class="space-y-2.5 text-xs sm:text-sm"
+            <form action="{{ route('register') }}" method="POST" class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm"
                   x-data="{
                       password: '',
                       confirmPassword: '',
@@ -155,7 +255,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                     <!-- Col 1: Nama Lengkap -->
                     <div>
-                        <label for="full_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Lengkap *</label>
+                        <label for="full_name" class="block text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Lengkap *</label>
                         <input type="text" id="full_name" name="full_name" required autofocus value="{{ $prefilledName }}"
                                placeholder="Nama lengkap Anda"
                                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4A6FA5] focus:bg-white transition-all text-xs sm:text-sm">
@@ -163,7 +263,7 @@
 
                     <!-- Col 2: Username -->
                     <div>
-                        <label for="username" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username *</label>
+                        <label for="username" class="block text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username *</label>
                         <input type="text" id="username" name="username" required value="{{ old('username') }}"
                                placeholder="contoh: daffa_dev"
                                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4A6FA5] focus:bg-white transition-all text-xs sm:text-sm">
@@ -172,7 +272,7 @@
                     <!-- Col 3: Email -->
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label for="email" class="text-xs font-bold text-slate-700 uppercase tracking-wider">Alamat Email *</label>
+                            <label for="email" class="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">Alamat Email *</label>
                             @if($googleId)
                                 <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                                     Google Terverifikasi
@@ -186,7 +286,7 @@
 
                     <!-- Col 4: Phone / WA -->
                     <div>
-                        <label for="phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nomor WhatsApp <span class="text-slate-400 font-normal lowercase">(opsional)</span></label>
+                        <label for="phone" class="block text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nomor WhatsApp <span class="text-slate-400 font-normal lowercase">(opsional)</span></label>
                         <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
                                placeholder="081234567890"
                                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4A6FA5] focus:bg-white transition-all text-xs sm:text-sm">
@@ -195,7 +295,7 @@
                     <!-- Col 5: Password with Strongmeter & Eye Toggle -->
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label for="password" class="text-xs font-bold text-slate-700 uppercase tracking-wider">Password *</label>
+                            <label for="password" class="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">Password *</label>
                             <span class="text-[10px] font-semibold" :class="labelColor" x-text="label">Belum diisi</span>
                         </div>
                         <div class="relative">
@@ -233,7 +333,7 @@
                     <!-- Col 6: Confirm Password with Eye Toggle -->
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label for="password_confirmation" class="text-xs font-bold text-slate-700 uppercase tracking-wider">Konfirmasi Password *</label>
+                            <label for="password_confirmation" class="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">Konfirmasi Password *</label>
                             <template x-if="confirmPassword">
                                 <span class="text-[10px] font-semibold"
                                       :class="password === confirmPassword ? 'text-emerald-600' : 'text-rose-600'"
@@ -262,7 +362,7 @@
                 </div>
 
                 <!-- Password Requirement Checklist (Compact) -->
-                <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] text-slate-500 pt-0.5">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[11px] text-slate-500 pt-0.5">
                     <span class="flex items-center gap-1" :class="hasLength ? 'text-emerald-600 font-semibold' : ''">
                         <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         Min. 8 karakter
@@ -294,7 +394,7 @@
                                oninvalid="this.setCustomValidity('Wajib menyetujui Ketentuan Layanan dan Kebijakan Privasi untuk mendaftar.')"
                                oninput="this.setCustomValidity('')"
                                class="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-[#4A6FA5] focus:ring-[#4A6FA5] focus:ring-offset-0 cursor-pointer shrink-0">
-                        <span class="text-[11px] leading-snug text-slate-600 group-hover:text-slate-900 transition-colors">
+                        <span class="text-[11px] sm:text-xs leading-snug text-slate-600 group-hover:text-slate-900 transition-colors">
                             Saya menyetujui
                             <a href="{{ route('terms') }}" target="_blank" class="font-semibold text-slate-900 hover:text-[#4A6FA5] underline underline-offset-2">Ketentuan Layanan</a>
                             &amp;
@@ -309,19 +409,19 @@
 
                 <div class="pt-0.5">
                     <button type="submit"
-                            class="w-full py-2 bg-black hover:bg-neutral-800 text-white text-xs sm:text-sm font-bold rounded-lg transition-colors shadow-2xs cursor-pointer">
+                            class="w-full py-2.5 sm:py-3 bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-xs sm:text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 cursor-pointer">
                         Buat Akun Sekarang
                     </button>
                 </div>
             </form>
 
-            <p class="mt-3 text-center text-xs text-slate-600">
+            <p class="mt-3.5 text-center text-xs text-slate-600">
                 Sudah memiliki akun?
                 <a href="{{ route('login') }}" class="font-bold text-slate-900 hover:text-[#4A6FA5] transition-colors">Masuk ke Akun</a>
             </p>
 
             <!-- Back to Dashboard / Home Button -->
-            <div class="mt-2.5 pt-2.5 border-t border-slate-100 text-center">
+            <div class="mt-3 pt-2.5 border-t border-slate-100 text-center">
                 <a href="{{ auth()->check() ? route('dashboard.index') : route('home') }}"
                    class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -332,7 +432,7 @@
         </div>
 
         <!-- Right Bottom: Copyright Footer -->
-        <div class="pt-3 border-t border-slate-100 text-center text-[11px] text-slate-400 font-normal shrink-0">
+        <div class="pt-3 border-t border-slate-100 text-center text-xs text-slate-400 font-normal shrink-0">
             &copy; 2026 VexaHost. All rights reserved. Created by RZ Digital Creative.
         </div>
 
