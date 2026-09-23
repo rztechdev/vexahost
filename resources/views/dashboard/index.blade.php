@@ -130,7 +130,7 @@
                 </div>
                 
                 <div class="flex gap-3">
-                    <a href="{{ route('order.payment', $order->id) }}" 
+                    <a href="{{ \App\Models\PaymentGateway::isMidtransMethod($order->payment_method) ? route('order.payment.status', $order->id) : route('order.payment', $order->id) }}" 
                        class="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm text-center transition-colors">
                         Selesaikan Pembayaran
                     </a>

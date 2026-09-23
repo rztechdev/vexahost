@@ -50,6 +50,29 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
+        // Cek sinkronisasi real-time ke Midtrans untuk pesanan unpaid yang memakai Midtrans
+        $hasSyncedMidtrans = false;
+        foreach ($unpaidOrders as $unpaidOrder) {
+            if (\App\Models\PaymentGateway::isMidtransMethod($unpaidOrder->payment_method)) {
+                $syncRes = \App\Services\Payments\MidtransService::checkAndSyncStatus($unpaidOrder);
+                if (!empty($syncRes['success'])) {
+                    $hasSyncedMidtrans = true;
+                }
+            }
+        }
+
+        // Jika ada yang terverifikasi lunas, refresh query unpaid orders
+        if ($hasSyncedMidtrans) {
+            $unpaidOrders = Order::where(function ($q) use ($organizationId, $user) {
+                    $q->where('organization_id', $organizationId)
+                      ->orWhere('customer_id', $user->id);
+                })
+                ->whereNull('paid_at')
+                ->with(['vpsSpec', 'invoice'])
+                ->latest()
+                ->get();
+        }
+
         // Orders yang sudah dibayar dan sedang dalam antrean/proses setup server oleh admin VexaHost
         $provisioningOrders = Order::where(function ($q) use ($organizationId, $user) {
                 $q->where('organization_id', $organizationId)

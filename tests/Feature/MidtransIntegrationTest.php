@@ -173,9 +173,11 @@ class MidtransIntegrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer)->get("/order/payment/{$order->id}");
+        $response->assertRedirect(route('order.payment.status', $order->id));
 
-        $response->assertStatus(200);
-        $response->assertSee('mock-token-page-test');
+        $statusResponse = $this->actingAs($customer)->get(route('order.payment.status', $order->id));
+        $statusResponse->assertStatus(200);
+        $statusResponse->assertSee('mock-token-page-test');
     }
 
     public function test_checkout_with_midtrans_snap_returns_snap_token_and_redirect_url(): void

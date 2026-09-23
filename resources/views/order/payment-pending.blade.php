@@ -50,24 +50,27 @@
 
             {{-- Info block --}}
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800 mb-6">
-                <p class="font-semibold mb-1">Cara kerja konfirmasi:</p>
-                <ol class="list-decimal list-inside space-y-1 text-blue-700 text-xs">
-                    <li>Anda melakukan pembayaran di aplikasi bank / e-wallet.</li>
-                    <li>Payment gateway mengirim notifikasi (webhook) ke server VexaHost.</li>
-                    <li>Sistem memverifikasi signature webhook.</li>
-                    <li>Status order otomatis berubah ke <b>Paid</b>.</li>
-                    <li>Halaman ini otomatis redirect ke halaman sukses.</li>
-                </ol>
+                <p class="font-semibold mb-1">Status Pembayaran Otomatis:</p>
+                <p class="text-blue-700 text-xs leading-relaxed">
+                    Sistem secara berkala memverifikasi pembayaran Anda langsung ke payment gateway resmi Midtrans. Begitu pembayaran selesai di aplikasi Anda, halaman ini akan otomatis dialihkan ke halaman konfirmasi pesanan lunas.
+                </p>
             </div>
 
             {{-- Actions --}}
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="{{ route('order.payment', $order->id) }}"
-                   class="px-6 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-sm text-center">
-                    Kembali ke Instruksi Pembayaran
-                </a>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <button type="button" @click="poll(true)" :disabled="isChecking"
+                   class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white font-semibold text-sm text-center transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50">
+                    <svg x-show="isChecking" class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span x-text="isChecking ? 'Memeriksa ke Gateway...' : 'Cek Status Pembayaran Sekarang'"></span>
+                </button>
+                @if(!empty($snapToken))
+                    <button type="button" @click="reopenPayment()"
+                       class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold text-sm text-center transition-colors">
+                        Buka Ulang Jendela Pembayaran
+                    </button>
+                @endif
                 <a href="{{ route('dashboard.index') }}"
-                   class="px-6 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm text-center">
+                   class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-sm text-center transition-colors">
                     Lihat Dashboard
                 </a>
             </div>
@@ -83,18 +86,36 @@
 function paymentPending() {
     return {
         pollUrl: '{{ route("order.payment.status.json", $order->id) }}',
+        snapToken: '{{ $snapToken ?? "" }}',
+        snapRedirectUrl: '{{ $snapRedirectUrl ?? "" }}',
         lastChecked: '--',
         currentStatus: '{{ $order->status }}',
         statusLabel: 'Menunggu Pembayaran',
         statusClass: 'bg-amber-100 text-amber-800',
         statusDot: 'bg-amber-500',
+        isChecking: false,
 
         init() {
             this.poll();
             setInterval(() => this.poll(), 5000);
         },
 
-        async poll() {
+        reopenPayment() {
+            if (this.snapToken && window.snap) {
+                window.snap.pay(this.snapToken, {
+                    onSuccess: () => this.poll(true),
+                    onPending: () => this.poll(true),
+                    onError: () => this.poll(true),
+                });
+            } else if (this.snapRedirectUrl) {
+                window.open(this.snapRedirectUrl, '_blank');
+            }
+        },
+
+        async poll(isManual = false) {
+            if (isManual) {
+                this.isChecking = true;
+            }
             try {
                 const res = await fetch(this.pollUrl, {
                     headers: { 'Accept': 'application/json' },
@@ -112,13 +133,17 @@ function paymentPending() {
                 }
             } catch (err) {
                 console.warn('Polling error:', err);
+            } finally {
+                if (isManual) {
+                    setTimeout(() => { this.isChecking = false; }, 600);
+                }
             }
         },
 
         updateBadge(status) {
             const map = {
                 'pending': { l: 'Menunggu Pembayaran', c: 'bg-amber-100 text-amber-800', d: 'bg-amber-500' },
-                'paid': { l: 'Lunas — Antri Provisioning', c: 'bg-emerald-100 text-emerald-800', d: 'bg-emerald-500' },
+                'paid': { l: 'Lunas — Menyiapkan Server', c: 'bg-emerald-100 text-emerald-800', d: 'bg-emerald-500' },
                 'provisioning': { l: 'Sedang Provisioning', c: 'bg-cyan-100 text-cyan-800', d: 'bg-cyan-500' },
                 'active': { l: 'Aktif', c: 'bg-emerald-100 text-emerald-800', d: 'bg-emerald-500' },
                 'cancelled': { l: 'Dibatalkan', c: 'bg-rose-100 text-rose-800', d: 'bg-rose-500' },
@@ -133,4 +158,10 @@ function paymentPending() {
     };
 }
 </script>
+
+@if(!empty($snapClientKey) && !empty($snapJsUrl))
+    @push('scripts')
+        <script src="{{ $snapJsUrl }}" data-client-key="{{ $snapClientKey }}"></script>
+    @endpush
+@endif
 @endsection

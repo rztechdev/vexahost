@@ -420,9 +420,21 @@ class OrderController extends Controller
             abort(403);
         }
 
+        // Cek sinkronisasi real-time ke Midtrans jika order masih pending
+        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
+            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            $order->refresh();
+        }
+
         // If order already paid, redirect directly to success callback view
         if ($order->paid_at) {
             return redirect()->route('order.success', $order->id);
+        }
+
+        // Untuk metode pembayaran Midtrans, jangan pernah tampilkan halaman perantara lama (payment-gateway).
+        // Alihkan langsung ke halaman status pembayaran (order.payment.status).
+        if (PaymentGateway::isMidtransMethod($order->payment_method)) {
+            return redirect()->route('order.payment.status', $order->id);
         }
 
         $paymentMethodNames = [
@@ -492,7 +504,7 @@ class OrderController extends Controller
     /**
      * Halaman "menunggu konfirmasi pembayaran" — read-only.
      * Frontend polling paymentStatusJson secara berkala; ketika paid_at terisi
-     * (oleh webhook) baru redirect ke success page.
+     * (oleh webhook atau sync otomatis) baru redirect ke success page.
      */
     public function paymentStatus($id)
     {
@@ -506,16 +518,46 @@ class OrderController extends Controller
             abort(403);
         }
 
+        // Cek sinkronisasi real-time ke Midtrans jika masih pending
+        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
+            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            $order->refresh();
+        }
+
         if ($order->paid_at) {
             return redirect()->route('order.success', $order->id);
         }
 
-        return view('order.payment-pending', compact('order'));
+        $midtransTx = \App\Models\PaymentTransaction::where('order_id', $order->id)
+            ->where('provider', 'midtrans')
+            ->latest()
+            ->first();
+        $snapToken = $midtransTx?->raw_payload['snap_token'] ?? null;
+        $snapRedirectUrl = $midtransTx?->raw_payload['snap_redirect_url'] ?? null;
+
+        if (PaymentGateway::isMidtransMethod($order->payment_method) && empty($snapToken)) {
+            $snapResult = \App\Services\Payments\MidtransService::createSnapTransaction($order);
+            if (!empty($snapResult['success'])) {
+                $snapToken = $snapResult['token'] ?? null;
+                $snapRedirectUrl = $snapResult['redirect_url'] ?? null;
+            }
+        }
+
+        $snapJsUrl = \App\Services\Payments\MidtransService::getSnapJsUrl();
+        $snapClientKey = \App\Services\Payments\MidtransService::getClientKey();
+
+        return view('order.payment-pending', compact(
+            'order',
+            'snapToken',
+            'snapRedirectUrl',
+            'snapJsUrl',
+            'snapClientKey'
+        ));
     }
 
     /**
      * JSON endpoint untuk polling status.
-     * Tidak pernah mengubah status — hanya membaca.
+     * Secara otomatis menyinkronkan status dengan Core API Midtrans jika belum lunas.
      */
     public function paymentStatusJson($id)
     {
@@ -527,6 +569,12 @@ class OrderController extends Controller
 
         if (!Auth::check() || ($order->customer_id !== Auth::id() && !Auth::user()->is_admin)) {
             abort(403);
+        }
+
+        // Cek sinkronisasi real-time ke Midtrans jika masih pending
+        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
+            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            $order->refresh();
         }
 
         return response()->json([
@@ -664,6 +712,17 @@ class OrderController extends Controller
 
         if (!Auth::check() || ($order->customer_id !== Auth::id() && !Auth::user()->is_admin)) {
             abort(403);
+        }
+
+        // Cek sinkronisasi real-time ke Midtrans jika belum tercatat paid_at
+        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
+            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            $order->refresh();
+        }
+
+        // Jika pesanan belum lunas dan bukan admin, arahkan ke halaman status pembayaran
+        if (!$order->paid_at && !in_array($order->status, ['paid', 'provisioning', 'active'], true) && !Auth::user()->is_admin) {
+            return redirect()->route('order.payment.status', $order->id);
         }
 
         return view('order.success', compact('order'));

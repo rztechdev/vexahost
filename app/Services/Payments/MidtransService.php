@@ -171,11 +171,23 @@ class MidtransService
 
         // 6. Panggil Snap API Midtrans
         try {
+            $snapHeaders = [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            try {
+                $webhookUrl = route('api.webhooks.payment');
+                if (filter_var($webhookUrl, FILTER_VALIDATE_URL) && !str_contains($webhookUrl, 'localhost') && !str_contains($webhookUrl, '127.0.0.1')) {
+                    $snapHeaders['X-Append-Notification'] = $webhookUrl;
+                    $snapHeaders['X-Override-Notification'] = $webhookUrl;
+                }
+            } catch (\Throwable) {
+                // Ignore route generation issues in tests/CLI
+            }
+
             $response = Http::withBasicAuth(trim($serverKey), '')
-                ->withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
+                ->withHeaders($snapHeaders)
                 ->timeout(15)
                 ->post(self::getSnapApiUrl(), $params);
 
@@ -241,6 +253,216 @@ class MidtransService
                 'success' => false,
                 'error' => 'Terjadi kendala koneksi ke server Midtrans: ' . $e->getMessage(),
             ];
+        }
+    }
+
+    /**
+     * Endpoint Core API untuk cek status transaksi.
+     */
+    public static function getStatusApiUrl(string $orderId): string
+    {
+        return self::isProduction()
+            ? 'https://api.midtrans.com/v2/' . urlencode($orderId) . '/status'
+            : 'https://api.sandbox.midtrans.com/v2/' . urlencode($orderId) . '/status';
+    }
+
+    /**
+     * Cek status transaksi langsung ke Midtrans Core API dan otomatis sinkronkan jika telah lunas.
+     */
+    public static function checkAndSyncStatus(Order $order): ?array
+    {
+        if ($order->paid_at || in_array($order->status, ['paid', 'provisioning', 'active'], true)) {
+            return [
+                'success' => true,
+                'status' => 'settled',
+                'order_status' => $order->status,
+                'already_paid' => true,
+            ];
+        }
+
+        $serverKey = self::getServerKey();
+        if (empty($serverKey)) {
+            return null;
+        }
+
+        // Kumpulkan kandidat order_id Midtrans yang mungkin tercatat
+        $transactions = PaymentTransaction::where('order_id', $order->id)
+            ->where('provider', 'midtrans')
+            ->orderByDesc('id')
+            ->get();
+
+        $orderRefs = [];
+        foreach ($transactions as $tx) {
+            if (!empty($tx->provider_order_ref)) {
+                $orderRefs[] = $tx->provider_order_ref;
+            }
+        }
+        $orderRefs[] = 'ORDER-' . $order->id;
+
+        $orderRefs = array_unique(array_filter($orderRefs));
+
+        foreach ($orderRefs as $refId) {
+            try {
+                $url = self::getStatusApiUrl($refId);
+                $response = Http::withBasicAuth(trim($serverKey), '')
+                    ->withHeaders(['Accept' => 'application/json'])
+                    ->timeout(8)
+                    ->get($url);
+
+                if (!$response->successful()) {
+                    continue;
+                }
+
+                $data = $response->json();
+                $txStatus = strtolower($data['transaction_status'] ?? '');
+                $fraudStatus = strtolower($data['fraud_status'] ?? '');
+
+                if (in_array($txStatus, ['settlement', 'capture', 'paid'], true) && $fraudStatus !== 'challenge') {
+                    self::settleOrderFromMidtrans($order, $data, $refId);
+                    return [
+                        'success' => true,
+                        'status' => 'settled',
+                        'data' => $data,
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Midtrans status check error for ref ' . $refId . ': ' . $e->getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Selesaikan order & sinkronkan database ketika terverifikasi lunas oleh Midtrans.
+     */
+    public static function settleOrderFromMidtrans(Order $order, array $data, string $refId): void
+    {
+        $order->loadMissing(['customer', 'vpsSpec', 'invoice']);
+        $grossAmount = $data['gross_amount'] ?? $order->amount;
+        $txId = $data['transaction_id'] ?? null;
+        $paymentType = $data['payment_type'] ?? $order->payment_method;
+
+        // 1. Temukan atau buat PaymentTransaction
+        $tx = PaymentTransaction::where('provider', 'midtrans')
+            ->where(function ($q) use ($txId, $refId) {
+                if ($txId) {
+                    $q->where('provider_transaction_id', $txId);
+                }
+                $q->orWhere('provider_order_ref', $refId);
+            })
+            ->latest()
+            ->first();
+
+        if (!$tx) {
+            $tx = PaymentTransaction::create([
+                'order_id' => $order->id,
+                'invoice_id' => $order->invoice?->id,
+                'provider' => 'midtrans',
+                'provider_transaction_id' => $txId,
+                'provider_order_ref' => $refId,
+                'payment_method' => $paymentType,
+                'amount' => $grossAmount,
+                'currency' => 'IDR',
+                'status' => 'settled',
+                'settled_at' => now(),
+                'fraud_status' => $data['fraud_status'] ?? 'accept',
+                'raw_payload' => $data,
+            ]);
+        } else {
+            $tx->update([
+                'status' => 'settled',
+                'settled_at' => now(),
+                'provider_transaction_id' => $txId ?: $tx->provider_transaction_id,
+                'fraud_status' => $data['fraud_status'] ?? $tx->fraud_status,
+                'raw_payload' => array_merge($tx->raw_payload ?? [], $data),
+            ]);
+        }
+
+        // 2. Transisi status order ke paid via OrderStateMachine jika belum paid
+        if (!in_array($order->status, ['paid', 'provisioning', 'active'], true) || !$order->paid_at) {
+            try {
+                $stateMachine = app(\App\Services\OrderStateMachine::class);
+                $stateMachine->transition($order, 'paid', [
+                    'reason' => 'Midtrans Core API transaction verified as settled.',
+                    'actor_type' => 'system',
+                    'metadata' => [
+                        'provider' => 'midtrans',
+                        'provider_tx_id' => $txId,
+                        'payment_type' => $paymentType,
+                        'order_ref' => $refId,
+                    ],
+                    'onLocked' => function (Order $locked) use ($paymentType, $tx) {
+                        $locked->paid_at = now();
+                        $locked->payment_method = $paymentType ?: $locked->payment_method;
+                        $locked->save();
+
+                        if ($locked->invoice && $locked->invoice->status !== 'paid') {
+                            $locked->invoice->update([
+                                'status' => 'paid',
+                                'paid_at' => now(),
+                                'paid_via_transaction_id' => $tx->id,
+                            ]);
+                        }
+                    },
+                    'allowSame' => true,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Midtrans order state machine notice: ' . $e->getMessage(), ['order_id' => $order->id]);
+                // Fallback direct update jika state machine rejected
+                $order->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'payment_method' => $paymentType ?: $order->payment_method,
+                ]);
+                if ($order->invoice && $order->invoice->status !== 'paid') {
+                    $order->invoice->update([
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                        'paid_via_transaction_id' => $tx->id,
+                    ]);
+                }
+            }
+        }
+
+        // 3. Catat WebhookEvent agar tidak terjadi proses duplikat jika webhook tiba belakangan
+        if ($txId) {
+            \App\Models\WebhookEvent::firstOrCreate(
+                [
+                    'provider' => 'midtrans',
+                    'event_id' => $txId,
+                ],
+                [
+                    'event_type' => 'settlement',
+                    'signature' => $data['signature_key'] ?? 'direct-api-sync',
+                    'ip_address' => request()?->ip() ?? '127.0.0.1',
+                    'payload' => $data,
+                    'processing_status' => 'processed',
+                    'processed_at' => now(),
+                    'order_id' => $order->id,
+                    'payment_transaction_id' => $tx->id,
+                ]
+            );
+        }
+
+        // 4. Kirim notifikasi pembayaran ke customer & admin
+        try {
+            $customer = $order->customer;
+            if ($customer) {
+                $customer->notify(new \App\Notifications\PaymentReceivedNotification($order, $order->invoice));
+            }
+        } catch (\Throwable $e) {
+            Log::error('midtrans.sync.notify_customer_failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        try {
+            $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
+            if ($adminEmail) {
+                \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
+                    ->notify(new \App\Notifications\AdminNewPaidOrderNotification($order));
+            }
+        } catch (\Throwable $e) {
+            Log::error('midtrans.sync.notify_admin_failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
     }
 }
