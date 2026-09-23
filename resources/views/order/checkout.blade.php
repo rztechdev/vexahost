@@ -1258,10 +1258,10 @@ function checkoutState() {
                     this.isSubmitting = false;
                     window.snap.pay(data.snap_token, {
                         onSuccess: (result) => {
-                            window.location.href = '/order/payment/status/' + data.order_id;
+                            window.location.href = '/order/payment/' + data.order_id + '/status';
                         },
                         onPending: (result) => {
-                            window.location.href = '/order/payment/status/' + data.order_id;
+                            window.location.href = '/order/payment/' + data.order_id + '/status';
                         },
                         onError: (result) => {
                             showAlert('Pembayaran tidak berhasil atau dibatalkan. Anda dapat mengulangi proses pembayaran.', {
@@ -1290,7 +1290,7 @@ function checkoutState() {
                 if (data && data.redirect_url) {
                     window.location.href = data.redirect_url;
                 } else if (data && data.order_id) {
-                    window.location.href = '/order/payment/status/' + data.order_id;
+                    window.location.href = '/order/payment/' + data.order_id + '/status';
                 } else {
                     window.location.href = '/dashboard';
                 }

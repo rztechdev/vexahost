@@ -151,6 +151,7 @@ Route::post('/checkout/quick-login', [OrderController::class, 'quickLogin'])->na
 Route::get('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment')->middleware('auth');
 // Halaman polling status pembayaran (read-only, diotentikasi via controller & session order).
 Route::get('/order/payment/{id}/status', [OrderController::class, 'paymentStatus'])->name('order.payment.status');
+Route::get('/order/payment/status/{id}', fn ($id) => redirect()->route('order.payment.status', $id));
 // JSON endpoint untuk polling status by frontend.
 Route::get('/order/payment/{id}/status.json', [OrderController::class, 'paymentStatusJson'])->name('order.payment.status.json');
 // DEV ONLY: simulate payment - dipagari APP_ENV=local dan APP_DEV_SIMULATE_PAYMENT=true.

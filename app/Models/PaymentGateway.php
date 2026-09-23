@@ -160,12 +160,17 @@ class PaymentGateway extends Model
     {
         try {
             if (!Schema::hasTable('payment_gateways') || !self::query()->exists()) {
-                return ['lynk', 'qris'];
+                return ['midtrans_snap'];
             }
 
             $activeCodes = self::active()->pluck('code')->all();
+
+            // Bila MIDTRANS_SERVER_KEY ada di .env, aktifkan metode Midtrans secara otomatis
+            if (!in_array('midtrans', $activeCodes, true) && !empty(config('services.midtrans.server_key'))) {
+                $activeCodes[] = 'midtrans';
+            }
         } catch (\Throwable $e) {
-            return ['lynk', 'qris'];
+            return ['midtrans_snap'];
         }
 
         return array_keys(array_filter(

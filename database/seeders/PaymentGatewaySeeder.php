@@ -23,22 +23,22 @@ class PaymentGatewaySeeder extends Seeder
             [
                 'code' => 'lynk',
                 'name' => 'Lynk.id',
-                'description' => 'Jalur pembayaran utama lewat webhook. QRIS, VA, e-wallet, dan kartu via Lynk.id.',
-                'is_active' => true,
+                'description' => 'Jalur pembayaran Lynk.id.',
+                'is_active' => false,
                 'mode' => 'production',
             ],
             [
                 'code' => 'qris',
                 'name' => 'QRIS VexaHost',
-                'description' => 'QRIS statis dengan verifikasi manual di menu Verifikasi Pembayaran.',
-                'is_active' => true,
+                'description' => 'QRIS statis verifikasi manual.',
+                'is_active' => false,
                 'mode' => 'production',
             ],
             [
                 'code' => 'midtrans',
                 'name' => 'Midtrans',
-                'description' => 'Virtual Account dan e-wallet (BCA, Mandiri, BNI, BRI, GoPay, OVO, DANA, ShopeePay). Menunggu pendaftaran merchant.',
-                'is_active' => false,
+                'description' => 'QRIS Otomatis, Virtual Account, dan E-Wallet resmi via Midtrans.',
+                'is_active' => true,
                 'mode' => 'sandbox',
             ],
             [
