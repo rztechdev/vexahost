@@ -1,4 +1,4 @@
-<div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs">
+<div class="border border-slate-200 rounded-2xl p-4 sm:p-7 bg-white shadow-xs">
     <div class="flex items-center gap-3 mb-2">
         <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-semibold flex items-center justify-center" x-text="isDirectCheckout ? '2' : '3'"></span>
         <h2 class="font-bold text-slate-900 text-lg">Pilih Metode Pembayaran</h2>
@@ -9,7 +9,7 @@
     </p>
 
     {{-- Payment Selection Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-6">
         @foreach([
             'midtrans_snap' => ['QRIS Otomatis', 'qris.svg', 'Semua e-wallet & mobile banking instan', 'Instan QR'],
             'gopay' => ['GoPay', 'gopay.svg', 'Aplikasi GoPay & Gojek', 'E-Wallet'],
@@ -40,59 +40,59 @@
 
             @if($isMethodActive)
                 {{-- Active Method --}}
-                <label class="p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between relative text-left select-none"
+                <label class="p-3 sm:p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between relative text-left select-none"
                        :class="paymentMethod === '{{ $method }}' ? 'border-black bg-slate-50 ring-2 ring-black shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'"
                        @click="selectPayment('{{ $method }}')">
                     <input type="radio" name="payment_method" value="{{ $method }}" x-model="paymentMethod" class="sr-only">
 
                     {{-- Active Indicator / Badge --}}
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+                    <div class="flex items-center justify-between mb-2 sm:mb-3 gap-1">
+                        <span class="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded uppercase tracking-wider truncate max-w-[70%]"
                               :class="paymentMethod === '{{ $method }}' ? 'bg-black text-white' : 'bg-slate-100 text-slate-600'">
                             {{ $details[3] }}
                         </span>
-                        <div class="w-4 h-4 rounded-full border flex items-center justify-center transition-all"
+                        <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 rounded-full border flex items-center justify-center transition-all"
                              :class="paymentMethod === '{{ $method }}' ? 'border-black bg-black text-white' : 'border-slate-300 bg-white'">
-                            <svg x-show="paymentMethod === '{{ $method }}'" class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                            <svg x-show="paymentMethod === '{{ $method }}'" class="w-2 h-2 sm:w-2.5 sm:h-2.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
                         </div>
                     </div>
 
                     {{-- Logo Container --}}
-                    <div class="w-full h-12 mb-3 flex items-center justify-center bg-white border border-slate-100 rounded-lg p-2">
-                        <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-8 max-w-full object-contain">
+                    <div class="w-full h-10 sm:h-12 mb-2 sm:mb-3 flex items-center justify-center bg-white border border-slate-100 rounded-lg p-1.5 sm:p-2">
+                        <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-6 sm:max-h-8 max-w-full object-contain">
                     </div>
 
                     {{-- Name & Description --}}
                     <div>
-                        <h3 class="font-bold text-sm text-slate-900">{{ $details[0] }}</h3>
-                        <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $details[0] }}</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
                     </div>
                 </label>
             @else
                 {{-- Inactive Method: Tampilan abu-abu, kursor nonaktif --}}
-                <div class="p-4 rounded-xl border border-slate-200 bg-white opacity-50 cursor-not-allowed transition-all flex flex-col justify-between relative text-left select-none"
+                <div class="p-3 sm:p-4 rounded-xl border border-slate-200 bg-white opacity-50 cursor-not-allowed transition-all flex flex-col justify-between relative text-left select-none"
                      title="{{ $details[0] }} sedang tidak aktif"
                      @click="selectPayment('{{ $method }}', false)">
 
                     {{-- Badge & Inactive Circle Indicator --}}
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-slate-100 text-slate-600">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3 gap-1">
+                        <span class="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded uppercase tracking-wider bg-slate-100 text-slate-600 truncate max-w-[70%]">
                             {{ $details[3] }}
                         </span>
-                        <div class="w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center"></div>
+                        <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 rounded-full border border-slate-300 bg-white flex items-center justify-center"></div>
                     </div>
 
                     {{-- Logo Container --}}
-                    <div class="w-full h-12 mb-3 flex items-center justify-center bg-white border border-slate-100 rounded-lg p-2">
-                        <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-8 max-w-full object-contain">
+                    <div class="w-full h-10 sm:h-12 mb-2 sm:mb-3 flex items-center justify-center bg-white border border-slate-100 rounded-lg p-1.5 sm:p-2">
+                        <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-6 sm:max-h-8 max-w-full object-contain">
                     </div>
 
                     {{-- Name & Description --}}
                     <div>
-                        <h3 class="font-bold text-sm text-slate-900">{{ $details[0] }}</h3>
-                        <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $details[0] }}</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
                     </div>
                 </div>
             @endif

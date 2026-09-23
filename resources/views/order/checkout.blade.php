@@ -5,14 +5,224 @@
 ])
 
 @section('content')
-<div class="py-10 bg-white min-h-screen" x-data="checkoutState()" x-init="init()">
+<div class="pt-6 sm:pt-10 pb-28 sm:pb-20 bg-white min-h-screen" id="checkout-wizard-top" x-data="checkoutState()" x-init="init()">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Back link --}}
-        <a :href="isDatabasePackage ? '{{ route('home') }}#database-packages' : (isAiPackage ? '{{ route('home') }}#ai-packages' : '{{ route('home') }}#pricing')" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-black transition-colors mb-6">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        <a :href="isDatabasePackage ? '{{ route('home') }}#database-packages' : (isAiPackage ? '{{ route('home') }}#ai-packages' : '{{ route('home') }}#pricing')" class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 hover:text-black transition-colors mb-5">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             <span x-text="isDatabasePackage ? 'Kembali ke Katalog Managed Database' : (isAiPackage ? 'Kembali ke Katalog AI Combo' : 'Kembali ke Pilihan Paket VPS')"></span>
         </a>
+
+        {{-- ========================================================
+             PROGRESS STEPPER (TOP POSITION - FULLY RESPONSIVE)
+             ======================================================== --}}
+        {{-- Desktop & Tablet Stepper (sm:block) --}}
+        <div class="hidden sm:block mb-8">
+            {{-- Direct Checkout Stepper (3 Steps: AI / Managed DB) --}}
+            <template x-if="isDirectCheckout">
+                <div class="flex items-center justify-between max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
+                              :class="currentSlide === 1 ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > 1 ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
+                            <template x-if="currentSlide > 1">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </template>
+                            <template x-if="currentSlide <= 1"><span>1</span></template>
+                        </span>
+                        <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
+                              :class="currentSlide === 1 ? 'text-black' : (currentSlide > 1 ? 'text-emerald-700' : 'text-slate-400')">Informasi Akun</span>
+                    </div>
+                    <div class="flex-1 h-0.5 mx-3 md:mx-5 transition-colors" :class="currentSlide > 1 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
+                              :class="currentSlide === 2 ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > 2 ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
+                            <template x-if="currentSlide > 2">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </template>
+                            <template x-if="currentSlide <= 2"><span>2</span></template>
+                        </span>
+                        <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
+                              :class="currentSlide === 2 ? 'text-black' : (currentSlide > 2 ? 'text-emerald-700' : 'text-slate-400')">Pilih Pembayaran</span>
+                    </div>
+                    <div class="flex-1 h-0.5 mx-3 md:mx-5 transition-colors" :class="currentSlide > 2 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
+                              :class="currentSlide === 3 ? 'bg-black text-white ring-4 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">3</span>
+                        <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
+                              :class="currentSlide === 3 ? 'text-black' : 'text-slate-400'">Konfirmasi Pembayaran</span>
+                    </div>
+                </div>
+            </template>
+
+            {{-- Standard VPS Stepper (4 Steps) --}}
+            <template x-if="!isDirectCheckout">
+                <div class="flex items-center justify-between max-w-4xl mx-auto px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+                    @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'] as $index => $step)
+                        <div class="flex items-center gap-2.5 shrink-0">
+                            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
+                                  :class="currentSlide === {{ $index }} ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > {{ $index }} ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
+                                <template x-if="currentSlide > {{ $index }}">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                                <template x-if="currentSlide <= {{ $index }}">
+                                    <span>{{ $index + 1 }}</span>
+                                </template>
+                            </span>
+                            <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
+                                  :class="currentSlide === {{ $index }} ? 'text-black' : (currentSlide > {{ $index }} ? 'text-emerald-700' : 'text-slate-400')">
+                                {{ $step }}
+                            </span>
+                        </div>
+                        @if($index < 3)
+                            <div class="flex-1 h-0.5 mx-2 md:mx-4 transition-colors"
+                                 :class="currentSlide > {{ $index }} ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                        @endif
+                    @endforeach
+                </div>
+            </template>
+        </div>
+
+        {{-- Mobile Stepper (< sm) --}}
+        <div class="sm:hidden mb-5 bg-slate-50 border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+            {{-- Step Circles & Tracks --}}
+            <div class="flex items-center justify-between gap-1 mb-3">
+                <template x-if="!isDirectCheckout">
+                    <div class="flex items-center justify-between w-full">
+                        @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'] as $index => $step)
+                            <div class="flex items-center gap-1 shrink-0">
+                                <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                                      :class="currentSlide === {{ $index }} ? 'bg-black text-white ring-3 ring-black/10' : (currentSlide > {{ $index }} ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300')">
+                                    <template x-if="currentSlide > {{ $index }}">
+                                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    </template>
+                                    <template x-if="currentSlide <= {{ $index }}">
+                                        <span>{{ $index + 1 }}</span>
+                                    </template>
+                                </span>
+                            </div>
+                            @if($index < 3)
+                                <div class="flex-1 h-0.5 mx-1.5 transition-colors"
+                                     :class="currentSlide > {{ $index }} ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                            @endif
+                        @endforeach
+                    </div>
+                </template>
+                <template x-if="isDirectCheckout">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                                  :class="currentSlide === 1 ? 'bg-black text-white ring-3 ring-black/10' : (currentSlide > 1 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300')">
+                                <template x-if="currentSlide > 1">
+                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                                <template x-if="currentSlide <= 1"><span>1</span></template>
+                            </span>
+                        </div>
+                        <div class="flex-1 h-0.5 mx-1.5 transition-colors" :class="currentSlide > 1 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                                  :class="currentSlide === 2 ? 'bg-black text-white ring-3 ring-black/10' : (currentSlide > 2 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300')">
+                                <template x-if="currentSlide > 2">
+                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                                <template x-if="currentSlide <= 2"><span>2</span></template>
+                            </span>
+                        </div>
+                        <div class="flex-1 h-0.5 mx-1.5 transition-colors" :class="currentSlide > 2 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                                  :class="currentSlide === 3 ? 'bg-black text-white ring-3 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">
+                                <span>3</span>
+                            </span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            {{-- Active Step Label --}}
+            <div class="flex items-center justify-between text-xs pt-2.5 border-t border-slate-200/70">
+                <span class="text-slate-500 font-medium">Langkah <span x-text="currentStepNumber" class="font-bold text-slate-900"></span> dari <span x-text="totalStepCount" class="font-bold text-slate-900"></span></span>
+                <span class="font-bold text-slate-900 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs text-[11px]" x-text="currentStepTitle"></span>
+            </div>
+        </div>
+
+        {{-- Mobile Collapsible Order Summary (< lg) --}}
+        <div class="lg:hidden mb-6 bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-xs" x-data="{ mobileSummaryOpen: false }">
+            <button type="button" @click="mobileSummaryOpen = !mobileSummaryOpen" class="w-full px-4 py-3 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors text-left">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-900">Ringkasan Pesanan</span>
+                            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200" :class="mobileSummaryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <span class="text-[11px] text-slate-500 line-clamp-1" x-text="specs[selectedSpec] ? specs[selectedSpec].name : 'Pilih Paket'"></span>
+                    </div>
+                </div>
+                <div class="text-right shrink-0">
+                    <span class="text-[10px] text-slate-400 block">Total</span>
+                    <span class="font-mono-code font-bold text-slate-900 text-sm" x-text="formatRupiah(totalPrice)"></span>
+                </div>
+            </button>
+            <div x-show="mobileSummaryOpen" x-cloak class="px-4 pb-4 pt-2 border-t border-slate-200/70 space-y-2.5 text-xs bg-white">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Paket</span>
+                    <span class="font-semibold text-slate-900" x-text="currentSpec ? currentSpec.name : '-'"></span>
+                </div>
+                <template x-if="!isDirectCheckout">
+                    <div class="space-y-2 border-t border-slate-100 pt-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Hostname / VPS</span>
+                            <span class="font-mono-code text-slate-800" x-text="vpsName || '-'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Provider</span>
+                            <span class="text-slate-800" x-text="provider === 'tencent' ? 'Tencent Cloud' : 'Cloudeka'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Datacenter</span>
+                            <span class="capitalize text-slate-800" x-text="datacenter"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">OS</span>
+                            <span class="text-slate-800" x-text="os === 'ubuntu2404' ? 'Ubuntu 24.04 LTS' : 'Ubuntu 22.04 LTS'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Stack</span>
+                            <span class="text-slate-800" x-text="controlPanelLabel"></span>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="isDirectCheckout && currentSpec">
+                    <div class="space-y-2 border-t border-slate-100 pt-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Resource</span>
+                            <span class="font-medium text-slate-800" x-text="currentSpec.cpu + ' Core vCPU · ' + currentSpec.ram + ' GB RAM'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Storage</span>
+                            <span class="font-medium text-slate-800" x-text="currentSpec.disk + ' GB NVMe'"></span>
+                        </div>
+                        <template x-if="isDatabasePackage">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Database Engine</span>
+                                <span class="font-bold text-[#4A6FA5]" x-text="dbEngineLabel"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <div class="flex justify-between pt-2 border-t border-slate-200 text-slate-900 font-bold">
+                    <span>Total Tagihan Bersih</span>
+                    <span class="font-mono-code text-sm text-emerald-600" x-text="formatRupiah(totalPrice)"></span>
+                </div>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Left: Configuration Slides --}}
@@ -300,13 +510,13 @@
                 </div>
 
                 {{-- Navigation Buttons --}}
-                <div class="flex justify-between items-center pt-8 mt-8 border-t border-slate-200">
-                    <div>
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-slate-200">
+                    <div class="w-full sm:w-auto">
                         {{-- Tombol Kembali jika Direct Checkout (AI Package / Managed DB) --}}
                         <template x-if="isDirectCheckout">
                             <div>
                                 <button type="button" @click="previousSlide()" x-show="currentSlide > 1"
-                                        class="px-5 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium transition-colors">
+                                        class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
                                     ← <span x-text="currentSlide === 3 ? 'Kembali ke Pilih Pembayaran' : 'Kembali ke Informasi Akun'"></span>
                                 </button>
                             </div>
@@ -315,18 +525,18 @@
                         {{-- Tombol Kembali jika Standard VPS --}}
                         <template x-if="!isDirectCheckout">
                             <button type="button" @click="previousSlide()" x-show="currentSlide > 0"
-                                    class="px-5 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium transition-colors">
+                                    class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
                                 ← Kembali
                             </button>
                         </template>
                     </div>
 
                     {{-- Tombol Lanjut / Submit --}}
-                    <div x-show="!isDirectCheckout && currentSlide === 0" class="ml-auto">
+                    <div x-show="!isDirectCheckout && currentSlide === 0" class="w-full sm:w-auto sm:ml-auto">
                         <button type="button" @click="isPackageInactive ? null : nextSlide()"
                                 :disabled="isPackageInactive"
                                 :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
-                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                                class="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl sm:rounded-lg text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-xs">
                             <span x-show="!isPackageInactive">Lanjut ke Informasi Akun →</span>
                             <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -334,11 +544,11 @@
                             </span>
                         </button>
                     </div>
-                    <div x-show="currentSlide === 1" class="ml-auto">
+                    <div x-show="currentSlide === 1" class="w-full sm:w-auto sm:ml-auto">
                         <button type="button" @click="isPackageInactive ? null : nextSlide()"
                                 :disabled="isPackageInactive"
                                 :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
-                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                                class="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl sm:rounded-lg text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-xs">
                             <span x-show="!isPackageInactive">Lanjut ke Pilih Pembayaran →</span>
                             <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -346,11 +556,11 @@
                             </span>
                         </button>
                     </div>
-                    <div x-show="currentSlide === 2" class="ml-auto">
+                    <div x-show="currentSlide === 2" class="w-full sm:w-auto sm:ml-auto">
                         <button type="button" @click="isPackageInactive ? null : nextSlide()"
                                 :disabled="isPackageInactive"
                                 :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
-                                class="px-6 py-2.5 rounded-lg text-white text-sm font-bold transition-colors inline-flex items-center gap-2">
+                                class="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl sm:rounded-lg text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-xs">
                             <span x-show="!isPackageInactive">Lanjut ke Konfirmasi Pembayaran →</span>
                             <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -358,15 +568,15 @@
                             </span>
                         </button>
                     </div>
-                    <div x-show="currentSlide === 3" class="ml-auto flex flex-col items-end gap-1.5">
-                        <p x-show="!termsAccepted && !isPackageInactive" x-cloak class="text-xs font-semibold text-slate-500">
+                    <div x-show="currentSlide === 3" class="w-full sm:w-auto sm:ml-auto flex flex-col items-stretch sm:items-end gap-1.5">
+                        <p x-show="!termsAccepted && !isPackageInactive" x-cloak class="text-xs font-semibold text-slate-500 text-center sm:text-right">
                             Centang persetujuan ketentuan untuk melanjutkan.
                         </p>
-                        <p x-show="isPackageInactive" x-cloak class="text-xs font-semibold text-amber-600">
+                        <p x-show="isPackageInactive" x-cloak class="text-xs font-semibold text-amber-600 text-center sm:text-right">
                             Paket dinonaktifkan sementara untuk pemeliharaan sistem.
                         </p>
                         <button type="button" @click="isPackageInactive ? null : submitCheckout()" :disabled="isSubmitting || !termsAccepted || isPackageInactive"
-                                class="px-7 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-sm">
+                                class="w-full sm:w-auto px-7 py-3.5 sm:py-3 rounded-xl sm:rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm">
                             <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
@@ -374,14 +584,14 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : (isPackageInactive ? 'Paket Dinonaktifkan' : (paymentMethod === 'lynk' ? 'Bayar Sekarang via Lynk.id' : 'Bayar Sekarang'))"></span>
+                            <span x-text="isSubmitting ? 'Memproses Pesanan...' : (isPackageInactive ? 'Paket Dinonaktifkan' : 'Bayar Sekarang')"></span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            {{-- Right: Sticky Summary --}}
-            <div class="lg:col-span-1">
+            {{-- Right: Sticky Summary (Desktop only - Mobile has top accordion) --}}
+            <div class="hidden lg:block lg:col-span-1">
                 <div class="sticky top-24 border border-slate-200 rounded-xl p-6 space-y-5 bg-white shadow-sm">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-slate-900 text-base">Ringkasan Pesanan</h3>
@@ -497,14 +707,15 @@
                     {{-- Payment Logos --}}
                     <div class="border-t border-slate-200 pt-4">
                         <p class="text-xs text-slate-500 mb-3 text-center">Metode Pembayaran Tersedia</p>
-                        <div class="flex flex-wrap justify-center gap-3">
+                        <div class="flex flex-wrap justify-center gap-2.5">
                             @foreach([
-                                'lynk' => 'Lynk.id',
                                 'qris' => 'QRIS',
                                 'va_bca' => 'BCA',
                                 'va_mandiri' => 'Mandiri', 
                                 'va_bri' => 'BRI',
                                 'va_bni' => 'BNI',
+                                'va_permata' => 'Permata',
+                                'va_cimb' => 'CIMB Niaga',
                                 'gopay' => 'GoPay',
                                 'ewallet_ovo' => 'OVO',
                                 'dana' => 'DANA',
@@ -518,57 +729,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- Progress Steps (Rata Tengah Halaman / Full Width) --}}
-        <div class="mt-10">
-            {{-- Progress Steps untuk Direct Checkout (AI & Database - 3 Langkah) --}}
-            <template x-if="isDirectCheckout">
-                <div class="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 mx-auto">
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all"
-                              :class="currentSlide >= 1 ? 'bg-black text-white' : 'bg-slate-200 text-slate-500 border border-slate-300'">1</span>
-                        <span class="text-xs sm:text-sm font-semibold whitespace-nowrap"
-                              :class="currentSlide >= 1 ? 'text-slate-900' : 'text-slate-400'">Informasi Akun</span>
-                    </div>
-                    <div class="w-8 sm:w-16 md:w-24 h-px shrink-0 transition-colors" :class="currentSlide > 1 ? 'bg-black' : 'bg-slate-200'"></div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all"
-                              :class="currentSlide >= 2 ? 'bg-black text-white' : 'bg-slate-200 text-slate-500 border border-slate-300'">2</span>
-                        <span class="text-xs sm:text-sm font-semibold whitespace-nowrap"
-                              :class="currentSlide >= 2 ? 'text-slate-900' : 'text-slate-400'">Pilih Pembayaran</span>
-                    </div>
-                    <div class="w-8 sm:w-16 md:w-24 h-px shrink-0 transition-colors" :class="currentSlide > 2 ? 'bg-black' : 'bg-slate-200'"></div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all"
-                              :class="currentSlide >= 3 ? 'bg-black text-white' : 'bg-slate-200 text-slate-500 border border-slate-300'">3</span>
-                        <span class="text-xs sm:text-sm font-semibold whitespace-nowrap"
-                              :class="currentSlide >= 3 ? 'text-slate-900' : 'text-slate-400'">Konfirmasi Pembayaran</span>
-                    </div>
-                </div>
-            </template>
-
-            {{-- Progress Steps untuk VPS Reguler (4 Langkah) --}}
-            <template x-if="!isDirectCheckout">
-                <div class="flex items-center justify-center gap-2 sm:gap-4 md:gap-6 mx-auto">
-                    @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'] as $index => $step)
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all"
-                                  :class="currentSlide >= {{ $index }} ? 'bg-black text-white' : 'bg-slate-200 text-slate-500 border border-slate-300'">
-                                {{ $index + 1 }}
-                            </span>
-                            <span class="text-xs sm:text-sm font-semibold whitespace-nowrap"
-                                  :class="currentSlide >= {{ $index }} ? 'text-slate-900' : 'text-slate-400'">
-                                {{ $step }}
-                            </span>
-                        </div>
-                        @if($index < 3)
-                            <div class="w-6 sm:w-12 md:w-16 lg:w-20 h-px shrink-0 transition-colors"
-                                 :class="currentSlide > {{ $index }} ? 'bg-black' : 'bg-slate-200'"></div>
-                        @endif
-                    @endforeach
-                </div>
-            </template>
         </div>
     </div>
 </div>
@@ -613,7 +773,6 @@ function checkoutState() {
             permata_va: { name: 'Permata Virtual Account', image: 'va_permata.svg', description: 'Virtual Account otomatis 24 jam' },
             cimb_va: { name: 'CIMB Niaga VA', image: 'va_cimb.svg', description: 'Virtual Account otomatis 24 jam' },
             other_va: { name: 'Bank Lainnya (VA)', image: 'va_permata.svg', description: 'Transfer ATM & Bank Lainnya' },
-            lynk: { name: 'Lynk.id Checkout', image: 'lynk.svg', description: 'QRIS, VA, E-Wallet, Kartu via Lynk.id' },
             bca_va: { name: 'BCA Virtual Account', image: 'va_bca.svg', description: 'Sedang dinonaktifkan' },
             bsi_va: { name: 'BSI Virtual Account', image: 'va_bsi.svg', description: 'Sedang dinonaktifkan' },
             danamon_va: { name: 'Danamon Virtual Account', image: 'va_danamon.svg', description: 'Sedang dinonaktifkan' },
@@ -683,6 +842,28 @@ function checkoutState() {
         },
         get isDirectCheckout() {
             return this.isAiPackage || this.isDatabasePackage;
+        },
+        get totalStepCount() {
+            return this.isDirectCheckout ? 3 : 4;
+        },
+        get currentStepNumber() {
+            if (this.isDirectCheckout) {
+                if (this.currentSlide === 1) return 1;
+                if (this.currentSlide === 2) return 2;
+                if (this.currentSlide === 3) return 3;
+                return 1;
+            }
+            return this.currentSlide + 1;
+        },
+        get currentStepTitle() {
+            if (this.isDirectCheckout) {
+                if (this.currentSlide === 1) return 'Informasi Akun';
+                if (this.currentSlide === 2) return 'Pilih Pembayaran';
+                if (this.currentSlide === 3) return 'Konfirmasi Pembayaran';
+                return 'Informasi Akun';
+            }
+            const titles = ['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'];
+            return titles[this.currentSlide] || 'Konfigurasi VPS';
         },
         get dbEngineLabel() {
             const labels = {
@@ -1028,12 +1209,25 @@ function checkoutState() {
             return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
         },
         
+        scrollToWizardTop() {
+            this.$nextTick(() => {
+                const el = document.getElementById('checkout-wizard-top');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        },
+
         previousSlide() {
             if (this.isDirectCheckout) {
                 if (this.currentSlide === 3) {
                     this.currentSlide = 2;
+                    this.scrollToWizardTop();
                 } else if (this.currentSlide === 2) {
                     this.currentSlide = 1;
+                    this.scrollToWizardTop();
                 } else if (this.currentSlide === 1) {
                     window.location.href = this.isDatabasePackage ? "{{ route('home') }}#database-packages" : "{{ route('home') }}#ai-packages";
                 }
@@ -1041,6 +1235,7 @@ function checkoutState() {
             }
             if (this.currentSlide > 0) {
                 this.currentSlide--;
+                this.scrollToWizardTop();
             }
         },
         
@@ -1073,9 +1268,11 @@ function checkoutState() {
                         return;
                     }
                     this.currentSlide = 3;
+                    this.scrollToWizardTop();
                     return;
                 }
                 this.currentSlide = 2;
+                this.scrollToWizardTop();
                 return;
             }
 
@@ -1093,6 +1290,7 @@ function checkoutState() {
                     }
                 }
                 this.currentSlide++;
+                this.scrollToWizardTop();
             }
         },
         

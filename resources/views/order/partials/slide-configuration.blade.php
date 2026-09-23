@@ -1,4 +1,4 @@
-<div class="border border-slate-200 rounded-lg p-6 space-y-6">
+<div class="border border-slate-200 rounded-2xl p-5 sm:p-7 bg-white shadow-xs space-y-6">
     {{-- 1. VPS Name & Akses Root --}}
     <div>
         <div class="flex items-center gap-3 mb-4">
@@ -158,7 +158,7 @@
                         :class="controlPanel === '{{ $value }}' ? 'border-black bg-slate-50 ring-1 ring-black shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'" 
                         class="p-3 rounded-lg border text-left flex items-center gap-3 transition-all min-h-[56px]">
                     <img src="{{ asset('images/logos/panels/' . $value . '.svg') }}" alt="{{ $label }}" class="w-6 h-6 object-contain shrink-0" />
-                    <span class="text-sm font-semibold text-slate-900 leading-tight">{{ $label }}</span>
+                    <span class="text-xs sm:text-sm font-semibold text-slate-900 leading-tight">{{ $label }}</span>
                 </button>
             @endforeach
         </div>
@@ -168,7 +168,7 @@
                         :class="controlPanel === '{{ $value }}' ? 'border-black bg-slate-50 ring-1 ring-black shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'" 
                         class="p-3 rounded-lg border text-left flex items-center gap-3 transition-all min-h-[56px]">
                     <img src="{{ asset('images/logos/apps/' . $value . '.svg') }}" alt="{{ $label }}" class="w-6 h-6 object-contain shrink-0" />
-                    <span class="text-sm font-semibold text-slate-900 leading-tight">{{ $label }}</span>
+                    <span class="text-xs sm:text-sm font-semibold text-slate-900 leading-tight">{{ $label }}</span>
                 </button>
             @endforeach
         </div>

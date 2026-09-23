@@ -545,92 +545,120 @@
                             Dashboard
                         </a>
                     @endguest
-                    <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                    <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Menu Mobile">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                            <path x-show="mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" style="display: none;"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
 
             </div>
+        </div>
+    </header>
 
-            <!-- Mobile Dropdown Navigation -->
-            <div x-show="mobileMenu" x-transition class="md:hidden border-t border-slate-200 py-4 space-y-2" style="display: none;">
-                <!-- Beranda -->
-                <a href="{{ route('home') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-semibold {{ request()->routeIs('home') ? 'text-[#4A6FA5] bg-blue-50/50' : 'text-slate-800' }} rounded-lg hover:bg-slate-50">
-                    Beranda
-                </a>
+    {{-- ===================== Mobile Drawer (Muncul dari Bawah / Bottom Sheet) ===================== --}}
+    <div x-show="mobileMenu" x-cloak
+         x-effect="document.body.style.overflow = mobileMenu ? 'hidden' : ''"
+         x-transition:enter="transition-transform duration-300 ease-out"
+         x-transition:enter-start="translate-y-full"
+         x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-250 ease-in"
+         x-transition:leave-start="translate-y-0"
+         x-transition:leave-end="translate-y-full"
+         class="fixed inset-0 z-50 flex flex-col bg-white md:hidden">
 
-                <!-- Accordion Produk -->
-                <div>
-                    <button @click="mobileProduk = !mobileProduk" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
-                        <span>Produk Cloud</span>
-                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileProduk ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="mobileProduk" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
-                        <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">Cloud VPS KVM</a>
-                        <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
-                            <span>AI Combo Packages</span>
-                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+        {{-- Drawer Top Header Bar --}}
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 shrink-0 bg-white">
+            <a href="{{ route('home') }}" @click="mobileMenu = false" class="flex items-center space-x-3 shrink-0">
+                <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-8 w-auto object-contain">
+                <span class="text-lg font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+            </a>
+            <button @click="mobileMenu = false" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 transition-colors" aria-label="Tutup Menu">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Drawer Scrollable Content --}}
+        <div class="flex-1 space-y-3 overflow-y-auto px-5 py-4 text-slate-800">
+            <!-- Beranda -->
+            <a href="{{ route('home') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-semibold {{ request()->routeIs('home') ? 'text-[#4A6FA5] bg-blue-50/50' : 'text-slate-800' }} rounded-lg hover:bg-slate-50">
+                Beranda
+            </a>
+
+            <!-- Accordion Produk -->
+            <div>
+                <button @click="mobileProduk = !mobileProduk" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                    <span>Produk Cloud</span>
+                    <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileProduk ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="mobileProduk" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                    <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">Cloud VPS KVM</a>
+                    <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                        <span>AI Combo Packages</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                    </a>
+                    <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                        <span>Managed Database</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Accordion Paket VPS -->
+            <div>
+                <button @click="mobileVps = !mobileVps" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                    <span>Paket VPS</span>
+                    <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileVps ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="mobileVps" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                    @foreach($navVpsSpecs as $spec)
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                            <span>{{ $spec->name }}</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                         </a>
-                        <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
-                            <span>Managed Database</span>
-                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                    @endforeach
+                    <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Paket VPS &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Accordion AI Agent -->
+            <div>
+                <button @click="mobileAi = !mobileAi" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                    <span>AI Agent</span>
+                    <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileAi ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="mobileAi" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                    @foreach($navAiSpecs as $spec)
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                            <span>{{ $spec->name }}</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                         </a>
-                    </div>
+                    @endforeach
+                    <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur AI &rarr;</a>
                 </div>
+            </div>
 
-                <!-- Accordion Paket VPS -->
-                <div>
-                    <button @click="mobileVps = !mobileVps" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
-                        <span>Paket VPS</span>
-                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileVps ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="mobileVps" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
-                        @foreach($navVpsSpecs as $spec)
-                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
-                                <span>{{ $spec->name }}</span>
-                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
-                            </a>
-                        @endforeach
-                        <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Paket VPS &rarr;</a>
-                    </div>
+            <!-- Accordion Database -->
+            <div>
+                <button @click="mobileDb = !mobileDb" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                    <span>Database (DB)</span>
+                    <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileDb ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="mobileDb" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                    @foreach($navDbSpecs as $spec)
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                            <span>{{ $spec->name }}</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                        </a>
+                    @endforeach
+                    <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur Database &rarr;</a>
                 </div>
+            </div>
 
-                <!-- Accordion AI Agent -->
-                <div>
-                    <button @click="mobileAi = !mobileAi" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
-                        <span>AI Agent</span>
-                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileAi ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="mobileAi" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
-                        @foreach($navAiSpecs as $spec)
-                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
-                                <span>{{ $spec->name }}</span>
-                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
-                            </a>
-                        @endforeach
-                        <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur AI &rarr;</a>
-                    </div>
-                </div>
-
-                <!-- Accordion Database -->
-                <div>
-                    <button @click="mobileDb = !mobileDb" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
-                        <span>Database (DB)</span>
-                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="mobileDb ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="mobileDb" class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3" style="display: none;">
-                        @foreach($navDbSpecs as $spec)
-                            <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
-                                <span>{{ $spec->name }}</span>
-                                <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
-                            </a>
-                        @endforeach
-                        <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur Database &rarr;</a>
-                    </div>
-                </div>
+            {{-- Direct Links --}}
+            <div class="border-t border-slate-100 pt-3 mt-2 space-y-1">
                 <a href="{{ route('docs') }}" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
                     <span>Docs</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -650,26 +678,37 @@
                     </svg>
                 </a>
                 <a href="{{ route('status') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
-                    Status
+                    Status Sistem
                 </a>
-
-                <div class="border-t border-slate-100 pt-3 mt-3 space-y-2 px-1">
-                    @auth
-                        <a href="{{ route('dashboard.index') }}" class="block w-full text-center px-4 py-2.5 text-sm font-semibold text-slate-800 bg-slate-100 rounded-lg">Dashboard</a>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="block w-full text-left px-3 py-2 text-sm font-medium text-rose-600">Keluar</button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="block text-center py-2.5 text-sm font-bold text-white bg-[#4A6FA5] hover:bg-[#3D5E8C] rounded-lg shadow-xs">Masuk</a>
-                        <div class="text-center pt-1">
-                            <a href="{{ route('register') }}" class="text-xs font-medium text-slate-500 hover:text-slate-800">Belum punya akun? Daftar</a>
-                        </div>
-                    @endauth
-                </div>
             </div>
         </div>
-    </header>
+
+        {{-- Bottom Bar: Fixed / Pinned Auth Actions (Persis Seperti VexaHost WA Gateway) --}}
+        <div class="shrink-0 border-t border-slate-200 bg-white/95 backdrop-blur-md p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+            @auth
+                <div class="space-y-2">
+                    <a href="{{ route('dashboard.index') }}" @click="mobileMenu = false" class="block w-full text-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-neutral-800 transition-all">
+                        Dashboard
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="block w-full text-center px-4 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700">
+                            Keluar dari Akun
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div class="grid grid-cols-2 gap-2.5">
+                    <a href="{{ route('login') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-all text-center">
+                        Masuk
+                    </a>
+                    <a href="{{ route('register') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-neutral-800 transition-all text-center">
+                        Buat Akun
+                    </a>
+                </div>
+            @endauth
+        </div>
+    </div>
 
     <!-- Flash Messages via SweetAlert (Overlay alert, avoids pushing down Hero section) -->
     @if(session('success'))

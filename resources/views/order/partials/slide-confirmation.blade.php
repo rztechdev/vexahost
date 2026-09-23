@@ -1,6 +1,6 @@
 <div class="space-y-6">
     {{-- Header Slide Konfirmasi --}}
-    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs">
+    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-white shadow-xs">
         <div class="flex items-center gap-3 mb-2">
             <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-semibold flex items-center justify-center" x-text="isDirectCheckout ? '3' : '4'"></span>
             <h2 class="font-bold text-slate-900 text-lg">Konfirmasi Pembayaran</h2>
@@ -11,7 +11,7 @@
     </div>
 
     {{-- Card 1: Metode Pembayaran Terpilih --}}
-    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs space-y-4">
+    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-white shadow-xs space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
@@ -82,33 +82,6 @@
                     </div>
                 </template>
 
-                {{-- Lynk.id Payment Notice in Slide Konfirmasi --}}
-                <template x-if="paymentMethod === 'lynk'">
-                    <div class="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                        <div class="flex flex-col items-center justify-center">
-                            <div class="w-24 h-12 mb-3 flex items-center justify-center bg-white border border-slate-200 rounded-xl p-2 shadow-2xs">
-                                <img src="{{ asset('images/payments/lynk.svg') }}" alt="Lynk.id" class="max-h-8 max-w-full object-contain">
-                            </div>
-
-                            <h4 class="text-base font-bold text-slate-900">Pembayaran Instan via Lynk.id</h4>
-                            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4 leading-relaxed">
-                                Mendukung pembayaran lengkap: <strong>QRIS, Virtual Account (BCA, Mandiri, BNI, BRI), E-Wallet (GoPay, OVO, DANA, ShopeePay)</strong>, dan Kartu Debit/Kredit.
-                            </p>
-
-                            <div class="p-4 bg-white rounded-xl border border-slate-200 inline-block min-w-[240px] text-center shadow-2xs">
-                                <span class="text-xs text-slate-500 block">Total Nominal yang Harus Dibayar:</span>
-                                <span class="text-2xl font-black font-mono-code text-slate-900" x-text="formatRupiah(totalPrice)"></span>
-                            </div>
-
-                            <div class="mt-4 flex items-center gap-2 text-xs text-slate-600 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-lg max-w-md mx-auto text-left">
-                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>Saat menekan tombol <strong>Bayar Sekarang</strong> di bawah, Anda akan otomatis dialihkan ke link checkout Lynk.id untuk menyelesaikan pembayaran.</span>
-                            </div>
-                        </div>
-                    </div>
-                </template>
 
                 {{-- Automatic Instant Payment Notice in Slide Konfirmasi --}}
                 <template x-if="['midtrans_snap', 'mandiri_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'gopay', 'bca_va'].includes(paymentMethod)">
@@ -149,7 +122,7 @@
     </div>
 
     {{-- Card 2: Full Breakdown Harga (Rincian Lengkap Tagihan) --}}
-    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-xs space-y-4">
+    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-white shadow-xs space-y-4">
         <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
             <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -194,7 +167,7 @@
     </div>
 
     {{-- Card 3: Ringkasan Spesifikasi Server --}}
-    <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/70 shadow-xs space-y-4">
+    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-slate-50/70 shadow-xs space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Ringkasan Konfigurasi Layanan</h3>
             <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-white border border-slate-200 text-slate-700"
@@ -222,7 +195,7 @@
     </div>
 
     {{-- Card 4: Jaminan Keamanan & Informasi Transaksi --}}
-    <div class="border border-slate-200 rounded-xl p-4 bg-white space-y-2 text-xs text-slate-600 shadow-xs">
+    <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-white space-y-2 text-xs text-slate-600 shadow-xs">
         <div class="flex items-center gap-2 font-semibold text-slate-800">
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -239,7 +212,7 @@
     {{-- Card 5: Persetujuan Ketentuan Penggunaan (WAJIB).
          Persetujuan ini dicatat ke tabel terms_acceptances beserta versi naskah,
          waktu, dan alamat IP. Validasi ulang dilakukan di sisi server. --}}
-    <div class="border border-slate-300 rounded-xl p-5 bg-slate-50 shadow-xs">
+    <div class="border border-slate-300 rounded-2xl p-5 sm:p-6 bg-slate-50 shadow-xs">
         <div class="flex items-center gap-2 mb-3">
             <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.74 4a2 2 0 00-3.48 0l-7.1 12.25A2 2 0 004.99 19z"/>

@@ -1,4 +1,4 @@
-<div class="border border-slate-200 rounded-xl p-6 sm:p-7 bg-white shadow-xs">
+<div class="border border-slate-200 rounded-2xl p-5 sm:p-7 bg-white shadow-xs">
     {{-- Header Slide 2 --}}
     <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
         <div class="flex items-center gap-3">
