@@ -601,19 +601,27 @@ function checkoutState() {
             },
             cloudeka: { ubuntu2404: 'Ubuntu Server 24.04 LTS 64bit', ubuntu2204: 'Ubuntu Server 22.04 LTS 64bit' }
         },
-        paymentMethod: 'qris',
+        paymentMethod: 'midtrans_snap',
         selectedPaymentImage: 'qris.svg',
         paymentMethods: {
-            lynk: { name: 'Lynk.id Checkout', image: 'lynk.svg', description: 'QRIS, VA, E-Wallet, Kartu via Lynk.id' },
-            qris: { name: 'QRIS VexaHost', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
-            bca_va: { name: 'BCA Virtual Account', image: 'va_bca.svg', description: 'Transfer otomatis 24 jam' },
-            mandiri_va: { name: 'Mandiri Virtual Account', image: 'va_mandiri.svg', description: 'Transfer otomatis 24 jam' },
-            bni_va: { name: 'BNI Virtual Account', image: 'va_bni.svg', description: 'Transfer otomatis 24 jam' },
-            bri_va: { name: 'BRI Virtual Account', image: 'va_bri.svg', description: 'Transfer otomatis 24 jam' },
+            midtrans_snap: { name: 'QRIS Otomatis', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
+            qris: { name: 'QRIS Manual', image: 'qris.svg', description: 'Scan barcode QRIS VexaHost' },
             gopay: { name: 'GoPay', image: 'gopay.svg', description: 'Aplikasi GoPay & Gojek' },
-            ovo: { name: 'OVO', image: 'ewallet_ovo.svg', description: 'Aplikasi E-Wallet OVO' },
-            dana: { name: 'DANA', image: 'dana.svg', description: 'Aplikasi E-Wallet DANA' },
-            shopeepay: { name: 'ShopeePay', image: 'ewallet_shopeepay.svg', description: 'Scan & Saldo ShopeePay' }
+            mandiri_va: { name: 'Mandiri Virtual Account', image: 'va_mandiri.svg', description: 'Virtual Account otomatis 24 jam' },
+            bni_va: { name: 'BNI Virtual Account', image: 'va_bni.svg', description: 'Virtual Account otomatis 24 jam' },
+            bri_va: { name: 'BRI Virtual Account', image: 'va_bri.svg', description: 'Virtual Account otomatis 24 jam' },
+            permata_va: { name: 'Permata Virtual Account', image: 'va_permata.svg', description: 'Virtual Account otomatis 24 jam' },
+            cimb_va: { name: 'CIMB Niaga VA', image: 'va_cimb.svg', description: 'Virtual Account otomatis 24 jam' },
+            other_va: { name: 'Bank Lainnya (VA)', image: 'va_permata.svg', description: 'Transfer ATM & Bank Lainnya' },
+            lynk: { name: 'Lynk.id Checkout', image: 'lynk.svg', description: 'QRIS, VA, E-Wallet, Kartu via Lynk.id' },
+            bca_va: { name: 'BCA Virtual Account', image: 'va_bca.svg', description: 'Sedang dinonaktifkan' },
+            bsi_va: { name: 'BSI Virtual Account', image: 'va_bsi.svg', description: 'Sedang dinonaktifkan' },
+            danamon_va: { name: 'Danamon Virtual Account', image: 'va_danamon.svg', description: 'Sedang dinonaktifkan' },
+            seabank_va: { name: 'SeaBank Virtual Account', image: 'va_seabank.svg', description: 'Sedang dinonaktifkan' },
+            credit_card: { name: 'Kartu Kredit / Debit', image: 'credit_card.svg', description: 'Sedang dinonaktifkan' },
+            ovo: { name: 'OVO', image: 'ewallet_ovo.svg', description: 'Sedang dinonaktifkan' },
+            dana: { name: 'DANA', image: 'dana.svg', description: 'Sedang dinonaktifkan' },
+            shopeepay: { name: 'ShopeePay', image: 'ewallet_shopeepay.svg', description: 'Sedang dinonaktifkan' }
         },
         qrisSvgDataUri: '{{ app(\App\Services\QrisService::class)->generateDataUri($selectedSpec ? $selectedSpec->sell_price : 80000) }}',
 
@@ -1144,9 +1152,9 @@ function checkoutState() {
         },
         
         selectPayment(method, isActive = true) {
-            if (!isActive || (method !== 'qris' && method !== 'lynk')) {
+            if (!isActive) {
                 const methodName = this.paymentMethods[method]?.name || method;
-                showAlert('Metode pembayaran ' + methodName + ' sedang tidak aktif. Saat ini transaksi dapat menggunakan QRIS atau Lynk.id Checkout.', {
+                showAlert('Metode pembayaran ' + methodName + ' sedang tidak aktif. Silakan pilih metode pembayaran lain yang bertanda aktif.', {
                     icon: 'info',
                     title: 'Metode Pembayaran Nonaktif'
                 });
@@ -1245,10 +1253,44 @@ function checkoutState() {
                 // Hapus draft saat checkout berhasil disubmit
                 this.clearDraft();
 
+                // 1. Jika backend mengembalikan snap_token dan script Snap tersedia, buka popup langsung di halaman checkout
+                if (data && data.snap_token && window.snap) {
+                    this.isSubmitting = false;
+                    window.snap.pay(data.snap_token, {
+                        onSuccess: (result) => {
+                            window.location.href = '/order/payment/status/' + data.order_id;
+                        },
+                        onPending: (result) => {
+                            window.location.href = '/order/payment/status/' + data.order_id;
+                        },
+                        onError: (result) => {
+                            showAlert('Pembayaran tidak berhasil atau dibatalkan. Anda dapat mengulangi proses pembayaran.', {
+                                icon: 'error',
+                                title: 'Pembayaran Gagal'
+                            });
+                            this.isSubmitting = false;
+                        },
+                        onClose: () => {
+                            showAlert('Jendela pembayaran ditutup. Anda dapat melanjutkan pembayaran nanti melalui menu Tagihan di Dashboard.', {
+                                icon: 'info',
+                                title: 'Pembayaran Ditunda'
+                            });
+                            this.isSubmitting = false;
+                        }
+                    });
+                    return;
+                }
+
+                // 2. Fallback jika snap script terhalang peramban: langsung alihkan ke halaman Midtrans tanpa halaman perantara
+                if (data && data.snap_redirect_url) {
+                    window.location.href = data.snap_redirect_url;
+                    return;
+                }
+
                 if (data && data.redirect_url) {
                     window.location.href = data.redirect_url;
                 } else if (data && data.order_id) {
-                    window.location.href = '/order/payment/' + data.order_id;
+                    window.location.href = '/order/payment/status/' + data.order_id;
                 } else {
                     window.location.href = '/dashboard';
                 }
@@ -1265,3 +1307,13 @@ function checkoutState() {
 }
 </script>
 @endsection
+
+@push('scripts')
+    @php
+        $midtransClientKey = \App\Services\Payments\MidtransService::getClientKey();
+        $midtransSnapJsUrl = \App\Services\Payments\MidtransService::getSnapJsUrl();
+    @endphp
+    @if(!empty($midtransClientKey))
+        <script src="{{ $midtransSnapJsUrl }}" data-client-key="{{ $midtransClientKey }}"></script>
+    @endif
+@endpush

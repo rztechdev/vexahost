@@ -57,10 +57,10 @@ class SecurityHeaders
                 'Content-Security-Policy',
                 "default-src 'self'; " .
                 "img-src 'self' data: blob:{$devViteHttp}; " .
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com{$devViteHttp}; " .
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}; " .
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com{$devViteHttp}; " .
                 "font-src 'self' https://fonts.gstatic.com data:{$devViteHttp}; " .
-                "frame-src 'self' https://challenges.cloudflare.com; " .
+                "frame-src 'self' https://challenges.cloudflare.com https://app.midtrans.com https://app.sandbox.midtrans.com; " .
                 "connect-src 'self' https://challenges.cloudflare.com https://*.lynk.id https://lynk.id https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}{$devViteWs}; " .
                 "frame-ancestors 'self'; " .
                 "base-uri 'self'; " .

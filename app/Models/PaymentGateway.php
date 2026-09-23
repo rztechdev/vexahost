@@ -131,11 +131,24 @@ class PaymentGateway extends Model
         'bri_va' => 'midtrans',
         'cimb_va' => 'midtrans',
         'permata_va' => 'midtrans',
+        'other_va' => 'midtrans',
         'gopay' => 'midtrans',
+        'bsi_va' => 'midtrans',
+        'danamon_va' => 'midtrans',
+        'seabank_va' => 'midtrans',
+        'credit_card' => 'midtrans',
         'ovo' => 'midtrans',
         'dana' => 'midtrans',
         'shopeepay' => 'midtrans',
     ];
+
+    /**
+     * Cek apakah suatu metode pembayaran ditangani oleh Midtrans.
+     */
+    public static function isMidtransMethod(string $method): bool
+    {
+        return (self::METHOD_GATEWAY[$method] ?? null) === 'midtrans';
+    }
 
     /**
      * Metode checkout yang boleh dipilih saat ini.

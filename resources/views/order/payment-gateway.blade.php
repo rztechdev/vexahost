@@ -1,6 +1,9 @@
 @extends('layouts.app', ['title' => 'Pembayaran — VexaHost'])
 
 @section('content')
+@if(!empty($isMidtrans) && !empty($snapJsUrl) && !empty($snapClientKey))
+    <script src="{{ $snapJsUrl }}" data-client-key="{{ $snapClientKey }}"></script>
+@endif
 <div class="py-12 bg-slate-50 min-h-screen" x-data="paymentGateway()">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Back to Checkout --}}
@@ -264,8 +267,147 @@
                         </div>
                         @endif
 
-                        {{-- Virtual Account Payment --}}
-                        @if(in_array($order->payment_method, ['bca_va', 'mandiri_va', 'bni_va', 'bri_va']))
+                        {{-- Midtrans Snap Payment (Active Gateway) --}}
+                        @if(!empty($isMidtrans))
+                        <div class="text-center mb-8 flex flex-col items-center justify-center">
+                            {{-- Midtrans Logo Container --}}
+                            <div class="w-48 h-16 mx-auto flex items-center justify-center p-3 bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
+                                @php
+                                    $midtransMethodIcons = [
+                                        'mandiri_va' => 'va_mandiri.svg',
+                                        'bni_va' => 'va_bni.svg',
+                                        'bri_va' => 'va_bri.svg',
+                                        'permata_va' => 'va_permata.svg',
+                                        'cimb_va' => 'va_cimb.svg',
+                                        'gopay' => 'gopay.svg',
+                                    ];
+                                    $methodIcon = $midtransMethodIcons[$order->payment_method] ?? 'midtrans.svg';
+                                @endphp
+                                <img src="{{ asset('images/payments/' . $methodIcon) }}" alt="Midtrans Payment" class="max-h-10 max-w-full object-contain">
+                            </div>
+
+                            <h2 class="text-lg font-bold text-slate-900 mb-1">
+                                Pembayaran {{ $order->payment_method_name }} via Midtrans
+                            </h2>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto mb-4">
+                                Transaksi diproses secara instan dan terverifikasi otomatis melalui payment gateway resmi Midtrans (mendukung GoPay, QRIS, dan Virtual Account Bank).
+                            </p>
+
+                            {{-- Nominal Tagihan Sesuai Order --}}
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 max-w-sm w-full mx-auto text-center space-y-1 mb-5">
+                                <span class="text-xs text-slate-500 block">Total Nominal Tagihan:</span>
+                                <div class="text-2xl font-black font-mono-code text-slate-900">
+                                    Rp {{ number_format($order->amount, 0, ',', '.') }}
+                                </div>
+                            </div>
+
+                            @if(!empty($snapToken))
+                                {{-- Tombol Utama: Bayar via Midtrans Pop-up --}}
+                                <div class="w-full max-w-sm mx-auto space-y-2.5 mb-5">
+                                    <button type="button" @click="payWithMidtrans()"
+                                            class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition-all cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                        <span>Buka Jendela Pembayaran Midtrans</span>
+                                    </button>
+
+                                    @if(!empty($snapRedirectUrl))
+                                        <a href="{{ $snapRedirectUrl }}" target="_blank"
+                                           class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all">
+                                            <span>Buka di Tab Baru (Halaman Web Midtrans)</span>
+                                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    @endif
+                                    <p class="text-[11px] text-slate-400">Jendela pembayaran Midtrans otomatis terbuka. Klik tombol di atas jika belum muncul.</p>
+                                </div>
+                            @elseif(!empty($snapError))
+                                <div class="w-full max-w-sm mx-auto mb-5 p-4 rounded-xl bg-amber-50 border border-amber-300 text-left">
+                                    <div class="flex items-center gap-2 font-bold text-amber-900 text-xs mb-1">
+                                        <svg class="w-4 h-4 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        <span>Konfigurasi Gateway Belum Selesai</span>
+                                    </div>
+                                    <p class="text-xs text-amber-800 leading-relaxed">
+                                        {{ $snapError }}
+                                    </p>
+                                    <p class="text-[11px] text-amber-700 mt-2">
+                                        Admin VexaHost: Pastikan Server Key dan Client Key sudah diisi di panel admin dan mode (Produksi/Sandbox) sesuai.
+                                    </p>
+                                </div>
+                            @endif
+
+                            {{-- Section Cek Status Pembayaran --}}
+                            <div class="w-full max-w-sm mx-auto">
+                                <div class="p-4 rounded-xl border transition-all text-center"
+                                     :class="{
+                                         'bg-slate-50 border-slate-200': checkStatus === 'idle',
+                                         'bg-amber-50 border-amber-300 text-amber-900': checkStatus === 'pending',
+                                         'bg-emerald-50 border-emerald-300 text-emerald-900': checkStatus === 'success'
+                                     }">
+                                    
+                                    {{-- Tombol Cek Status --}}
+                                    <button type="button" 
+                                            @click="handleCheckStatus()" 
+                                            :disabled="isChecking"
+                                            class="w-full px-5 py-3 rounded-lg font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                                            :class="checkStatus === 'success' ? 'bg-black hover:bg-neutral-800' : 'bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60'">
+                                        <svg x-show="isChecking" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg x-show="!isChecking && checkStatus !== 'success'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <svg x-show="checkStatus === 'success'" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span x-text="buttonText"></span>
+                                    </button>
+
+                                    {{-- Info Text --}}
+                                    <div class="mt-3 text-xs">
+                                        <template x-if="checkStatus === 'idle'">
+                                            <p class="text-slate-500">
+                                                Setelah Anda menyelesaikan pembayaran di Midtrans, sistem akan otomatis mendeteksi dan mengaktifkan pesanan Anda.
+                                            </p>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'pending'">
+                                            <div class="space-y-1.5 text-left bg-amber-100/80 p-3 rounded-lg border border-amber-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <span>Status: Menunggu Pembayaran</span>
+                                                </div>
+                                                <p class="text-[11px] text-amber-800 leading-relaxed">
+                                                    Webhook dari Midtrans sedang ditunggu. Silakan selesaikan pembayaran di jendela Midtrans.
+                                                </p>
+                                                <div class="text-[11px] text-amber-900 font-semibold pt-0.5 border-t border-amber-200">
+                                                    Verifikasi otomatis: <span class="font-mono-code text-amber-950" x-text="countdownText"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="checkStatus === 'success'">
+                                            <div class="space-y-1 text-left bg-emerald-100/80 p-3 rounded-lg border border-emerald-200">
+                                                <div class="flex items-center gap-1.5 font-bold text-emerald-900 text-xs">
+                                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span>Status: Pembayaran Berhasil Diterima!</span>
+                                                </div>
+                                                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                                                    Transaksi Anda telah terverifikasi. Mengalihkan ke dashboard...
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- Fallback Non-Midtrans VA Payment --}}
+                        @if(empty($isMidtrans) && in_array($order->payment_method, ['bca_va', 'mandiri_va', 'bni_va', 'bri_va']))
                         <div class="text-center mb-8">
                             <div class="bg-slate-50 border border-slate-200 rounded-lg p-8 max-w-md mx-auto">
                                 <div class="w-16 h-16 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center">
@@ -285,8 +427,8 @@
                         </div>
                         @endif
 
-                        {{-- E-Wallet Payment --}}
-                        @if(in_array($order->payment_method, ['gopay', 'ovo', 'dana', 'shopeepay']))
+                        {{-- Fallback Non-Midtrans E-Wallet Payment --}}
+                        @if(empty($isMidtrans) && in_array($order->payment_method, ['gopay', 'ovo', 'dana', 'shopeepay']))
                         <div class="text-center mb-8">
                             <div class="flex flex-col items-center">
                                 <div class="w-32 h-32 mb-6 bg-white border-2 border-slate-300 rounded-lg flex items-center justify-center p-4">
@@ -305,17 +447,6 @@
                                 <p class="text-sm text-slate-600 mb-4">
                                     Buka aplikasi {{ strtoupper($order->payment_method) }} Anda dan scan QR code atau gunakan metode pembayaran yang tersedia
                                 </p>
-                                <div class="flex items-center justify-center gap-2">
-                                    <span class="text-xs text-slate-500">Tersedia di:</span>
-                                    <div class="flex items-center gap-1">
-                                        <svg class="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"></path></svg>
-                                        <span class="text-xs font-medium">App Store</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <svg class="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
-                                        <span class="text-xs font-medium">Google Play</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         @endif
@@ -333,6 +464,8 @@
                                                 Scan QR code menggunakan aplikasi e-wallet atau mobile banking
                                             @elseif($order->payment_method === 'lynk')
                                                 Buka tautan checkout Lynk.id dan selesaikan pembayaran via QRIS, Virtual Account, E-Wallet, atau Kartu
+                                            @elseif(!empty($isMidtrans))
+                                                Selesaikan pembayaran melalui jendela Midtrans menggunakan GoPay, QRIS, atau Virtual Account bank yang Anda pilih
                                             @elseif(str_contains($order->payment_method, '_va'))
                                                 Transfer ke nomor Virtual Account yang ditampilkan
                                             @else
@@ -547,11 +680,21 @@ function paymentGateway() {
         isChecking: false,
         timer: null,
         pollTimer: null,
+        snapToken: '{{ $snapToken ?? '' }}',
+        snapRedirectUrl: '{{ $snapRedirectUrl ?? '' }}',
+        isMidtrans: {{ !empty($isMidtrans) ? 'true' : 'false' }},
 
         init() {
             this.timer = setInterval(() => {
                 this.elapsedSeconds++;
             }, 1000);
+
+            // Auto-trigger Midtrans Snap jika metode Midtrans dan token tersedia
+            if (this.isMidtrans && this.snapToken) {
+                setTimeout(() => {
+                    this.payWithMidtrans();
+                }, 800);
+            }
 
             // Background polling: otomatis periksa jika webhook masuk atau admin approve
             this.pollTimer = setInterval(() => {
@@ -568,6 +711,41 @@ function paymentGateway() {
                 })
                 .catch(() => {});
             }, 4000);
+        },
+
+        payWithMidtrans() {
+            if (!this.snapToken) {
+                showAlert('Token pembayaran Midtrans tidak ditemukan. Silakan muat ulang halaman.', { icon: 'error' });
+                return;
+            }
+            if (typeof window.snap === 'undefined') {
+                if (this.snapRedirectUrl) {
+                    window.open(this.snapRedirectUrl, '_blank');
+                    return;
+                }
+                showAlert('SDK Midtrans gagal dimuat di browser Anda. Harap nonaktifkan ad-blocker atau muat ulang halaman.', { icon: 'error' });
+                return;
+            }
+
+            window.snap.pay(this.snapToken, {
+                onSuccess: (result) => {
+                    this.checkStatus = 'success';
+                    showAlert('Pembayaran berhasil dikonfirmasi! Mengalihkan ke dashboard...', { icon: 'success' });
+                    setTimeout(() => {
+                        window.location.href = '{{ route("dashboard.index", ["payment_success" => 1, "order_id" => $order->id]) }}';
+                    }, 1200);
+                },
+                onPending: (result) => {
+                    this.checkStatus = 'pending';
+                    showAlert('Transaksi dibuat! Silakan selesaikan pembayaran sesuai instruksi.', { icon: 'info' });
+                },
+                onError: (result) => {
+                    showAlert('Pembayaran gagal atau dibatalkan.', { icon: 'error' });
+                },
+                onClose: () => {
+                    // Popup ditutup oleh pelanggan
+                }
+            });
         },
 
         get countdownText() {

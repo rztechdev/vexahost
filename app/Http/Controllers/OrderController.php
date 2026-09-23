@@ -130,7 +130,7 @@ class OrderController extends Controller
             'billing_cycle' => 'nullable|string|in:monthly',
             'hostname' => ['required', 'string', 'max:63', 'regex:/^[A-Za-z0-9][A-Za-z0-9-]*$/'],
             'root_password' => 'required|string|min:8|max:255',
-            'payment_method' => 'required|string|in:midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,gopay,shopeepay,ovo,dana',
+            'payment_method' => 'required|string|in:midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,other_va,bsi_va,danamon_va,seabank_va,credit_card,gopay,shopeepay,ovo,dana',
             'db_engine' => 'nullable|string|in:postgres,mysql,redis,mongodb,vector',
             'db_manager' => 'nullable|string|in:cloudbeaver,cli_only',
             // Guest fields if not logged in
@@ -359,9 +359,20 @@ class OrderController extends Controller
         // VPS Instance TIDAK dibuat di sini.
         // Instance hanya dibuat oleh Admin setelah payment terkonfirmasi via webhook.
 
+        $snapToken = null;
+        $snapRedirectUrl = null;
+
+        if (PaymentGateway::isMidtransMethod($order->payment_method)) {
+            $snapResult = \App\Services\Payments\MidtransService::createSnapTransaction($order);
+            if (!empty($snapResult['success'])) {
+                $snapToken = $snapResult['token'] ?? null;
+                $snapRedirectUrl = $snapResult['redirect_url'] ?? null;
+            }
+        }
+
         $redirectUrl = ($order->payment_method === 'lynk' && !empty($spec->payment_url))
             ? $spec->payment_url
-            : route('order.payment', $order->id);
+            : ($snapRedirectUrl ?: route('order.payment', $order->id));
 
         // If user explicitly chose to postpone payment and view dashboard (locked state)
         if ($request->filled('redirect_to_dashboard') && $request->input('redirect_to_dashboard') == '1') {
@@ -381,6 +392,8 @@ class OrderController extends Controller
             return response()->json([
                 'success' => true,
                 'order_id' => $order->id,
+                'snap_token' => $snapToken,
+                'snap_redirect_url' => $snapRedirectUrl,
                 'redirect_url' => $redirectUrl,
             ]);
         }
@@ -388,6 +401,11 @@ class OrderController extends Controller
         // Jika metode pembayaran Lynk dan paket memiliki payment_url, langsung alihkan ke Lynk checkout
         if ($order->payment_method === 'lynk' && !empty($spec->payment_url)) {
             return redirect()->away($spec->payment_url);
+        }
+
+        // Jika metode Midtrans dan ada snap redirect url, alihkan langsung ke halaman pembayaran Midtrans
+        if ($snapRedirectUrl) {
+            return redirect()->away($snapRedirectUrl);
         }
 
         return redirect()->route('order.payment', $order->id)
@@ -408,17 +426,24 @@ class OrderController extends Controller
         }
 
         $paymentMethodNames = [
+            'midtrans_snap' => 'QRIS Otomatis',
+            'qris' => 'QRIS Manual',
             'lynk' => 'Lynk.id Checkout',
-            'qris' => 'QRIS',
             'bca_va' => 'BCA Virtual Account',
+            'bsi_va' => 'BSI Virtual Account',
+            'danamon_va' => 'Danamon Virtual Account',
+            'seabank_va' => 'SeaBank Virtual Account',
+            'credit_card' => 'Kartu Kredit / Debit',
             'mandiri_va' => 'Mandiri Virtual Account',
             'bni_va' => 'BNI Virtual Account',
             'bri_va' => 'BRI Virtual Account',
+            'permata_va' => 'Permata Virtual Account',
+            'cimb_va' => 'CIMB Niaga VA',
+            'other_va' => 'Virtual Account Bank Lainnya',
             'gopay' => 'GoPay',
             'ovo' => 'OVO',
             'dana' => 'DANA',
             'shopeepay' => 'ShopeePay',
-            'midtrans_snap' => 'Kartu Kredit/Debit',
         ];
 
         $devSimulateEnabled = config('app.env') === 'local' && (bool) env('APP_DEV_SIMULATE_PAYMENT', false);
@@ -429,7 +454,39 @@ class OrderController extends Controller
         $qrisPayload = $qrisService->generatePayload((float) $order->amount);
         $elapsedSeconds = (int) max(0, now()->diffInSeconds($order->created_at));
 
-        return view('order.payment-gateway', compact('order', 'devSimulateEnabled', 'qrisDataUri', 'qrisPayload', 'elapsedSeconds'));
+        // Integrasi Midtrans Snap
+        $isMidtrans = PaymentGateway::isMidtransMethod($order->payment_method);
+        $snapToken = null;
+        $snapRedirectUrl = null;
+        $snapJsUrl = null;
+        $snapClientKey = null;
+        $snapError = null;
+
+        if ($isMidtrans) {
+            $snapResult = \App\Services\Payments\MidtransService::createSnapTransaction($order);
+            if ($snapResult['success']) {
+                $snapToken = $snapResult['token'];
+                $snapRedirectUrl = $snapResult['redirect_url'];
+            } else {
+                $snapError = $snapResult['error'] ?? 'Gagal membuat sesi pembayaran Midtrans.';
+            }
+            $snapJsUrl = \App\Services\Payments\MidtransService::getSnapJsUrl();
+            $snapClientKey = \App\Services\Payments\MidtransService::getClientKey();
+        }
+
+        return view('order.payment-gateway', compact(
+            'order',
+            'devSimulateEnabled',
+            'qrisDataUri',
+            'qrisPayload',
+            'elapsedSeconds',
+            'isMidtrans',
+            'snapToken',
+            'snapRedirectUrl',
+            'snapJsUrl',
+            'snapClientKey',
+            'snapError'
+        ));
     }
 
     /**

@@ -109,6 +109,34 @@
                         </div>
                     </div>
                 </template>
+
+                {{-- Automatic Instant Payment Notice in Slide Konfirmasi --}}
+                <template x-if="['midtrans_snap', 'mandiri_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'gopay', 'bca_va'].includes(paymentMethod)">
+                    <div class="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="w-32 h-14 mb-3 flex items-center justify-center bg-white border border-slate-200 rounded-xl p-2 shadow-2xs">
+                                <img :src="'/images/payments/' + (selectedPaymentMethod?.image || 'qris.svg')" :alt="selectedPaymentMethod?.name || 'Pembayaran'" class="max-h-9 max-w-full object-contain">
+                            </div>
+
+                            <h4 class="text-base font-bold text-slate-900" x-text="selectedPaymentMethod?.name || 'Pembayaran Otomatis'"></h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4 leading-relaxed">
+                                <span x-text="selectedPaymentMethod?.description || 'Pembayaran otomatis 24 jam'"></span>. Transaksi diproses instan dengan verifikasi otomatis tanpa perlu upload bukti transfer.
+                            </p>
+
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 inline-block min-w-[240px] text-center shadow-2xs">
+                                <span class="text-xs text-slate-500 block">Total Nominal yang Harus Dibayar:</span>
+                                <span class="text-2xl font-black font-mono-code text-slate-900" x-text="formatRupiah(totalPrice)"></span>
+                            </div>
+
+                            <div class="mt-4 flex items-center gap-2 text-xs text-slate-600 bg-emerald-50 border border-emerald-200 px-4 py-2.5 rounded-lg max-w-md mx-auto text-left">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                <span>Saat menekan tombol <strong>Bayar Sekarang</strong> di bawah, jendela pembayaran aman akan langsung terbuka seketika untuk menyelesaikan pesanan Anda.</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
 

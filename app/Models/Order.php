@@ -238,18 +238,23 @@ class Order extends Model
     {
         $names = [
             'lynk' => 'Lynk.id Checkout',
-            'qris' => 'QRIS',
-            'bca_va' => 'BCA Virtual Account',
+            'qris' => 'QRIS Manual',
+            'midtrans_snap' => 'QRIS Otomatis',
             'mandiri_va' => 'Mandiri Virtual Account',
             'bni_va' => 'BNI Virtual Account',
             'bri_va' => 'BRI Virtual Account',
             'cimb_va' => 'CIMB Niaga VA',
             'permata_va' => 'Permata Bank VA',
+            'other_va' => 'Virtual Account Bank Lainnya',
             'gopay' => 'GoPay',
+            'bca_va' => 'BCA Virtual Account',
+            'bsi_va' => 'BSI Virtual Account',
+            'danamon_va' => 'Danamon Virtual Account',
+            'seabank_va' => 'SeaBank Virtual Account',
+            'credit_card' => 'Kartu Kredit / Debit',
             'ovo' => 'OVO',
             'dana' => 'DANA',
             'shopeepay' => 'ShopeePay',
-            'midtrans_snap' => 'Kartu Kredit/Debit',
         ];
 
         return $names[$this->payment_method] ?? strtoupper((string) $this->payment_method);

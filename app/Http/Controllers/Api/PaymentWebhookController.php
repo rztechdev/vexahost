@@ -37,6 +37,14 @@ class PaymentWebhookController extends Controller
 
     public function handle(Request $request)
     {
+        // Respond to GET requests (for browser check, uptime monitoring, and ping tests)
+        if ($request->isMethod('get')) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Midtrans payment webhook endpoint is active and ready.',
+            ], 200);
+        }
+
         // PHASE 4 - registry gateway lebih dulu, jatuh kembali ke .env.
         $serverKey = PaymentGateway::credential('midtrans', 'server_key', config('services.midtrans.server_key'));
 
@@ -95,19 +103,37 @@ class PaymentWebhookController extends Controller
         }
         $paymentStatus = strtolower($statusField);
 
-        // Parse order id dari format "INV-YYYYMM-XXXX" atau "ORDER-123".
-        $cleanId = preg_replace('/[^0-9]/', '', $rawOrderId);
-        $orderIdInt = !empty($cleanId) ? (int) $cleanId : null;
-
-        // Guard 3: order harus ada.
-        $order = $orderIdInt ? Order::with('invoice')->find($orderIdInt) : null;
+        // Parse order id dari format "ORDER-123", "ORDER-123-timestamp", "INV-YYYYMM-XXXX", atau ID angka langsung.
+        $order = null;
+        if (is_numeric($rawOrderId)) {
+            $order = Order::with('invoice')->find((int) $rawOrderId);
+        }
+        if (!$order && preg_match('/^(?:ORDER|VX)[-_]?(\d+)(?:[-_].*)?$/i', $rawOrderId, $matches)) {
+            $order = Order::with('invoice')->find((int) $matches[1]);
+        }
+        if (!$order) {
+            $order = Order::whereHas('invoice', fn ($q) => $q->where('invoice_number', $rawOrderId))->with('invoice')->first();
+        }
+        if (!$order) {
+            $tx = PaymentTransaction::where('provider_order_ref', $rawOrderId)->with('order.invoice')->first();
+            if ($tx && $tx->order) {
+                $order = $tx->order;
+            }
+        }
+        if (!$order) {
+            $cleanId = preg_replace('/[^0-9]/', '', $rawOrderId);
+            if (!empty($cleanId)) {
+                $order = Order::with('invoice')->find((int) $cleanId);
+            }
+        }
         if (!$order) {
             // Tetap catat webhook untuk forensik.
-            $this->recordWebhook($provider, $providerTxId, $paymentStatus, $incomingSignature, $request, null, null, 'ignored', 'Order not found');
+            $this->recordWebhook($provider, $providerTxId, $paymentStatus, $incomingSignature, $request, null, null, 'ignored', 'Order not found / Midtrans test ping');
+            // Kembalikan 200 OK agar tes webhook / simulasi Midtrans dashboard tidak mendeteksi kegagalan
             return response()->json([
-                'success' => false,
-                'message' => 'Order not found.',
-            ], 404);
+                'success' => true,
+                'message' => 'Notification acknowledged (order not found or dashboard test).',
+            ], 200);
         }
 
         // Guard 4: amount match.
