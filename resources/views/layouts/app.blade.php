@@ -241,7 +241,7 @@
                 'bg-transparent border-transparent shadow-none': !isScrolled && !mobileMenu && {{ $isHome ? 'true' : 'false' }}
             }"
             class="sticky top-0 z-50 transition-all duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
                 <!-- Brand Logo (Left) -->
@@ -255,7 +255,7 @@
                     <nav class="flex items-center space-x-5 text-sm font-medium text-slate-700">
 
                         <!-- Beranda -->
-                        <a href="{{ route('home') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('home') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('home') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('home') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
                             <span class="relative pb-0.5">
                                 Beranda
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('home') ? 'w-full' : 'w-0' }}"></span>
@@ -263,9 +263,9 @@
                         </a>
 
                         <!-- Dropdown Produk -->
-                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
                                     :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
                                 <span class="relative pb-0.5">
                                     Produk
@@ -324,9 +324,9 @@
                         </div>
 
                         <!-- Dropdown Paket VPS -->
-                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
                                     :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
                                 <span class="relative pb-0.5">
                                     Paket VPS
@@ -371,9 +371,9 @@
                         </div>
 
                         <!-- Dropdown AI Agent -->
-                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
                                     :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
                                 <span class="relative pb-0.5">
                                     AI Agent
@@ -418,9 +418,9 @@
                         </div>
 
                         <!-- Dropdown Database -->
-                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors"
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
                                     :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
                                 <span class="relative pb-0.5">
                                     Database
@@ -465,7 +465,7 @@
                         </div>
 
                         <!-- Docs -->
-                        <a href="{{ route('docs') }}" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('docs') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('docs') }}" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('docs') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
                             <span class="relative pb-0.5">
                                 Docs
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('docs') ? 'w-full' : 'w-0' }}"></span>
@@ -476,7 +476,7 @@
                         </a>
 
                         <!-- WA Gateway -->
-                        <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors text-slate-700">
+                        <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 text-slate-700">
                             <span class="relative pb-0.5">
                                 WA Gateway
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
@@ -486,8 +486,19 @@
                             </svg>
                         </a>
 
+                        <!-- Jasa Web -->
+                        <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 text-slate-700">
+                            <span class="relative pb-0.5">
+                                Jasa Web
+                                <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
+                            </span>
+                            <svg class="w-3 h-3 text-slate-400 group-hover:text-[#4A6FA5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+
                         <!-- Status -->
-                        <a href="{{ route('status') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors {{ request()->routeIs('status') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('status') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('status') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
                             <span class="relative pb-0.5">
                                 Status
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('status') ? 'w-full' : 'w-0' }}"></span>
@@ -623,13 +634,19 @@
                 <a href="{{ route('docs') }}" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
                     <span>Docs</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                     </svg>
                 </a>
                 <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
                     <span>WA Gateway</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7V17"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+                <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                    <span>Jasa Web</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                     </svg>
                 </a>
                 <a href="{{ route('status') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
