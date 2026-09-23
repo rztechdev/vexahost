@@ -57,8 +57,8 @@ class PaymentWebhookController extends Controller
             ], 500);
         }
 
-        // Validasi struktur minimal payload.
-        $validated = $request->validate([
+        // Validasi struktur minimal payload (menggunakan Validator agar tidak redirect 302 jika non-JSON Accept header).
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'order_id' => 'required|string',
             'status_code' => 'nullable|string',
             'gross_amount' => 'nullable|string',
@@ -69,6 +69,16 @@ class PaymentWebhookController extends Controller
             'payment_type' => 'nullable|string',
             'fraud_status' => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid webhook payload structure.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
 
         $rawOrderId = (string) $validated['order_id'];
         $statusCode = (string) ($validated['status_code'] ?? '');
@@ -155,10 +165,11 @@ class PaymentWebhookController extends Controller
         }
 
         // Idempotency check + processing di dalam transaction.
+        $needsNotification = false;
         try {
             $result = DB::transaction(function () use (
                 $provider, $providerTxId, $paymentStatus, $incomingSignature,
-                $request, $order, $validated, $grossAmount
+                $request, $order, $validated, $grossAmount, &$needsNotification
             ) {
                 // Cek apakah webhook ini sudah pernah diproses (idempotency).
                 $existingEvent = WebhookEvent::where('provider', $provider)
@@ -229,6 +240,7 @@ class PaymentWebhookController extends Controller
                 // Route berdasarkan payment status.
                 if (in_array($paymentStatus, ['settlement', 'capture', 'paid'], true)) {
                     $this->handleSettlement($order, $tx, $event, $validated);
+                    $needsNotification = true;
                     return [
                         'status' => 'settled',
                         'message' => 'Payment recorded. Order transitioned to paid.',
@@ -287,16 +299,38 @@ class PaymentWebhookController extends Controller
             ], 500);
         }
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'message' => $result['message'],
             'order_id' => $order->id,
             'order_status' => $result['order_status'],
         ], 200);
+
+        // Jika request diproses oleh Web Server (FastCGI / PHP-FPM / LiteSpeed),
+        // segera kirimkan respons HTTP 200 ke gateway dan tutup koneksi client sekarang.
+        // Dengan ini Midtrans menerima konfirmasi sukses dalam < 50ms tanpa risiko timeout.
+        if (function_exists('fastcgi_finish_request')) {
+            ignore_user_abort(true);
+            $response->send();
+            fastcgi_finish_request();
+        } elseif (function_exists('litespeed_finish_request')) {
+            ignore_user_abort(true);
+            $response->send();
+            litespeed_finish_request();
+        }
+
+        // Jalankan pengiriman notifikasi (render PDF & kirim email SMTP)
+        // setelah koneksi Midtrans selesai dilepas atau secara sinkron bila CLI.
+        if ($needsNotification) {
+            $this->dispatchPostPaymentNotifications($order);
+        }
+
+        return $response;
     }
 
     /**
      * Sukses payment: transisi order pending → paid, tandai invoice paid.
+     * HANYA modifikasi state & database di sini (cepat <10ms, bebas lock eksternal).
      */
     protected function handleSettlement(Order $order, PaymentTransaction $tx, WebhookEvent $event, array $validated): void
     {
@@ -339,7 +373,14 @@ class PaymentWebhookController extends Controller
             'processed_at' => now(),
             'payment_transaction_id' => $tx->id,
         ]);
+    }
 
+    /**
+     * Kirim email dan notifikasi setelah pembayaran sukses.
+     * Dijalankan terpisah di luar transaksi database dan setelah koneksi HTTP Midtrans dilepas.
+     */
+    protected function dispatchPostPaymentNotifications(Order $order): void
+    {
         // Kirim email pembayaran diterima ke customer
         try {
             $order->loadMissing(['customer', 'vpsSpec', 'invoice']);

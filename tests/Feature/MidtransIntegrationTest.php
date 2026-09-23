@@ -326,5 +326,29 @@ class MidtransIntegrationTest extends TestCase
             'success' => true,
         ]);
     }
+
+    public function test_webhook_with_missing_fields_returns_422_json_without_redirect(): void
+    {
+        $serverKey = 'Mid-server-test12345';
+        $gw = PaymentGateway::where('code', 'midtrans')->first();
+        $gw->update([
+            'is_active' => true,
+            'credentials' => [
+                'server_key' => $serverKey,
+                'client_key' => 'Mid-client-test12345',
+            ],
+        ]);
+
+        // Post raw request without Accept: application/json header
+        $response = $this->call('POST', '/api/webhooks/payment', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode(['foo' => 'bar']));
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Invalid webhook payload structure.',
+        ]);
+    }
 }
 

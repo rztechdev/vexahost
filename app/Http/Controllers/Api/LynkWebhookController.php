@@ -176,6 +176,18 @@ class LynkWebhookController extends Controller
 
         $result = $this->processor->process($webhookEvent);
 
-        return response()->json($result['body'], $result['http']);
+        $response = response()->json($result['body'], $result['http']);
+
+        if (function_exists('fastcgi_finish_request')) {
+            ignore_user_abort(true);
+            $response->send();
+            fastcgi_finish_request();
+        } elseif (function_exists('litespeed_finish_request')) {
+            ignore_user_abort(true);
+            $response->send();
+            litespeed_finish_request();
+        }
+
+        return $response;
     }
 }

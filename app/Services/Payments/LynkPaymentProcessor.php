@@ -302,18 +302,20 @@ class LynkPaymentProcessor
                     'payment_transaction_id' => $tx->id,
                 ]);
 
-                // 7. Notifikasi pembayaran
-                try {
-                    $user->notify(new PaymentReceivedNotification($order, $invoice));
-                } catch (\Throwable $notifEx) {
-                    Log::error("Failed to send payment notification for Order #{$order->id}: " . $notifEx->getMessage());
-                }
-
                 return [
                     'order' => $order,
+                    'invoice' => $invoice,
+                    'user' => $user,
                     'is_new_user' => $isNewUser,
                 ];
             });
+
+            // 7. Notifikasi pembayaran (dijalankan di luar transaksi database agar tidak menahan lock)
+            try {
+                $result['user']->notify(new PaymentReceivedNotification($result['order'], $result['invoice']));
+            } catch (\Throwable $notifEx) {
+                Log::error("Failed to send payment notification for Order #{$result['order']->id}: " . $notifEx->getMessage());
+            }
 
             Log::info("Lynk webhook successfully processed for Order #{$result['order']->id} (Ref: {$refId})");
 
