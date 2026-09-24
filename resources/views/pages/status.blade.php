@@ -188,7 +188,7 @@
             <p>
                 Status di halaman ini diperbarui secara manual oleh tim VexaHost. Penggunaan layanan tunduk pada
                 <a href="{{ route('terms') }}" class="text-slate-600 hover:underline">Ketentuan Layanan VexaHost</a>.
-                <span class="text-slate-400">Created by RZ Digital Creative.</span>
+                <span class="text-slate-400">Created by vexahostcloud.</span>
             </p>
         </div>
 

@@ -830,7 +830,7 @@
                         Platform cloud VPS KVM di Indonesia dengan akses root penuh, storage NVMe SSD, dan kemudahan 1-click control panel.
                     </p>
                     <div class="space-y-1 text-xs text-slate-500">
-                        <p class="text-slate-500 font-normal">Created by <span class="text-slate-800 font-medium">RZ Digital Creative</span></p>
+                        <p class="text-slate-500 font-normal">Created by <span class="text-slate-800 font-medium">vexahostcloud</span></p>
                         <p>Infrastruktur: Tencent Cloud &amp; Lintasarta Cloudeka (Jakarta &amp; Singapore)</p>
                     </div>
                 </div>
@@ -914,7 +914,7 @@
 
             <!-- Bottom Copyright -->
             <div class="pt-6 border-t border-slate-200/80 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by RZ Digital Creative.</p>
+                <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by vexahostcloud.</p>
                 <div class="flex items-center space-x-5 text-[11px]">
                     <a href="{{ route('terms') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Terms of Service</a>
                     <span>&bull;</span>

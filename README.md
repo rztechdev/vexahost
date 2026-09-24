@@ -65,4 +65,4 @@ Platform Cloud VPS & Infrastructure as a Service (IaaS) dengan performa enterpri
 - `dev` : Active development branch.
 
 ---
-© 2026 VexaHost Indonesia — Created by RZ Digital Creative.
+© 2026 VexaHost. All rights reserved. Created by vexahostcloud.

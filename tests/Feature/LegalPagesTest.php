@@ -37,7 +37,7 @@ class LegalPagesTest extends TestCase
 
         $response->assertSee('Ketentuan Layanan (Terms of Service)');
         $response->assertSee('Acceptable Use Policy');
-        $response->assertSee('RZ Digital Creative');
+        $response->assertSee('Created by vexahostcloud.');
         $response->assertSee('Kredensial Root');
         $response->assertSee('PASAL 1');
         $response->assertSee('Zero Tolerance Enforcement');

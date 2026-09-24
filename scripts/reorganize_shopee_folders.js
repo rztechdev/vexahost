@@ -491,7 +491,7 @@ function generateUpdatedGalleryHtml(manifest) {
   <div class="tips-box">
     <div class="tips-title">💡 Struktur Folder di Komputer Anda:</div>
     <p style="color: #CBD5E1; font-size: 14px; margin-bottom: 12px;">
-      Buka Windows Explorer di: <code>d:\\Project - Rz digital creative\\vexahost\\public\\images\\shopee\\</code><br>
+      Buka Windows Explorer di: <code>d:\\Project - VexaHost\\vexahost\\public\\images\\shopee\\</code><br>
       Anda akan melihat 13 folder yang tersusun rapi dari nomor 01 sampai 13. Cukup buka folder paket yang ingin Anda upload ke Shopee, di dalamnya sudah tersedia 3 file berurutan:
     </p>
     <ul style="padding-left: 20px; color: #94A3B8; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px;">

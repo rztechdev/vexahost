@@ -38,7 +38,7 @@ class StatusPageTest extends TestCase
         $response->assertSee('Status Layanan VexaHost');
         $response->assertSee('Semua Sistem Beroperasi Normal');
         $response->assertSee('Status Komponen Layanan');
-        $response->assertSee('RZ Digital Creative');
+        $response->assertSee('Created by vexahostcloud.');
         $response->assertSee(route('terms'));
         $response->assertSee(route('docs'));
 

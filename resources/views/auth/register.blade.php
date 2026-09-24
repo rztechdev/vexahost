@@ -433,7 +433,7 @@
 
         <!-- Right Bottom: Copyright Footer -->
         <div class="pt-3 border-t border-slate-100 text-center text-xs text-slate-400 font-normal shrink-0">
-            &copy; 2026 VexaHost. All rights reserved. Created by RZ Digital Creative.
+            &copy; 2026 VexaHost. All rights reserved. Created by vexahostcloud.
         </div>
 
     </div>

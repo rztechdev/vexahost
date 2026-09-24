@@ -450,7 +450,7 @@
                         <div>
                             <p class="font-normal text-slate-900">VexaHost Cloud Indonesia</p>
                             <p class="text-slate-500 mt-0.5">Departemen Tata Kelola Privasi &amp; Kepatuhan UU PDP</p>
-                            <p class="text-[11px] text-slate-400 mt-2">Platform created by RZ Digital Creative.</p>
+                            <p class="text-[11px] text-slate-400 mt-2">Platform created by vexahostcloud.</p>
                         </div>
                         <div class="font-mono-code text-[11px] text-slate-400">
                             Dokumen Resmi: PRIV-2026-V2

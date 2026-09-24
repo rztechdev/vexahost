@@ -14,7 +14,7 @@
 
         <!-- Copyright -->
         <p class="mt-6 text-center text-xs text-slate-400 font-normal">
-            &copy; 2026 VexaHost. All rights reserved. Created by RZ Digital Creative.
+            &copy; 2026 VexaHost. All rights reserved. Created by vexahostcloud.
         </p>
     </div>
 </div>
