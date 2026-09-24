@@ -107,20 +107,32 @@ class AppServiceProvider extends ServiceProvider
         // Branding dibagikan ke SELURUH view agar nama merek, logo, dan warna
         // tidak lagi ditulis langsung di blade. Diambil dari tabel settings (Phase 1).
         // View::share dieksekusi sekali per request (bukan per @include/@component).
-        $settings = app(SettingsService::class);
-        View::share('brand', [
-            'name' => $settings->get('brand_name', config('app.name', 'VexaHost')),
-            'tagline' => $settings->get('brand_tagline', ''),
-            'logo' => $settings->get('brand_logo_path')
-                ? asset('storage/' . $settings->get('brand_logo_path'))
-                : asset('images/logo.png'),
-            'favicon' => $settings->get('brand_favicon_path')
-                ? asset('storage/' . $settings->get('brand_favicon_path'))
-                : asset('images/logo.png'),
-            'accent' => $settings->get('brand_accent_color', '#4A6FA5'),
-            'support_email' => $settings->get('support_email', 'vexahostcloudtech@gmail.com'),
-            'support_whatsapp' => $settings->get('support_whatsapp', ''),
-        ]);
+        try {
+            $settings = app(SettingsService::class);
+            View::share('brand', [
+                'name' => $settings->get('brand_name', config('app.name', 'VexaHost')),
+                'tagline' => $settings->get('brand_tagline', ''),
+                'logo' => $settings->get('brand_logo_path')
+                    ? asset('storage/' . $settings->get('brand_logo_path'))
+                    : asset('images/logo.png'),
+                'favicon' => $settings->get('brand_favicon_path')
+                    ? asset('storage/' . $settings->get('brand_favicon_path'))
+                    : asset('images/logo.png'),
+                'accent' => $settings->get('brand_accent_color', '#4A6FA5'),
+                'support_email' => $settings->get('support_email', 'vexahostcloudtech@gmail.com'),
+                'support_whatsapp' => $settings->get('support_whatsapp', ''),
+            ]);
+        } catch (\Throwable) {
+            View::share('brand', [
+                'name' => config('app.name', 'VexaHost'),
+                'tagline' => '',
+                'logo' => asset('images/logo.png'),
+                'favicon' => asset('images/logo.png'),
+                'accent' => '#4A6FA5',
+                'support_email' => 'vexahostcloudtech@gmail.com',
+                'support_whatsapp' => '',
+            ]);
+        }
 
         // Spanduk maintenance terjadwal di dasbor klien.
         View::composer('layouts.dashboard', function ($view) {
