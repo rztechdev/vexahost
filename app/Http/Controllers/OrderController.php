@@ -458,7 +458,7 @@ class OrderController extends Controller
             'shopeepay' => 'ShopeePay',
         ];
 
-        $devSimulateEnabled = config('app.env') === 'local' && (bool) env('APP_DEV_SIMULATE_PAYMENT', false);
+        $devSimulateEnabled = config('app.env') === 'local' && (bool) config('vexahost.dev_simulate_payment', false);
 
         // Generate dynamic QRIS khusus nominal pesanan ini
         $qrisService = app(\App\Services\QrisService::class);
@@ -571,11 +571,10 @@ class OrderController extends Controller
             abort(403);
         }
 
-        // Cek sinkronisasi real-time ke Midtrans jika masih pending
-        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
-            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
-            $order->refresh();
-        }
+        // Status dibaca dari DB saja — sinkronisasi Midtrans dilakukan via
+        // webhook dan scheduled command (CheckMidtransStatusCommand).
+        // JANGAN panggil MidtransService::checkAndSyncStatus() di sini
+        // karena endpoint ini di-poll frontend setiap beberapa detik.
 
         return response()->json([
             'order_id' => $order->id,
@@ -606,7 +605,7 @@ class OrderController extends Controller
             abort(404, 'Endpoint ini hanya tersedia di environment lokal.');
         }
         // Guard 2: feature flag
-        if (!env('APP_DEV_SIMULATE_PAYMENT', false)) {
+        if (!config('vexahost.dev_simulate_payment', false)) {
             abort(404, 'Simulasi pembayaran dinonaktifkan. Set APP_DEV_SIMULATE_PAYMENT=true di .env untuk mengaktifkan.');
         }
 
@@ -682,7 +681,7 @@ class OrderController extends Controller
                 if ($order->customer) {
                     $order->customer->notify(new \App\Notifications\PaymentReceivedNotification($order, $order->invoice));
                 }
-                $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
+                $adminEmail = config('vexahost.admin_email', config('mail.from.address'));
                 if ($adminEmail) {
                     \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
                         ->notify(new \App\Notifications\AdminNewPaidOrderNotification($order));

@@ -23,4 +23,7 @@ return [
 
     // Secret API Key untuk mengamankan endpoint /api/admin/*
     'admin_api_key' => env('ADMIN_API_KEY'),
+
+    // Feature flag: simulasi pembayaran (hanya di local environment)
+    'dev_simulate_payment' => env('APP_DEV_SIMULATE_PAYMENT', false),
 ];

@@ -1056,7 +1056,7 @@ class AdminController extends Controller
         $status = $request->input('status', 'all');
         $search = trim((string) $request->input('search', ''));
 
-        $query = VpsInstance::with(['customer', 'order.vpsSpec', 'activityLogs'])
+        $query = VpsInstance::with(['customer', 'order.vpsSpec', 'activityLogs' => fn($q) => $q->latest()->take(5)])
             ->orderBy('created_at', 'desc');
 
         if ($status !== 'all' && in_array($status, ['running', 'stopped', 'provisioning', 'suspended', 'terminated', 'error'], true)) {

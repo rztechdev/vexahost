@@ -50,28 +50,10 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        // Cek sinkronisasi real-time ke Midtrans untuk pesanan unpaid yang memakai Midtrans
-        $hasSyncedMidtrans = false;
-        foreach ($unpaidOrders as $unpaidOrder) {
-            if (\App\Models\PaymentGateway::isMidtransMethod($unpaidOrder->payment_method)) {
-                $syncRes = \App\Services\Payments\MidtransService::checkAndSyncStatus($unpaidOrder);
-                if (!empty($syncRes['success'])) {
-                    $hasSyncedMidtrans = true;
-                }
-            }
-        }
-
-        // Jika ada yang terverifikasi lunas, refresh query unpaid orders
-        if ($hasSyncedMidtrans) {
-            $unpaidOrders = Order::where(function ($q) use ($organizationId, $user) {
-                    $q->where('organization_id', $organizationId)
-                      ->orWhere('customer_id', $user->id);
-                })
-                ->whereNull('paid_at')
-                ->with(['vpsSpec', 'invoice'])
-                ->latest()
-                ->get();
-        }
+        // Status pembayaran Midtrans di-sync via webhook + scheduled command
+        // (CheckMidtransStatusCommand), BUKAN di sini. Sinkronisasi sinkron
+        // di setiap page load menyebabkan delay 5-30 detik dan bisa membuat
+        // server jebol saat banyak user akses bersamaan.
 
         // Orders yang sudah dibayar dan sedang dalam antrean/proses setup server oleh admin VexaHost
         $provisioningOrders = Order::where(function ($q) use ($organizationId, $user) {
@@ -434,7 +416,7 @@ class DashboardController extends Controller
     {
         try {
             $ticket->loadMissing('customer');
-            $adminEmail = env('VEXAHOST_ADMIN_EMAIL', config('mail.from.address'));
+            $adminEmail = config('vexahost.admin_email', config('mail.from.address'));
             if ($adminEmail) {
                 \Illuminate\Support\Facades\Notification::route('mail', $adminEmail)
                     ->notify(new \App\Notifications\AdminTicketNotification($ticket, $message, $eventType));
