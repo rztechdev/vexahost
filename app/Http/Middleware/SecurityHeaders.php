@@ -49,19 +49,19 @@ class SecurityHeaders
             $devViteHttp = '';
             $devViteWs = '';
             if (app()->environment('local')) {
-                $devViteHttp = ' http://127.0.0.1:5173 http://[::1]:5173';
-                $devViteWs = ' ws://127.0.0.1:5173 ws://[::1]:5173';
+                $devViteHttp = ' http://127.0.0.1:5173 http://localhost:5173';
+                $devViteWs = ' ws://127.0.0.1:5173 ws://localhost:5173';
             }
 
             $response->headers->set(
                 'Content-Security-Policy',
                 "default-src 'self'; " .
                 "img-src 'self' data: blob:{$devViteHttp}; " .
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}; " .
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}; " .
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com{$devViteHttp}; " .
                 "font-src 'self' https://fonts.gstatic.com data:{$devViteHttp}; " .
                 "frame-src 'self' https://challenges.cloudflare.com https://app.midtrans.com https://app.sandbox.midtrans.com; " .
-                "connect-src 'self' https://challenges.cloudflare.com https://*.lynk.id https://lynk.id https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}{$devViteWs}; " .
+                "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com https://*.lynk.id https://lynk.id https://app.midtrans.com https://app.sandbox.midtrans.com{$devViteHttp}{$devViteWs}; " .
                 "frame-ancestors 'self'; " .
                 "base-uri 'self'; " .
                 "form-action 'self' https://*.lynk.id https://lynk.id https://app.midtrans.com https://app.sandbox.midtrans.com;"

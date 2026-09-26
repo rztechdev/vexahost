@@ -84,6 +84,24 @@ Route::view('/privacy', 'pages.privacy')->name('privacy');
 Route::permanentRedirect('/sla', '/terms');
 Route::view('/refund', 'pages.refund')->name('refund');
 
+// Web App Manifest (PWA & Mobile Bookmark)
+Route::get('/site.webmanifest', function () {
+    $manifestPath = public_path('site.webmanifest');
+    if (file_exists($manifestPath)) {
+        return response()->file($manifestPath, [
+            'Content-Type' => 'application/manifest+json; charset=utf-8',
+            'Cache-Control' => 'public, max-age=604800',
+        ]);
+    }
+
+    return response()->json([
+        'name' => 'VexaHost Cloud',
+        'short_name' => 'VexaHost',
+        'start_url' => '/',
+        'display' => 'standalone',
+    ], 200, ['Content-Type' => 'application/manifest+json; charset=utf-8']);
+});
+
 // Public XML Sitemap (Google Search Console)
 Route::get('/sitemap.xml', function () {
     $baseUrl = rtrim(config('app.url', url('/')), '/');

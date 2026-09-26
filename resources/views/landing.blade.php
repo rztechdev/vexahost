@@ -706,7 +706,20 @@
 </section>
 
 <!-- PAKET MANAGED DATABASE (Dedicated DB VPS) SECTION -->
-<section id="database-packages" class="scroll-mt-16 sm:scroll-mt-20 pt-8 pb-16 bg-slate-50 border-b border-slate-200">
+<section id="database-packages" class="scroll-mt-16 sm:scroll-mt-20 pt-8 pb-16 bg-slate-50 border-b border-slate-200" x-data="{
+    scrollDbLeft() {
+        const c = this.$refs.dbSlider;
+        const card = c.querySelector('.pricing-card');
+        const step = card ? (card.offsetWidth + 24) : 320;
+        c.scrollBy({ left: -step, behavior: 'smooth' });
+    },
+    scrollDbRight() {
+        const c = this.$refs.dbSlider;
+        const card = c.querySelector('.pricing-card');
+        const step = card ? (card.offsetWidth + 24) : 320;
+        c.scrollBy({ left: step, behavior: 'smooth' });
+    }
+}">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Centered Header -->
         <div class="text-center max-w-2xl mx-auto mb-8">
@@ -718,8 +731,17 @@
             $dbPackages = $dbSpecs ?? \App\Models\VpsSpec::where('category', 'managed_db')->orderBy('sell_price', 'asc')->get();
         @endphp
 
-        <!-- 3-Column Grid for DB Packages -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Relative Carousel Container with Slide Buttons -->
+        <div class="relative">
+            <!-- Left Side Slide Button (tablet only, hidden on md+ because all 3 cards fit) -->
+            <button @click="scrollDbLeft()" 
+                    title="Geser sebelumnya"
+                    class="hidden sm:flex md:hidden absolute -left-4 sm:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-slate-300 bg-white hover:bg-slate-50 items-center justify-center text-slate-900 shadow-md transition-all focus:outline-none hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <!-- Carousel Track: horizontal scroll on mobile (< md), 3-column grid on desktop (md+) -->
+            <div x-ref="dbSlider" class="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto md:overflow-visible scroll-smooth snap-x snap-mandatory pb-4 pt-1 no-scrollbar px-1">
             @foreach($dbPackages as $package)
                 @php
                     $isPopular = str_contains(strtolower($package->name), 'standard') || ($package->id == 12);
@@ -751,7 +773,7 @@
                     $topFeatures = array_slice($businessFeatures, 0, 3);
                     $moreFeatures = array_slice($businessFeatures, 3);
                 @endphp
-                <div class="bg-white rounded-xl border {{ $isPopular ? 'border-[#4A6FA5] shadow-sm ring-1 ring-[#4A6FA5]' : 'border-slate-200' }} p-7 sm:p-8 flex flex-col justify-between"
+                <div class="pricing-card snap-start shrink-0 w-[84%] sm:w-[calc(48%-12px)] md:w-auto md:shrink bg-white rounded-xl border {{ $isPopular ? 'border-[#4A6FA5] shadow-sm ring-1 ring-[#4A6FA5]' : 'border-slate-200' }} p-7 sm:p-8 flex flex-col justify-between"
                      x-data="{ openDb: false }">
                     <div>
                         <!-- Header badge -->
@@ -844,6 +866,24 @@
                     </div>
                 </div>
             @endforeach
+            </div>
+
+            <!-- Right Side Slide Button (tablet only) -->
+            <button @click="scrollDbRight()" 
+                    title="Geser berikutnya"
+                    class="hidden sm:flex md:hidden absolute -right-4 sm:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-slate-300 bg-white hover:bg-slate-50 items-center justify-center text-slate-900 shadow-md transition-all focus:outline-none hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+        <!-- Mobile-only slide buttons -->
+        <div class="flex sm:hidden justify-center items-center gap-3 mt-4">
+            <button @click="scrollDbLeft()" class="p-2 rounded-lg border border-slate-300 bg-white text-slate-900 shadow-xs active:scale-95 transition-transform" aria-label="Geser ke kiri">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button @click="scrollDbRight()" class="p-2 rounded-lg border border-slate-300 bg-white text-slate-900 shadow-xs active:scale-95 transition-transform" aria-label="Geser ke kanan">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
         </div>
     </div>
 </section>
