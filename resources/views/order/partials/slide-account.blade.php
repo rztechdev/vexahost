@@ -5,7 +5,6 @@
             <span class="w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">2</span>
             <div>
                 <h2 class="font-bold text-slate-900 text-base sm:text-lg">Informasi Akun</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Identitas pemilik layanan &amp; akses portal dashboard VexaHost</p>
             </div>
         </div>
         <template x-if="isLoggedIn">
@@ -40,30 +39,17 @@
                 </a>
             </div>
 
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed pt-2 border-t border-slate-200">
-                Pesanan VPS ini akan otomatis dihubungkan ke akun Anda. Invoice dan kredensial akses server dikirimkan ke email terdaftar di atas.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP (Untuk Notifikasi)</label>
-                    <input type="text" x-model="currentUser.phone" name="logged_in_phone" placeholder="081234567890"
-                           class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
-                    <p class="text-[11px] text-slate-400 mt-1">Notifikasi aktivasi VPS akan dikirim juga ke nomor ini.</p>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP</label>
+                    <input type="text" x-model="currentUser.phone" name="logged_in_phone"
+                           class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm bg-white focus:border-black focus:ring-1 focus:ring-black">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">Hostname / VPS Name</label>
                     <input type="text" :value="vpsName || '-'" readonly
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code bg-slate-100 text-slate-600 focus:outline-none">
-                    <p class="text-[11px] text-slate-400 mt-1">Ditetapkan pada konfigurasi Slide 1.</p>
                 </div>
-            </div>
-
-            <div class="flex items-center gap-2.5 p-3.5 bg-blue-50/80 rounded-lg border border-blue-200 text-blue-800 text-xs">
-                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Akun Anda siap. Klik tombol <strong>"Lanjut ke Pilih Pembayaran"</strong> di bawah untuk memilih metode pembayaran.</span>
             </div>
         </div>
     </div>
@@ -94,18 +80,14 @@
         </div>
 
         {{-- TAB 1: FORM PENDAFTARAN AKUN BARU --}}
-        <div x-show="authTab === 'register'" class="space-y-5">
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 sm:p-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Lengkapi formulir pendaftaran di bawah ini. Akun VexaHost Anda akan dibuat otomatis saat checkout selesai untuk mengelola server dan memantau invoice.
-            </div>
-
+        <div x-show="authTab === 'register'" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {{-- Nama Lengkap --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Nama Lengkap <span class="text-rose-600">*</span>
                     </label>
-                    <input type="text" x-model="registerFullName" placeholder="Contoh: Andi Pratama"
+                    <input type="text" x-model="registerFullName"
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
                 </div>
 
@@ -114,9 +96,8 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Username <span class="text-slate-400 font-normal">(opsional)</span>
                     </label>
-                    <input type="text" x-model="registerUsername" placeholder="contoh: andipratama"
+                    <input type="text" x-model="registerUsername"
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
-                    <p class="text-[11px] text-slate-400 mt-1">Kosongkan jika ingin dibuatkan otomatis oleh sistem.</p>
                 </div>
 
                 {{-- Email Aktif --}}
@@ -124,9 +105,8 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Alamat Email Aktif <span class="text-rose-600">*</span>
                     </label>
-                    <input type="email" x-model="registerEmail" placeholder="andi@email.com"
+                    <input type="email" x-model="registerEmail"
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
-                    <p class="text-[11px] text-slate-400 mt-1">Kredensial dan tagihan akan dikirimkan ke email ini.</p>
                 </div>
 
                 {{-- Nomor WhatsApp / HP --}}
@@ -134,9 +114,8 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Nomor WhatsApp / HP
                     </label>
-                    <input type="text" x-model="registerPhone" placeholder="081234567890"
+                    <input type="text" x-model="registerPhone"
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
-                    <p class="text-[11px] text-slate-400 mt-1">Untuk notifikasi darurat &amp; status aktivasi VPS.</p>
                 </div>
 
                 {{-- Password Akun --}}
@@ -151,7 +130,6 @@
                     <div class="relative">
                         <input :type="showRegisterPassword ? 'text' : 'password'" 
                                x-model="registerPassword" 
-                               placeholder="Minimal 8 karakter"
                                class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
                         <button type="button" 
                                 @click="showRegisterPassword = !showRegisterPassword" 
@@ -184,7 +162,6 @@
                     <div class="relative">
                         <input :type="showRegisterConfirmPassword ? 'text' : 'password'" 
                                x-model="registerPasswordConfirmation" 
-                               placeholder="Ketik ulang password"
                                class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-black focus:ring-1 focus:ring-black">
                         <button type="button" 
                                 @click="showRegisterConfirmPassword = !showRegisterConfirmPassword" 
@@ -203,13 +180,13 @@
             </div>
 
             {{-- Divider atau opsi Google --}}
-            <div class="pt-2">
+            <div class="pt-1">
                 <div class="relative my-3">
                     <div class="absolute inset-0 flex items-center">
                         <div class="w-full border-t border-slate-200"></div>
                     </div>
                     <div class="relative flex justify-center text-xs uppercase tracking-wider">
-                        <span class="bg-white px-2.5 text-slate-400 font-medium text-[11px]">atau cara cepat</span>
+                        <span class="bg-white px-2.5 text-slate-400 font-medium text-[11px]">atau</span>
                     </div>
                 </div>
 
@@ -222,20 +199,13 @@
                         <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z"/>
                         <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.6 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                     </svg>
-                    <span>Lanjutkan / Daftar Cepat dengan Google</span>
+                    <span>Masuk dengan Akun Google</span>
                 </a>
             </div>
         </div>
 
         {{-- TAB 2: FORM MASUK (QUICK LOGIN INLINE) --}}
-        <div x-show="authTab === 'login'" class="space-y-5" style="display: none;">
-            <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3.5 sm:p-4 text-xs sm:text-sm text-blue-800 leading-relaxed flex items-start gap-2.5">
-                <svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Silakan masuk ke akun VexaHost Anda. <strong>Konfigurasi Slide 1 tidak akan hilang</strong> dan Anda langsung diarahkan ke langkah pembayaran.</span>
-            </div>
-
+        <div x-show="authTab === 'login'" class="space-y-4" style="display: none;">
             {{-- Error Message Alert --}}
             <template x-if="loginError">
                 <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
@@ -252,7 +222,6 @@
                         Email atau Username Terdaftar <span class="text-rose-600">*</span>
                     </label>
                     <input type="text" x-model="loginIdentifier" @keydown.enter="performQuickLogin()"
-                           placeholder="nama@email.com atau username"
                            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm bg-white focus:border-black focus:ring-1 focus:ring-black">
                 </div>
 
@@ -270,7 +239,6 @@
                         <input :type="showLoginPassword ? 'text' : 'password'" 
                                x-model="loginPassword" 
                                @keydown.enter="performQuickLogin()"
-                               placeholder="Masukkan password Anda"
                                class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm bg-white focus:border-black focus:ring-1 focus:ring-black">
                         <button type="button" 
                                 @click="showLoginPassword = !showLoginPassword" 
@@ -302,7 +270,6 @@
                         </svg>
                         <span x-text="isLoggingIn ? 'Memverifikasi...' : 'Masuk ke Akun Saya'"></span>
                     </button>
-                    <p class="text-[11px] text-slate-400 text-center mt-2">Tips: Anda juga dapat langsung menekan tombol <strong>"Lanjut ke Pilih Pembayaran"</strong> di bawah setelah mengisi form.</p>
                 </div>
 
                 {{-- Google Auth Link --}}
@@ -312,7 +279,7 @@
                             <div class="w-full border-t border-slate-200"></div>
                         </div>
                         <div class="relative flex justify-center text-xs uppercase tracking-wider">
-                            <span class="bg-slate-50 px-2 text-slate-400 font-medium text-[10px]">atau masuk lewat</span>
+                            <span class="bg-slate-50 px-2 text-slate-400 font-medium text-[10px]">atau</span>
                         </div>
                     </div>
 
