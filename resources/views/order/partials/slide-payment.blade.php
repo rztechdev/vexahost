@@ -1,15 +1,11 @@
 <div class="border border-slate-200 rounded-2xl p-4 sm:p-7 bg-white shadow-xs">
-    <div class="flex items-center gap-3 mb-2">
+    <div class="flex items-center gap-3 mb-6">
         <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-semibold flex items-center justify-center" x-text="isDirectCheckout ? '2' : '3'"></span>
         <h2 class="font-bold text-slate-900 text-lg">Pilih Metode Pembayaran</h2>
     </div>
 
-    <p class="text-sm text-slate-600 mb-6">
-        Pilih salah satu metode pembayaran yang tersedia. Anda dapat memeriksa rincian tagihan lengkap di langkah berikutnya.
-    </p>
-
     {{-- Payment Selection Grid --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
         @foreach([
             'midtrans_snap' => ['QRIS Otomatis', 'qris.svg', 'Semua e-wallet & mobile banking instan', 'Instan QR'],
             'gopay' => ['GoPay', 'gopay.svg', 'Aplikasi GoPay & Gojek', 'E-Wallet'],
@@ -64,10 +60,9 @@
                         <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-6 sm:max-h-8 max-w-full object-contain">
                     </div>
 
-                    {{-- Name & Description --}}
+                    {{-- Name --}}
                     <div>
                         <h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $details[0] }}</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
                     </div>
                 </label>
             @else
@@ -89,25 +84,12 @@
                         <img src="{{ asset('images/payments/' . $details[1]) }}" alt="{{ $details[0] }}" class="max-h-6 sm:max-h-8 max-w-full object-contain">
                     </div>
 
-                    {{-- Name & Description --}}
+                    {{-- Name --}}
                     <div>
                         <h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $details[0] }}</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $details[2] }}</p>
                     </div>
                 </div>
             @endif
         @endforeach
-    </div>
-
-    {{-- Selection Feedback Banner --}}
-    <div x-show="paymentMethod" x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
-         class="flex items-center gap-3 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs">
-        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        <span>
-            Metode pembayaran terpilih: <strong class="font-bold" x-text="paymentMethods[paymentMethod]?.name || paymentMethod"></strong>. Klik tombol <strong>Lanjut ke Konfirmasi Pembayaran</strong> di bawah untuk memeriksa rincian tagihan.
-        </span>
     </div>
 </div>
