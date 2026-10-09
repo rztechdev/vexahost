@@ -197,7 +197,7 @@
          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
          style="display: none;" @keydown.escape.window="purchaseModalOpen = false">
-        <div @click.away="purchaseModalOpen = false" class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+        <div @click.away="purchaseModalOpen = false" class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="font-bold text-slate-900 text-base">Catat Pembelian Supplier</h3>
                 <p class="text-xs text-slate-500">Untuk perpanjangan bulanan instance yang sudah berjalan.</p>
@@ -250,7 +250,7 @@
          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
          style="display: none;" @keydown.escape.window="editModalOpen = false">
-        <div @click.away="editModalOpen = false" class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+        <div @click.away="editModalOpen = false" class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             @foreach($purchases as $p)
                 <form x-show="editId === {{ $p->id }}" x-cloak action="{{ route('admin.supplier.update', $p->id) }}" method="POST" class="p-6 space-y-4">
                     @csrf

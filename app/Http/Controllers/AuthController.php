@@ -58,10 +58,11 @@ class AuthController extends Controller
             ]);
         }
 
-        $loginInput = trim($validated['username']);
-        $user = str_contains($loginInput, '@')
-            ? User::where('email', $loginInput)->first()
-            : User::where('username', $loginInput)->first();
+        $loginInput = trim((string) $validated['username']);
+        $normalizedLogin = strtolower(preg_replace('/@([a-zA-Z0-9.-]+),([a-zA-Z]{2,})/i', '@$1.$2', $loginInput));
+        $user = User::whereRaw('LOWER(email) = ?', [$normalizedLogin])
+            ->orWhereRaw('LOWER(username) = ?', [strtolower($loginInput)])
+            ->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             RateLimiter::hit($throttleKey, 60);

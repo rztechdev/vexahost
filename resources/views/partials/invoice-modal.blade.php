@@ -32,7 +32,7 @@ style="display: none; z-index: 99999;">
          @click="close()"></div>
 
     <!-- Container: Pure Native PDF Viewer without extra card styling (Guaranteed full viewport size) -->
-    <div class="relative w-full rounded-xl overflow-hidden shadow-2xl bg-neutral-900 border border-neutral-700/60"
+    <div class="relative w-full rounded-lg overflow-hidden shadow-2xl bg-neutral-900 border border-neutral-700/60"
          style="width: 95vw; max-width: 1100px; height: 94vh; max-height: 96vh; display: flex; flex-direction: column; z-index: 10;"
          @click.stop>
         

@@ -17,7 +17,7 @@
         }
     </style>
 </head>
-<body class="bg-neutral-100 text-neutral-900 p-4 sm:p-8">
+<body class="light-isolated bg-neutral-100 text-neutral-900 p-4 sm:p-8">
     <div class="max-w-4xl mx-auto">
         <!-- Floating Print Bar (No-print) -->
         <div class="no-print mb-6 flex items-center justify-between bg-black text-white p-4 rounded-lg shadow-md">

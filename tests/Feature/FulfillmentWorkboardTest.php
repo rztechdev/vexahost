@@ -238,7 +238,10 @@ class FulfillmentWorkboardTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->post("/admin/orders/{$order->id}/provision", ['public_ip' => '103.150.10.9'])
+            ->post("/admin/orders/{$order->id}/provision", [
+                'public_ip' => '103.150.10.9',
+                'root_password' => 'VexaRootSecretPass123!',
+            ])
             ->assertSessionHas('success');
 
         $order->refresh();
@@ -257,7 +260,10 @@ class FulfillmentWorkboardTest extends TestCase
     {
         $order = $this->makeOrder();
 
-        $this->actingAs($this->admin())->post("/admin/orders/{$order->id}/provision", ['public_ip' => '103.150.10.10']);
+        $this->actingAs($this->admin())->post("/admin/orders/{$order->id}/provision", [
+            'public_ip' => '103.150.10.10',
+            'root_password' => 'VexaRootSecretPass123!',
+        ]);
 
         $instance = VpsInstance::where('order_id', $order->id)->first();
         $this->assertSame(5, (int) round($instance->expires_at->diffInDays($instance->grace_period_ends_at)));
@@ -266,7 +272,10 @@ class FulfillmentWorkboardTest extends TestCase
     public function test_handover_text_contains_access_but_no_password(): void
     {
         $order = $this->makeOrder();
-        $this->actingAs($this->admin())->post("/admin/orders/{$order->id}/provision", ['public_ip' => '103.150.10.11']);
+        $this->actingAs($this->admin())->post("/admin/orders/{$order->id}/provision", [
+            'public_ip' => '103.150.10.11',
+            'root_password' => 'VexaRootSecretPass123!',
+        ]);
 
         $order->refresh()->load('vpsInstance', 'customer');
         $template = \App\Models\NotificationTemplate::where('code', 'fulfillment_handover')->first();

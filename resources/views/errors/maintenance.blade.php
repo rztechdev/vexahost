@@ -15,12 +15,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme');
+            var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', isDark);
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        })();
+    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        html.dark { color-scheme: dark; background-color: #09090b; }
+        html.dark body { background-color: #09090b; color: #fafafa; }
     </style>
 </head>
-<body class="h-full antialiased bg-slate-50 text-slate-900">
+<body class="h-full antialiased bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100">
 <div class="min-h-screen flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-lg">
 
@@ -30,31 +40,31 @@
                  class="h-10 w-auto object-contain">
         </div>
 
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm">
 
             <div class="flex items-center gap-3 mb-5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
                     Maintenance
                 </span>
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status Layanan</span>
+                <span class="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Status Layanan</span>
             </div>
 
-            <h1 class="text-xl font-extrabold text-slate-900 mb-2">
+            <h1 class="text-xl font-extrabold text-slate-900 dark:text-zinc-50 mb-2">
                 Sedang Dalam Pemeliharaan
             </h1>
 
-            <p class="text-sm text-slate-600 leading-relaxed mb-5">
+            <p class="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed mb-5">
                 {{ $message ?? 'Layanan ini sedang dalam pemeliharaan. Silakan coba beberapa saat lagi.' }}
             </p>
 
             @if(!empty($window))
-                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-5">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                <div class="rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 p-4 mb-5">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
                         Jadwal Pemeliharaan
                     </span>
-                    <div class="text-sm font-bold text-slate-900 mb-1">{{ $window->title }}</div>
-                    <div class="font-mono-code text-xs text-slate-600">
+                    <div class="text-sm font-bold text-slate-900 dark:text-zinc-100 mb-1">{{ $window->title }}</div>
+                    <div class="font-mono-code text-xs text-slate-600 dark:text-zinc-400">
                         {{ $window->starts_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}
                         &ndash;
                         {{ $window->ends_at->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB
@@ -64,11 +74,11 @@
 
             <div class="flex flex-col sm:flex-row gap-2">
                 <a href="{{ route('status') }}"
-                   class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-colors">
+                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-black hover:bg-neutral-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 text-xs font-bold transition-colors shadow-sm">
                     Lihat Halaman Status
                 </a>
                 <a href="{{ url('/') }}"
-                   class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors">
+                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-200 dark:border-zinc-700 text-xs font-bold border border-slate-200 transition-colors">
                     Kembali ke Beranda
                 </a>
             </div>
@@ -76,10 +86,10 @@
         </div>
 
         @if(!empty($brand['support_email']))
-            <p class="text-center text-xs text-slate-500 mt-6">
+            <p class="text-center text-xs text-slate-500 dark:text-zinc-500 mt-6">
                 Butuh bantuan? Hubungi
                 <a href="mailto:{{ $brand['support_email'] }}"
-                   class="font-semibold text-slate-700 hover:text-slate-900 underline underline-offset-2">
+                   class="font-semibold text-slate-700 hover:text-slate-900 dark:text-zinc-300 dark:hover:text-zinc-100 underline underline-offset-2">
                     {{ $brand['support_email'] }}
                 </a>
             </p>

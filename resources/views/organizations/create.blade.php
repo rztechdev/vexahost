@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
         <h2 class="text-xl font-bold">Buat workspace baru</h2>
         <p class="text-sm text-slate-500 mt-1">Gunakan organization untuk tim atau perusahaan.</p>
         <form method="POST" action="{{ route('organizations.store') }}" class="mt-6 space-y-4">

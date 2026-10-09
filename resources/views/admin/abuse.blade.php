@@ -210,7 +210,7 @@
          style="display: none;" @keydown.escape.window="createModalOpen = false">
 
         <div @click.away="createModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-900 text-base">Catat Kasus Pelanggaran</h3>
@@ -297,7 +297,7 @@
          style="display: none;" @keydown.escape.window="notifyModalOpen = false">
 
         <div @click.away="notifyModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="font-bold text-slate-900 text-base">Kirim Pemberitahuan Pelanggaran</h3>
                 <p class="text-xs text-slate-500">
@@ -340,7 +340,7 @@
          style="display: none;" @keydown.escape.window="resolveModalOpen = false">
 
         <div @click.away="resolveModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="font-bold text-slate-900 text-base">Tutup Kasus</h3>
                 <p class="text-xs text-slate-500">

@@ -235,7 +235,7 @@ class SendRenewalRemindersCommand extends Command
         return [
             'id' => $instance->id,
             'hostname' => $instance->hostname ?? '-',
-            'customer' => $instance->customer?->name ?? '-',
+            'customer' => $instance->customer?->full_name ?? ($instance->customer?->username ?? '-'),
             'email' => $instance->customer?->email ?? '-',
             'type' => $this->renewal->typeLabel($this->renewal->productType($instance)),
             'expires_at' => $instance->expires_at?->timezone('Asia/Jakarta')->format('d M Y') ?? '-',

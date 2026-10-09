@@ -58,7 +58,7 @@
 
 <div style="background-color: #f4f4f5; border-left: 3px solid #000000; padding: 12px 16px; border-radius: 4px; margin-bottom: 24px;">
     <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #3f3f46;">
-        <strong>Informasi Tambahan:</strong> Jika Anda merasa sudah melakukan transfer atau scan QRIS namun pembayaran ditolak, silakan hubungi tim dukungan kami dengan melampirkan bukti transfer mutasi Anda agar dapat ditindaklanjuti.
+        <strong>Informasi Tambahan:</strong> Jika Anda merasa sudah menyelesaikan pembayaran melalui gateway namun transaksi dibatalkan atau melewati batas waktu, silakan hubungi tim dukungan kami melalui tiket bantuan untuk pengecekan lebih lanjut.
     </p>
 </div>
 

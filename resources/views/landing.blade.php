@@ -67,25 +67,25 @@
 </div>
 
 <!-- Hero Section (Seamless Full-Bleed Showcase Integrated with Header) -->
-<section class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] -mt-16 pt-20 sm:pt-24 lg:pt-24 pb-4 sm:pb-5 border-b border-slate-200/50 min-h-screen lg:min-h-dvh flex flex-col justify-between">
+<section class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] dark:from-[#09090b] dark:via-[#09090b] dark:to-zinc-950 -mt-16 pt-20 sm:pt-24 lg:pt-24 pb-4 sm:pb-5 border-b border-slate-200/50 dark:border-zinc-800 min-h-screen lg:min-h-dvh flex flex-col justify-between">
 
     <!-- Ambient 3D Floating Orbs (Bokeh & Clay Depth across Full Hero Background) -->
     <!-- Top-Left Large Orb (Extends behind Header) -->
-    <div class="pointer-events-none absolute -top-8 -left-12 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-40 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute -top-8 -left-12 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-40 dark:opacity-10 filter blur-2xl"></div>
     <!-- Top-Center Subtle Orb (Extends behind Header) -->
-    <div class="pointer-events-none absolute -top-12 left-1/3 w-48 sm:w-60 h-48 sm:h-60 rounded-full bg-gradient-to-b from-[#A5C6EE] to-transparent opacity-35 filter blur-3xl"></div>
+    <div class="pointer-events-none absolute -top-12 left-1/3 w-48 sm:w-60 h-48 sm:h-60 rounded-full bg-gradient-to-b from-[#A5C6EE] to-transparent opacity-35 dark:opacity-10 filter blur-3xl"></div>
     <!-- Bottom-Left Orb -->
-    <div class="pointer-events-none absolute -bottom-16 left-10 w-60 sm:w-72 h-60 sm:h-72 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-45 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 left-10 w-60 sm:w-72 h-60 sm:h-72 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-45 dark:opacity-10 filter blur-2xl"></div>
     <!-- Right Orb Behind Organic Blob -->
-    <div class="pointer-events-none absolute top-1/2 -right-16 -translate-y-1/2 w-80 sm:w-96 h-80 sm:h-96 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-35 filter blur-3xl"></div>
+    <div class="pointer-events-none absolute top-1/2 -right-16 -translate-y-1/2 w-80 sm:w-96 h-80 sm:h-96 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-35 dark:opacity-15 filter blur-3xl"></div>
     <!-- Bottom-Center Orb -->
-    <div class="pointer-events-none absolute -bottom-10 right-1/3 w-52 sm:w-64 h-52 sm:h-64 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute -bottom-10 right-1/3 w-52 sm:w-64 h-52 sm:h-64 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 dark:opacity-10 filter blur-2xl"></div>
 
     <!-- Subtle Decorative Speed Slashes (Slanted Lines in Background) -->
-    <div class="pointer-events-none absolute top-20 left-1/4 w-16 sm:w-24 h-0.5 bg-white/70 rotate-[-40deg] rounded-full"></div>
-    <div class="pointer-events-none absolute top-1/2 left-8 w-12 sm:w-16 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
-    <div class="pointer-events-none absolute top-28 right-1/3 w-20 sm:w-28 h-0.5 bg-white/50 rotate-[-40deg] rounded-full"></div>
-    <div class="pointer-events-none absolute bottom-32 right-1/4 w-14 sm:w-20 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute top-20 left-1/4 w-16 sm:w-24 h-0.5 bg-white/70 dark:bg-zinc-800/60 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute top-1/2 left-8 w-12 sm:w-16 h-0.5 bg-white/60 dark:bg-zinc-800/50 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute top-28 right-1/3 w-20 sm:w-28 h-0.5 bg-white/50 dark:bg-zinc-800/40 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute bottom-32 right-1/4 w-14 sm:w-20 h-0.5 bg-white/60 dark:bg-zinc-800/50 rotate-[-40deg] rounded-full"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-4 sm:py-6">
 
@@ -332,10 +332,10 @@
     </div>
 
     <!-- Integrated Running Stack & Ecosystem Marquee (Full Screen Width / Edge-to-Edge) -->
-    <div class="w-full relative z-10 mt-auto pt-5 sm:pt-6 border-t border-slate-200/50 overflow-hidden">
+    <div class="w-full relative z-10 mt-auto pt-5 sm:pt-6 border-t border-slate-200/50 dark:border-zinc-800 overflow-hidden">
         <div class="flustra-stack-marquee relative w-full overflow-hidden">
-            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 to-transparent"></div>
-            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 dark:from-[#09090b] dark:via-[#09090b]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 dark:from-[#09090b] dark:via-[#09090b]/80 to-transparent"></div>
 
             <div class="flustra-stack-track flex w-max items-center gap-3 sm:gap-4">
                     @php
@@ -377,12 +377,12 @@
 
                     @for ($i = 0; $i < 2; $i++)
                         @foreach ($ecosystemLogos as $logo)
-                            <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-white/80 bg-white/75 backdrop-blur-xs hover:bg-white px-3 sm:px-3.5 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
+                            <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center gap-2 sm:gap-2.5 rounded-xl border border-white/80 dark:border-zinc-800 bg-white/75 dark:bg-zinc-900/90 backdrop-blur-xs hover:bg-white dark:hover:bg-zinc-800 px-3 sm:px-3.5 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
                                  title="{{ $logo['label'] }}">
                                 <img src="{{ asset($logo['file']) }}"
                                      alt="{{ $logo['label'] }}"
                                      class="h-4 w-4 sm:h-5 sm:w-5 shrink-0 object-contain">
-                                <span class="text-xs font-bold text-slate-800 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
+                                <span class="text-xs font-bold text-slate-800 dark:text-zinc-200 tracking-tight whitespace-nowrap">{{ $logo['label'] }}</span>
                             </div>
                         @endforeach
                     @endfor
@@ -437,7 +437,9 @@
                             <!-- Header badge -->
                             <div class="flex justify-between items-center mb-3">
                                 <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    @if($isPopular)
+                                    @if($spec->badge)
+                                        <span class="{{ $isPopular ? 'text-[#4A6FA5]' : 'text-slate-700' }} font-bold">{{ $spec->badge }}</span>
+                                    @elseif($isPopular)
                                         <span class="text-[#4A6FA5] font-bold">Terpopuler</span>
                                     @elseif($isBusiness)
                                         <span class="text-slate-700 font-bold">Business Tier</span>
@@ -451,12 +453,19 @@
                                         <span>Paket Standar</span>
                                     @endif
                                 </span>
+                                @if(!$spec->is_active)
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                                        Stok Habis
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Title -->
                             <h3 class="text-xl font-bold text-slate-900">{{ $spec->name }}</h3>
                             <p class="text-xs text-slate-500 mt-1 mb-5">
-                                @if($spec->name === 'Student Basic')
+                                @if($spec->tagline)
+                                    {{ $spec->tagline }}
+                                @elseif($spec->name === 'Student Basic')
                                     Cocok untuk belajar Linux &amp; portfolio web dasar
                                 @elseif($spec->name === 'Mahasiswa Basic')
                                     Resource 2 vCPU lega untuk praktikum, mini server &amp; bot
@@ -483,10 +492,17 @@
                             </div>
 
                             <!-- CTA Button -->
-                            <a href="{{ route('checkout', $spec->id) }}"
-                               class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
-                                Pilih Paket Ini &rarr;
-                            </a>
+                            @if($spec->is_active)
+                                <a href="{{ route('checkout', $spec->id) }}"
+                                   class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
+                                    Pilih Paket Ini &rarr;
+                                </a>
+                            @else
+                                <button type="button" disabled
+                                   class="w-full block text-center py-3 px-4 rounded-lg text-sm font-semibold mb-6 bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed">
+                                    Stok Habis / Tidak Tersedia
+                                </button>
+                            @endif
 
                             <!-- Features list -->
                             <ul class="space-y-3.5 text-xs text-slate-700">
@@ -596,7 +612,9 @@
                             <!-- Header badge -->
                             <div class="flex justify-between items-center mb-3">
                                 <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    @if($isPopular)
+                                    @if($package->badge)
+                                        <span class="{{ $isPopular ? 'text-[#4A6FA5]' : 'text-slate-700' }} font-bold">{{ $package->badge }}</span>
+                                    @elseif($isPopular)
                                         <span class="text-[#4A6FA5] font-bold">Terpopuler</span>
                                     @elseif(str_contains(strtolower($package->name), 'terminal'))
                                         <span class="text-slate-700 font-bold">Developer Stack</span>
@@ -606,6 +624,11 @@
                                         <span class="text-slate-700 font-bold">Private RAG</span>
                                     @endif
                                 </span>
+                                @if(!$package->is_active)
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                                        Stok Habis
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Title -->
@@ -624,10 +647,17 @@
                             </div>
 
                             <!-- CTA Button -->
-                            <a href="{{ route('checkout', $package->id) }}"
-                               class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
-                                Pilih Paket Ini &rarr;
-                            </a>
+                            @if($package->is_active)
+                                <a href="{{ route('checkout', $package->id) }}"
+                                   class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
+                                    Pilih Paket Ini &rarr;
+                                </a>
+                            @else
+                                <button type="button" disabled
+                                   class="w-full block text-center py-3 px-4 rounded-lg text-sm font-semibold mb-6 bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed">
+                                    Stok Habis / Tidak Tersedia
+                                </button>
+                            @endif
 
                             <!-- Features list (Fitur Inti) -->
                             <ul class="space-y-3.5 text-xs text-slate-700">
@@ -779,7 +809,9 @@
                         <!-- Header badge -->
                         <div class="flex justify-between items-center mb-3">
                             <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                @if($isPopular)
+                                @if($package->badge)
+                                    <span class="{{ $isPopular ? 'text-[#4A6FA5]' : 'text-slate-700' }} font-bold">{{ $package->badge }}</span>
+                                @elseif($isPopular)
                                     <span class="text-[#4A6FA5] font-bold">{{ $badgeLabel }}</span>
                                 @elseif($isEnterprise)
                                     <span class="text-slate-700 font-bold">{{ $badgeLabel }}</span>
@@ -789,6 +821,11 @@
                                     <span class="text-slate-700 font-bold">{{ $badgeLabel }}</span>
                                 @endif
                             </span>
+                            @if(!$package->is_active)
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                                    Stok Habis
+                                </span>
+                            @endif
                         </div>
 
                         <!-- Title -->
@@ -807,10 +844,17 @@
                         </div>
 
                         <!-- CTA Button -->
-                        <a href="{{ route('checkout', $package->id) }}"
-                           class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
-                            Pilih Paket Ini &rarr;
-                        </a>
+                        @if($package->is_active)
+                            <a href="{{ route('checkout', $package->id) }}"
+                               class="w-full block text-center py-3 px-4 rounded-lg text-sm font-bold transition-colors mb-6 {{ $isPopular ? 'bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white' : 'bg-slate-900 hover:bg-slate-800 text-white' }}">
+                                Pilih Paket Ini &rarr;
+                            </a>
+                        @else
+                            <button type="button" disabled
+                               class="w-full block text-center py-3 px-4 rounded-lg text-sm font-semibold mb-6 bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed">
+                                Stok Habis / Tidak Tersedia
+                            </button>
+                        @endif
 
                         <!-- Features list: Poin Utama Terlihat -->
                         <ul class="space-y-3 text-xs text-slate-700">
@@ -890,12 +934,12 @@
 
 <!-- RUNNING PAYMENT METHOD TICKER (Pindah ke Bawah Database Pricing) -->
 <section aria-label="Metode Pembayaran yang Didukung"
-         class="relative overflow-hidden border-y border-slate-200/70 bg-gradient-to-r from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] py-4 sm:py-5">
+         class="relative overflow-hidden border-y border-slate-200/70 dark:border-zinc-800 bg-gradient-to-r from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b] py-4 sm:py-5">
     <div class="w-full flex items-center px-4 sm:px-6 lg:px-8">
         <!-- Track Marquee -->
         <div class="flustra-pay-marquee relative flex-1 overflow-hidden">
-            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 to-transparent"></div>
-            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-[#F5F8FD] via-[#F5F8FD]/80 dark:from-[#09090b] dark:via-[#09090b]/80 to-transparent"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-[#DFEAF7] via-[#DFEAF7]/80 dark:from-[#09090b] dark:via-[#09090b]/80 to-transparent"></div>
 
             <div class="flustra-pay-track flex w-max items-center gap-3 sm:gap-4">
                 @php
@@ -921,7 +965,7 @@
 
                 @for ($i = 0; $i < 2; $i++)
                     @foreach ($marqueePayments as $payment)
-                        <div class="flex h-9 sm:h-10 shrink-0 items-center justify-center rounded-xl border border-white/80 bg-white/85 backdrop-blur-xs hover:bg-white px-3 sm:px-4 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
+                        <div class="light-isolated flex h-9 sm:h-10 shrink-0 items-center justify-center rounded-xl border border-white/80 dark:border-zinc-700 bg-white/95 dark:bg-zinc-100 backdrop-blur-xs hover:bg-white px-3 sm:px-4 shadow-2xs transition-all duration-200 hover:scale-105 select-none"
                              title="{{ $payment['label'] }}">
                             <img src="{{ asset('images/payments/' . $payment['file']) }}"
                                  alt="{{ $payment['label'] }}"
@@ -935,17 +979,17 @@
 </section>
 
 <!-- COMPARISON TABLE SECTION (VexaHost vs Alternatif Lain) -->
-<section class="py-20 bg-white border-b border-slate-200">
+<section class="py-20 bg-white dark:bg-[#09090b] border-b border-slate-200 dark:border-zinc-800">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-14">
-            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Kenapa VexaHost vs Alternatif Lain?</h2>
-            <p class="text-sm text-slate-600 mt-2">Bandingkan transparansi biaya, fleksibilitas root, dan kecepatan setup kami.</p>
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-zinc-100">Kenapa VexaHost vs Alternatif Lain?</h2>
+            <p class="text-sm text-slate-600 dark:text-zinc-400 mt-2">Bandingkan transparansi biaya, fleksibilitas root, dan kecepatan setup kami.</p>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <table class="w-full text-left border-collapse border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
                 <thead>
-                    <tr class="bg-slate-900 text-white text-xs uppercase tracking-wider">
+                    <tr class="bg-slate-900 dark:bg-zinc-900 text-white text-xs uppercase tracking-wider">
                         <th class="p-4 sm:p-5 font-bold">Karakteristik / Fitur</th>
                         <th class="p-4 sm:p-5 font-bold bg-[#4A6FA5] text-white">
                             <div class="flex items-center gap-2">
@@ -953,71 +997,71 @@
                                 <span class="px-2 py-0.5 rounded bg-white/20 text-[10px] font-mono-code">Rekomendasi</span>
                             </div>
                         </th>
-                        <th class="p-4 sm:p-5 font-bold text-slate-300">Shared Hosting Biasa</th>
-                        <th class="p-4 sm:p-5 font-bold text-slate-300">Hyperscaler (AWS / GCP)</th>
+                        <th class="p-4 sm:p-5 font-bold text-slate-300 dark:text-zinc-300">Shared Hosting Biasa</th>
+                        <th class="p-4 sm:p-5 font-bold text-slate-300 dark:text-zinc-300">Hyperscaler (AWS / GCP)</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200 text-xs sm:text-sm text-slate-700">
+                <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-300">
                     <!-- Row 1 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Harga / Biaya Bulanan</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-[#4A6FA5] font-mono-code">Rp 80rb – 590rb (Flat)</td>
-                        <td class="p-4 sm:p-5 text-slate-600">Rp 50rb – 150rb (Banyak limitasi)</td>
-                        <td class="p-4 sm:p-5 text-slate-500 font-mono-code">$10 – $100+ (Tagihan membengkak)</td>
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Harga / Biaya Bulanan</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-[#4A6FA5] dark:text-[#7da2d8] font-mono-code">Rp 80rb – 590rb (Flat)</td>
+                        <td class="p-4 sm:p-5 text-slate-600 dark:text-zinc-400">Rp 50rb – 150rb (Banyak limitasi)</td>
+                        <td class="p-4 sm:p-5 text-slate-500 dark:text-zinc-400 font-mono-code">$10 – $100+ (Tagihan membengkak)</td>
                     </tr>
                     <!-- Row 2 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Akses Root (SSH Port 22)</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-[#4A6FA5] flex items-center gap-1.5">
-                            <span class="w-4 h-4 rounded-full bg-blue-100 text-[#4A6FA5] flex items-center justify-center font-bold text-xs">✓</span> Full Root Access
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Akses Root (SSH Port 22)</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-[#4A6FA5] dark:text-[#7da2d8] flex items-center gap-1.5">
+                            <span class="w-4 h-4 rounded-full bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-[#7da2d8] flex items-center justify-center font-bold text-xs">✓</span> Full Root Access
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-400 font-medium">❌ Tidak ada (cPanel saja)</td>
-                        <td class="p-4 sm:p-5 text-slate-700 font-medium">✓ Full Root Access</td>
+                        <td class="p-4 sm:p-5 text-slate-400 dark:text-zinc-500 font-medium">❌ Tidak ada (cPanel saja)</td>
+                        <td class="p-4 sm:p-5 text-slate-700 dark:text-zinc-300 font-medium">✓ Full Root Access</td>
                     </tr>
                     <!-- Row 3 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Dedicated Compute Resource</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-slate-900">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Dedicated Compute Resource</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-slate-900 dark:text-zinc-100">
                             ✓ vCPU &amp; RAM KVM Terisolasi
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-500">❌ Rebutan dengan ratusan akun</td>
-                        <td class="p-4 sm:p-5 text-slate-700">✓ Dedicated Resource</td>
+                        <td class="p-4 sm:p-5 text-slate-500 dark:text-zinc-400">❌ Rebutan dengan ratusan akun</td>
+                        <td class="p-4 sm:p-5 text-slate-700 dark:text-zinc-300">✓ Dedicated Resource</td>
                     </tr>
                     <!-- Row 4 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Modern Control Panel</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-[#4A6FA5]">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Modern Control Panel</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-[#4A6FA5] dark:text-[#7da2d8]">
                             ✓ 1-Click Coolify / Dokploy (Gratis)
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-600">cPanel standar (tidak support Docker)</td>
-                        <td class="p-4 sm:p-5 text-slate-400">❌ Tanpa panel (setup manual rumit)</td>
+                        <td class="p-4 sm:p-5 text-slate-600 dark:text-zinc-400">cPanel standar (tidak support Docker)</td>
+                        <td class="p-4 sm:p-5 text-slate-400 dark:text-zinc-500">❌ Tanpa panel (setup manual rumit)</td>
                     </tr>
                     <!-- Row 5 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Dukungan Bahasa</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-slate-900">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Dukungan Bahasa</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-slate-900 dark:text-zinc-100">
                             ✓ 100% Bahasa Indonesia (WhatsApp &amp; Web)
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-600">✓ Bahasa Indonesia</td>
-                        <td class="p-4 sm:p-5 text-slate-500">❌ Bahasa Inggris / Bot otomatis</td>
+                        <td class="p-4 sm:p-5 text-slate-600 dark:text-zinc-400">✓ Bahasa Indonesia</td>
+                        <td class="p-4 sm:p-5 text-slate-500 dark:text-zinc-400">❌ Bahasa Inggris / Bot otomatis</td>
                     </tr>
                     <!-- Row 6 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Setup &amp; Pembayaran</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-[#4A6FA5]">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Setup &amp; Pembayaran</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-[#4A6FA5] dark:text-[#7da2d8]">
                             QRIS, VA Bank &amp; Shopee (&lt; 15 menit)
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-600">Instan tapi fitur terkunci</td>
-                        <td class="p-4 sm:p-5 text-slate-400">Wajib Kartu Kredit Internasional</td>
+                        <td class="p-4 sm:p-5 text-slate-600 dark:text-zinc-400">Instan tapi fitur terkunci</td>
+                        <td class="p-4 sm:p-5 text-slate-400 dark:text-zinc-500">Wajib Kartu Kredit Internasional</td>
                     </tr>
                     <!-- Row 7 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 sm:p-5 font-semibold text-slate-900">Biaya Transfer Egress / Kuota</td>
-                        <td class="p-4 sm:p-5 bg-blue-50/40 font-bold text-slate-900">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <td class="p-4 sm:p-5 font-semibold text-slate-900 dark:text-zinc-100">Biaya Transfer Egress / Kuota</td>
+                        <td class="p-4 sm:p-5 bg-blue-50/40 dark:bg-zinc-900/80 font-bold text-slate-900 dark:text-zinc-100">
                             ✓ Bebas Biaya Kuota Tersembunyi
                         </td>
-                        <td class="p-4 sm:p-5 text-slate-500">Sering di-throttle jika traffic ramai</td>
-                        <td class="p-4 sm:p-5 text-slate-500 font-mono-code">Mahal ($0.09 / GB bandwidth keluar)</td>
+                        <td class="p-4 sm:p-5 text-slate-500 dark:text-zinc-400">Sering di-throttle jika traffic ramai</td>
+                        <td class="p-4 sm:p-5 text-slate-500 dark:text-zinc-400 font-mono-code">Mahal ($0.09 / GB bandwidth keluar)</td>
                     </tr>
                 </tbody>
             </table>
@@ -1266,7 +1310,7 @@
             <div class="lg:col-span-5 space-y-3 flex flex-col justify-between">
                 <!-- Stack 1: Coolify -->
                 <button @click="activeStack = 'coolify'"
-                        :class="activeStack === 'coolify' ? 'border-[#4A6FA5] bg-blue-50/40 ring-1 ring-[#4A6FA5]' : 'border-slate-200 hover:border-slate-300 bg-white'"
+                        :class="activeStack === 'coolify' ? 'border-[#4A6FA5] dark:border-zinc-300 bg-blue-50/40 dark:bg-zinc-800 ring-1 ring-[#4A6FA5] dark:ring-zinc-300' : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'"
                         class="w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4">
                     <div class="w-9 h-9 rounded-lg bg-[#4A6FA5] text-white font-bold text-sm flex items-center justify-center shrink-0 mt-0.5">
                         C
@@ -1284,7 +1328,7 @@
 
                 <!-- Stack 2: Dokploy -->
                 <button @click="activeStack = 'dokploy'"
-                        :class="activeStack === 'dokploy' ? 'border-[#4A6FA5] bg-blue-50/40 ring-1 ring-[#4A6FA5]' : 'border-slate-200 hover:border-slate-300 bg-white'"
+                        :class="activeStack === 'dokploy' ? 'border-[#4A6FA5] dark:border-zinc-300 bg-blue-50/40 dark:bg-zinc-800 ring-1 ring-[#4A6FA5] dark:ring-zinc-300' : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'"
                         class="w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4">
                     <div class="w-9 h-9 rounded-lg bg-[#4A6FA5] text-white font-bold text-sm flex items-center justify-center shrink-0 mt-0.5">
                         D
@@ -1302,7 +1346,7 @@
 
                 <!-- Stack 3: CloudPanel -->
                 <button @click="activeStack = 'cloudpanel'"
-                        :class="activeStack === 'cloudpanel' ? 'border-[#4A6FA5] bg-blue-50/40 ring-1 ring-[#4A6FA5]' : 'border-slate-200 hover:border-slate-300 bg-white'"
+                        :class="activeStack === 'cloudpanel' ? 'border-[#4A6FA5] dark:border-zinc-300 bg-blue-50/40 dark:bg-zinc-800 ring-1 ring-[#4A6FA5] dark:ring-zinc-300' : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'"
                         class="w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4">
                     <div class="w-9 h-9 rounded-lg bg-[#4A6FA5] text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                         CP
@@ -1320,7 +1364,7 @@
 
                 <!-- Stack 4: AI Agent Runner -->
                 <button @click="activeStack = 'ai'"
-                        :class="activeStack === 'ai' ? 'border-[#4A6FA5] bg-blue-50/40 ring-1 ring-[#4A6FA5]' : 'border-slate-200 hover:border-slate-300 bg-white'"
+                        :class="activeStack === 'ai' ? 'border-[#4A6FA5] dark:border-zinc-300 bg-blue-50/40 dark:bg-zinc-800 ring-1 ring-[#4A6FA5] dark:ring-zinc-300' : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'"
                         class="w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4">
                     <div class="w-9 h-9 rounded-lg bg-[#4A6FA5] text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                         AI
@@ -1338,64 +1382,64 @@
             </div>
 
             <!-- Right: Interactive Live Developer Terminal Preview -->
-            <div class="lg:col-span-7 bg-[#0B0F19] rounded-2xl border border-slate-800 p-6 flex flex-col justify-between shadow-xl font-mono-code text-xs text-slate-300">
+            <div class="lg:col-span-7 bg-[#09090b] dark:bg-[#111113] rounded-2xl border border-zinc-800 dark:border-zinc-700/80 p-6 flex flex-col justify-between shadow-xl font-mono-code text-xs text-zinc-300">
                 <!-- Terminal Chrome Bar -->
                 <div>
-                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800/80">
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-zinc-800">
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-slate-700"></span>
-                            <span class="w-3 h-3 rounded-full bg-slate-700"></span>
-                            <span class="w-3 h-3 rounded-full bg-slate-700"></span>
-                            <span class="text-slate-500 text-[11px] ml-2" x-text="'root@vexahost-vps ~ ' + activeStack"></span>
+                            <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                            <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                            <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                            <span class="text-zinc-500 text-[11px] ml-2" x-text="'root@vexahost-vps ~ ' + activeStack"></span>
                         </div>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">KVM Shell (Port 22)</span>
+                        <span class="text-[10px] text-zinc-500 uppercase tracking-wider">KVM Shell (Port 22)</span>
                     </div>
 
                     <!-- Terminal Body Content -->
                     <div class="space-y-2.5 leading-relaxed">
                         <!-- Coolify terminal view -->
                         <div x-show="activeStack === 'coolify'" class="space-y-2">
-                            <p class="text-slate-400"># 1. Hubungkan repo GitHub ke Coolify Engine</p>
+                            <p class="text-zinc-400"># 1. Hubungkan repo GitHub ke Coolify Engine</p>
                             <p class="text-white"><span class="text-[#6588BC] font-bold">$</span> coolify deploy --repo=github.com/developer/saas-app --branch=main</p>
-                            <p class="text-slate-400">&gt; Building Next.js / Laravel container via Dockerfile...</p>
-                            <p class="text-slate-400">&gt; Generating Let's Encrypt Wildcard SSL certificate...</p>
+                            <p class="text-zinc-400">&gt; Building Next.js / Laravel container via Dockerfile...</p>
+                            <p class="text-zinc-400">&gt; Generating Let's Encrypt Wildcard SSL certificate...</p>
                             <p class="text-white font-bold">✓ Deployment Selesai dalam 38 detik! Server aktif di https://app.domain.id</p>
-                            <p class="text-slate-500 pt-2">Port Web UI: <span class="text-slate-300">http://103.150.xx.xx:8000</span> (Dashboard Admin Siap Pakai)</p>
+                            <p class="text-zinc-500 pt-2">Port Web UI: <span class="text-zinc-300">http://103.150.xx.xx:8000</span> (Dashboard Admin Siap Pakai)</p>
                         </div>
 
                         <!-- Dokploy terminal view -->
                         <div x-show="activeStack === 'dokploy'" class="space-y-2" style="display: none;">
-                            <p class="text-slate-400"># 1. Jalankan Traefik Reverse Proxy &amp; Postgres Container</p>
+                            <p class="text-zinc-400"># 1. Jalankan Traefik Reverse Proxy &amp; Postgres Container</p>
                             <p class="text-white"><span class="text-[#6588BC] font-bold">$</span> dokploy compose up -d ./production-stack.yml</p>
-                            <p class="text-slate-400">&gt; [+] Running 4/4 [redis, postgres-16, api-gateway, frontend]</p>
-                            <p class="text-slate-400">&gt; Auto-routing incoming HTTPS traffic via Traefik v3</p>
+                            <p class="text-zinc-400">&gt; [+] Running 4/4 [redis, postgres-16, api-gateway, frontend]</p>
+                            <p class="text-zinc-400">&gt; Auto-routing incoming HTTPS traffic via Traefik v3</p>
                             <p class="text-white font-bold">✓ Cluster Docker aktif dan terisolasi pada dedicated RAM KVM!</p>
-                            <p class="text-slate-500 pt-2">Port Web UI: <span class="text-slate-300">http://103.150.xx.xx:3000</span> (Dokploy Dashboard)</p>
+                            <p class="text-zinc-500 pt-2">Port Web UI: <span class="text-zinc-300">http://103.150.xx.xx:3000</span> (Dokploy Dashboard)</p>
                         </div>
 
                         <!-- CloudPanel terminal view -->
                         <div x-show="activeStack === 'cloudpanel'" class="space-y-2" style="display: none;">
-                            <p class="text-slate-400"># 1. Konfigurasi VHost Nginx &amp; Multi-PHP Pool</p>
+                            <p class="text-zinc-400"># 1. Konfigurasi VHost Nginx &amp; Multi-PHP Pool</p>
                             <p class="text-white"><span class="text-[#6588BC] font-bold">$</span> clp-site add --domain=toko-online.com --php=8.3 --type=wordpress</p>
-                            <p class="text-slate-400">&gt; Setting up Nginx high-concurrency microcache...</p>
-                            <p class="text-slate-400">&gt; Initializing MySQL database &amp; user credentials...</p>
+                            <p class="text-zinc-400">&gt; Setting up Nginx high-concurrency microcache...</p>
+                            <p class="text-zinc-400">&gt; Initializing MySQL database &amp; user credentials...</p>
                             <p class="text-white font-bold">✓ Situs WordPress live dengan kecepatan loading sub-100ms!</p>
-                            <p class="text-slate-500 pt-2">Port Web UI: <span class="text-slate-300">https://103.150.xx.xx:8443</span> (CloudPanel SSL)</p>
+                            <p class="text-zinc-500 pt-2">Port Web UI: <span class="text-zinc-300">https://103.150.xx.xx:8443</span> (CloudPanel SSL)</p>
                         </div>
 
                         <!-- AI Agent terminal view -->
                         <div x-show="activeStack === 'ai'" class="space-y-2" style="display: none;">
-                            <p class="text-slate-400"># 1. Inisialisasi Autonomous Agent &amp; Omniroute Proxy</p>
+                            <p class="text-zinc-400"># 1. Inisialisasi Autonomous Agent &amp; Omniroute Proxy</p>
                             <p class="text-white"><span class="text-[#6588BC] font-bold">$</span> hermes-agent start --workers=4 --proxy-port=8080</p>
-                            <p class="text-slate-400">&gt; Loading vector embeddings cache from NVMe SSD arrays...</p>
-                            <p class="text-slate-400">&gt; Sandbox process ready.</p>
+                            <p class="text-zinc-400">&gt; Loading vector embeddings cache from NVMe SSD arrays...</p>
+                            <p class="text-zinc-400">&gt; Sandbox process ready.</p>
                             <p class="text-white font-bold">✓ Worker AI agent aktif berjalan di background.</p>
-                            <p class="text-slate-500 pt-2">Status: <span class="text-slate-300">Active Background Daemon (PID: 14022)</span></p>
+                            <p class="text-zinc-500 pt-2">Status: <span class="text-zinc-300">Active Background Daemon (PID: 14022)</span></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
+                <div class="pt-6 mt-6 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-500">
                     <span>Full root access SSH port 22 disertakan di semua paket.</span>
                     <a href="{{ route('docs') }}" class="text-[#6588BC] hover:underline font-semibold font-sans">Lihat Dokumentasi Lengkap &rarr;</a>
                 </div>
@@ -1629,13 +1673,13 @@
 </section>
 
 <!-- Bottom CTA (Showcase Style Inspired by Hero) -->
-<section class="relative overflow-hidden py-16 sm:py-20 bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] border-b border-slate-200/70">
+<section class="relative overflow-hidden py-16 sm:py-20 bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b] border-b border-slate-200/70 dark:border-zinc-800">
 
     <!-- Ambient 3D Floating Orbs -->
-    <div class="pointer-events-none absolute -top-12 -left-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-35 filter blur-2xl"></div>
-    <div class="pointer-events-none absolute -bottom-16 -right-12 w-72 h-72 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 filter blur-2xl"></div>
-    <div class="pointer-events-none absolute top-8 right-1/4 w-20 h-0.5 bg-white/70 rotate-[-40deg] rounded-full"></div>
-    <div class="pointer-events-none absolute bottom-8 left-1/4 w-16 h-0.5 bg-white/60 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute -top-12 -left-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-35 dark:opacity-10 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -right-12 w-72 h-72 rounded-full bg-gradient-to-tl from-[#4A6FA5] to-[#C0D9F7] opacity-30 dark:opacity-10 filter blur-2xl"></div>
+    <div class="pointer-events-none absolute top-8 right-1/4 w-20 h-0.5 bg-white/70 dark:bg-zinc-800/50 rotate-[-40deg] rounded-full"></div>
+    <div class="pointer-events-none absolute bottom-8 left-1/4 w-16 h-0.5 bg-white/60 dark:bg-zinc-800/50 rotate-[-40deg] rounded-full"></div>
 
     <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-3 tracking-tight">Siap Meluncurkan Server Cloud Anda?</h2>

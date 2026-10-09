@@ -30,7 +30,7 @@
     }
 }">
     {{-- Banner Petunjuk Verifikasi DANA Bisnis --}}
-    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-start gap-3.5">
             <div class="w-10 h-10 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@
     </div>
 
     {{-- Tabel Order & Pembayaran --}}
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
@@ -245,7 +245,7 @@
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
             <div class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity" @click="approveModal = false"></div>
 
-            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full border border-slate-200">
+            <div class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full border border-slate-200">
                 <form :action="'/admin/payments/' + (selectedOrder ? selectedOrder.id : '') + '/approve'" method="POST">
                     @csrf
                     <div class="p-6">
@@ -319,7 +319,7 @@
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
             <div class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity" @click="holdModal = false"></div>
 
-            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md sm:w-full border border-slate-200">
+            <div class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-md sm:w-full border border-slate-200">
                 <form :action="'/admin/payments/' + (selectedOrder ? selectedOrder.id : '') + '/hold'" method="POST">
                     @csrf
                     <div class="p-6">
@@ -363,7 +363,7 @@
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
             <div class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity" @click="rejectModal = false"></div>
 
-            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full border border-slate-200">
+            <div class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full border border-slate-200">
                 <form :action="'/admin/payments/' + (selectedOrder ? selectedOrder.id : '') + '/reject'" method="POST">
                     @csrf
                     <div class="p-6">

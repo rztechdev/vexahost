@@ -422,7 +422,7 @@
              x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
              style="display: none;" @keydown.escape.window="couponModalOpen = false">
-            <div @click.away="couponModalOpen = false" class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
+            <div @click.away="couponModalOpen = false" class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
                 @foreach(array_merge([null], $coupons->items()) as $c)
                     <form x-show="editCouponId === {{ $c ? $c->id : "'new'" }}" x-cloak
                           action="{{ $c ? route('admin.billing.coupons.update', $c->id) : route('admin.billing.coupons.store') }}"
@@ -559,7 +559,7 @@
              x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
              style="display: none;" @keydown.escape.window="taxModalOpen = false">
-            <div @click.away="taxModalOpen = false" class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+            <div @click.away="taxModalOpen = false" class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
                 @foreach($taxRates->prepend(null) as $t)
                     <form x-show="editTaxId === {{ $t ? $t->id : "'new'" }}" x-cloak
                           action="{{ $t ? route('admin.billing.taxes.update', $t->id) : route('admin.billing.taxes.store') }}"

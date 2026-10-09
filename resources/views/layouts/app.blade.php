@@ -215,14 +215,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme');
+            var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', isDark);
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        })();
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        html.dark { color-scheme: dark; background-color: #09090b; }
+        html.dark body { background-color: #09090b; color: #fafafa; }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
-        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-white text-slate-800 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
+<body class="bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-100 antialiased flex flex-col min-h-screen selection:bg-[#4A6FA5] selection:text-white"
       x-data="{ isScrolled: false, mobileMenu: false, mobileProduk: false, mobileVps: false, mobileAi: false, mobileDb: false }"
       x-init="isScrolled = (window.pageYOffset > 20)"
       @scroll.window="isScrolled = (window.pageYOffset > 20)">
@@ -237,7 +249,7 @@
 
     <!-- Enterprise Navbar -->
     <header :class="{
-                'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs': isScrolled || mobileMenu || !{{ $isHome ? 'true' : 'false' }},
+                'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 shadow-xs': isScrolled || mobileMenu || !{{ $isHome ? 'true' : 'false' }},
                 'bg-transparent border-transparent shadow-none': !isScrolled && !mobileMenu && {{ $isHome ? 'true' : 'false' }}
             }"
             class="sticky top-0 z-50 transition-all duration-200">
@@ -247,15 +259,15 @@
                 <!-- Brand Logo (Left) -->
                 <a href="{{ route('home') }}" class="flex items-center space-x-3 shrink-0">
                     <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-9 w-auto object-contain">
-                    <span class="text-xl font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+                    <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Vexa<span class="text-[#4A6FA5]">Host</span></span>
                 </a>
 
                 <!-- Right Group: Nav Links pepet ke Button Masuk -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <nav class="flex items-center space-x-5 text-sm font-medium text-slate-700">
+                    <nav class="flex items-center space-x-5 text-sm font-medium text-slate-700 dark:text-zinc-200">
 
                         <!-- Beranda -->
-                        <a href="{{ route('home') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('home') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('home') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('home') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200' }}">
                             <span class="relative pb-0.5">
                                 Beranda
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('home') ? 'w-full' : 'w-0' }}"></span>
@@ -265,8 +277,8 @@
                         <!-- Dropdown Produk -->
                         <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
-                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200'">
                                 <span class="relative pb-0.5">
                                     Produk
                                     <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
@@ -282,42 +294,42 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
+                                 class="absolute left-0 mt-2 w-72 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-slate-200 dark:border-zinc-800 py-2 z-50 text-slate-800 dark:text-zinc-200"
                                  style="display: none;">
                                 
-                                <a href="{{ route('home') }}#pricing" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                <a href="{{ route('home') }}#pricing" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">Cloud VPS</p>
-                                        <p class="text-xs text-slate-500 leading-snug">Compute KVM andal, NVMe SSD &amp; root access.</p>
+                                        <p class="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#4A6FA5] transition-colors">Cloud VPS</p>
+                                        <p class="text-xs text-slate-500 dark:text-zinc-400 leading-snug">Compute KVM andal, NVMe SSD &amp; root access.</p>
                                     </div>
                                 </a>
 
-                                <a href="{{ route('home') }}#ai-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                <a href="{{ route('home') }}#ai-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-1.5">
-                                            <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">AI Combo Packages</p>
-                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                                            <p class="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#4A6FA5] transition-colors">AI Combo Packages</p>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Baru</span>
                                         </div>
-                                        <p class="text-xs text-slate-500 leading-snug">Zero setup coding agent &amp; private workstation.</p>
+                                        <p class="text-xs text-slate-500 dark:text-zinc-400 leading-snug">Zero setup coding agent &amp; private workstation.</p>
                                     </div>
                                 </a>
 
-                                <a href="{{ route('home') }}#database-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#4A6FA5] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
+                                <a href="{{ route('home') }}#database-packages" @click="open = false" class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#4A6FA5] group-hover:text-white transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-1.5">
-                                            <p class="text-sm font-semibold text-slate-900 group-hover:text-[#4A6FA5] transition-colors">Managed Database</p>
-                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                                            <p class="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#4A6FA5] transition-colors">Managed Database</p>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Baru</span>
                                         </div>
-                                        <p class="text-xs text-slate-500 leading-snug">Server database khusus, terpisah dari aplikasi.</p>
+                                        <p class="text-xs text-slate-500 dark:text-zinc-400 leading-snug">Server database khusus, terpisah dari aplikasi.</p>
                                     </div>
                                 </a>
                             </div>
@@ -326,8 +338,8 @@
                         <!-- Dropdown Paket VPS -->
                         <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
-                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200'">
                                 <span class="relative pb-0.5">
                                     Paket VPS
                                     <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
@@ -343,26 +355,26 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
+                                 class="absolute left-0 mt-2 w-72 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-slate-200 dark:border-zinc-800 py-2 z-50 text-slate-800 dark:text-zinc-200"
                                  style="display: none;">
-                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilihan Paket VPS</p>
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 dark:border-zinc-800 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Pilihan Paket VPS</p>
                                 </div>
                                 @foreach($navVpsSpecs as $spec)
-                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
                                         <div>
                                             <div class="flex items-center gap-1.5">
-                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                <p class="text-xs font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
                                                 @if($spec->name === 'Standard')
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Populer</span>
                                                 @endif
                                             </div>
-                                            <p class="text-[11px] text-slate-400">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
+                                            <p class="text-[11px] text-slate-400 dark:text-zinc-500">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
                                         </div>
-                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                                     </a>
                                 @endforeach
-                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                <div class="border-t border-slate-100 dark:border-zinc-800 mt-1 pt-1.5 px-3.5">
                                     <a href="{{ route('home') }}#pricing" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
                                         Lihat Semua Paket VPS &rarr;
                                     </a>
@@ -373,8 +385,8 @@
                         <!-- Dropdown AI Agent -->
                         <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
-                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200'">
                                 <span class="relative pb-0.5">
                                     AI Agent
                                     <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
@@ -390,26 +402,26 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
+                                 class="absolute left-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-slate-200 dark:border-zinc-800 py-2 z-50 text-slate-800 dark:text-zinc-200"
                                  style="display: none;">
-                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Paket AI Coding &amp; Automation</p>
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 dark:border-zinc-800 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Paket AI Coding &amp; Automation</p>
                                 </div>
                                 @foreach($navAiSpecs as $spec)
-                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
                                         <div class="pr-2">
                                             <div class="flex items-center gap-1.5">
-                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                <p class="text-xs font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
                                                 @if($spec->id == 8)
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Populer</span>
                                                 @endif
                                             </div>
-                                            <p class="text-[11px] text-slate-400 line-clamp-1">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
+                                            <p class="text-[11px] text-slate-400 dark:text-zinc-500 line-clamp-1">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB SSD</p>
                                         </div>
-                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                                     </a>
                                 @endforeach
-                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                <div class="border-t border-slate-100 dark:border-zinc-800 mt-1 pt-1.5 px-3.5">
                                     <a href="{{ route('home') }}#ai-packages" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
                                         Lihat Semua Fitur AI &rarr;
                                     </a>
@@ -420,8 +432,8 @@
                         <!-- Dropdown Database -->
                         <div class="relative shrink-0" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
                             <button @click="open = !open"
-                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0"
-                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700'">
+                                    class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0"
+                                    :class="open ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200'">
                                 <span class="relative pb-0.5">
                                     Database
                                     <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full"
@@ -437,26 +449,26 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800"
+                                 class="absolute left-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-slate-200 dark:border-zinc-800 py-2 z-50 text-slate-800 dark:text-zinc-200"
                                  style="display: none;">
-                                <div class="px-3.5 py-1.5 border-b border-slate-100 mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dedicated Database VPS</p>
+                                <div class="px-3.5 py-1.5 border-b border-slate-100 dark:border-zinc-800 mb-1">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Dedicated Database VPS</p>
                                 </div>
                                 @foreach($navDbSpecs as $spec)
-                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 transition-colors group">
+                                    <a href="{{ route('checkout', $spec->id) }}" @click="open = false" class="flex items-center justify-between px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors group">
                                         <div class="pr-2">
                                             <div class="flex items-center gap-1.5">
-                                                <p class="text-xs font-semibold text-slate-800 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
+                                                <p class="text-xs font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-[#4A6FA5] transition-colors">{{ $spec->name }}</p>
                                                 @if($spec->id == 12)
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Populer</span>
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Populer</span>
                                                 @endif
                                             </div>
-                                            <p class="text-[11px] text-slate-400">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB NVMe</p>
+                                            <p class="text-[11px] text-slate-400 dark:text-zinc-500">{{ $spec->cpu }} Core • {{ $spec->ram }} GB RAM • {{ $spec->disk }} GB NVMe</p>
                                         </div>
-                                        <span class="text-xs font-bold text-slate-900 font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white font-mono-code shrink-0">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                                     </a>
                                 @endforeach
-                                <div class="border-t border-slate-100 mt-1 pt-1.5 px-3.5">
+                                <div class="border-t border-slate-100 dark:border-zinc-800 mt-1 pt-1.5 px-3.5">
                                     <a href="{{ route('home') }}#database-packages" @click="open = false" class="block text-center text-xs font-bold text-[#4A6FA5] hover:text-[#3D5E8C] py-1">
                                         Lihat Semua Fitur Database &rarr;
                                     </a>
@@ -465,7 +477,7 @@
                         </div>
 
                         <!-- Docs -->
-                        <a href="{{ route('docs') }}" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('docs') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('docs') }}" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('docs') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200' }}">
                             <span class="relative pb-0.5">
                                 Docs
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('docs') ? 'w-full' : 'w-0' }}"></span>
@@ -476,7 +488,7 @@
                         </a>
 
                         <!-- WA Gateway -->
-                        <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 text-slate-700">
+                        <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0 text-slate-700 dark:text-zinc-200">
                             <span class="relative pb-0.5">
                                 WA Gateway
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
@@ -487,7 +499,7 @@
                         </a>
 
                         <!-- Jasa Web -->
-                        <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 text-slate-700">
+                        <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1 py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0 text-slate-700 dark:text-zinc-200">
                             <span class="relative pb-0.5">
                                 Jasa Web
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full w-0"></span>
@@ -498,7 +510,7 @@
                         </a>
 
                         <!-- Status -->
-                        <a href="{{ route('status') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('status') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700' }}">
+                        <a href="{{ route('status') }}" class="group flex items-center py-1 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors whitespace-nowrap shrink-0 {{ request()->routeIs('status') ? 'text-[#4A6FA5] font-semibold' : 'text-slate-700 dark:text-zinc-200' }}">
                             <span class="relative pb-0.5">
                                 Status
                                 <span class="absolute bottom-0 left-0 h-[2px] bg-[#4A6FA5] transition-all duration-200 group-hover:w-full {{ request()->routeIs('status') ? 'w-full' : 'w-0' }}"></span>
@@ -507,22 +519,25 @@
                     </nav>
 
                     <!-- Divider tipis -->
-                    <div class="h-4 w-px bg-slate-200"></div>
+                    <div class="h-4 w-px bg-slate-200 dark:bg-zinc-800"></div>
+
+                    <!-- Theme toggle button -->
+                    @include('partials.theme-toggle')
 
                     <!-- Tombol Aksi (Masuk & Pesan) rapat dengan menu -->
                     <div class="flex items-center space-x-3">
                         @auth
                             @if(auth()->user()->is_admin)
-                                <a href="{{ route('admin.index') }}" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200 hover:bg-amber-100 transition-colors">
+                                <a href="{{ route('admin.index') }}" class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 text-xs font-semibold border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
                                     Admin Area
                                 </a>
                             @endif
-                            <a href="{{ route('dashboard.index') }}" class="px-4 py-2 text-sm font-medium rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 transition-colors">
+                            <a href="{{ route('dashboard.index') }}" class="px-4 py-2 text-sm font-medium rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors">
                                 Dashboard
                             </a>
                             <form action="{{ route('logout') }}" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="text-sm font-medium text-slate-500 hover:text-rose-600 transition-colors px-2 py-2">
+                                <button type="submit" class="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors px-2 py-2">
                                     Keluar
                                 </button>
                             </form>
@@ -534,18 +549,19 @@
                     </div>
                 </div>
 
-                <!-- Mobile Hamburger Button -->
-                <div class="flex md:hidden items-center gap-2">
+                <!-- Mobile Header Right Actions -->
+                <div class="flex md:hidden items-center gap-1.5">
+                    @include('partials.theme-toggle')
                     @guest
                         <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#4A6FA5] hover:bg-[#3D5E8C]">
                             Masuk
                         </a>
                     @else
-                        <a href="{{ route('dashboard.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-slate-100">
+                        <a href="{{ route('dashboard.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800">
                             Dashboard
                         </a>
                     @endguest
-                    <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Menu Mobile">
+                    <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800" aria-label="Menu Mobile">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -555,7 +571,6 @@
             </div>
         </div>
     </header>
-
     {{-- ===================== Mobile Drawer (Muncul dari Bawah / Bottom Sheet) ===================== --}}
     <div x-show="mobileMenu" x-cloak
          x-effect="document.body.style.overflow = mobileMenu ? 'hidden' : ''"
@@ -565,15 +580,15 @@
          x-transition:leave="transition-transform duration-250 ease-in"
          x-transition:leave-start="translate-y-0"
          x-transition:leave-end="translate-y-full"
-         class="fixed inset-0 z-50 flex flex-col bg-white md:hidden">
+         class="fixed inset-0 z-50 flex flex-col bg-white dark:bg-zinc-950 md:hidden">
 
         {{-- Drawer Top Header Bar --}}
-        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 shrink-0 bg-white">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 px-5 py-4 shrink-0 bg-white dark:bg-zinc-950">
             <a href="{{ route('home') }}" @click="mobileMenu = false" class="flex items-center space-x-3 shrink-0">
                 <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-8 w-auto object-contain">
-                <span class="text-lg font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+                <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Vexa<span class="text-[#4A6FA5]">Host</span></span>
             </a>
-            <button @click="mobileMenu = false" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 transition-colors" aria-label="Tutup Menu">
+            <button @click="mobileMenu = false" class="rounded-lg p-2 text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors" aria-label="Tutup Menu">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -581,42 +596,42 @@
         </div>
 
         {{-- Drawer Scrollable Content --}}
-        <div class="flex-1 space-y-3 overflow-y-auto px-5 py-4 text-slate-800">
+        <div class="flex-1 space-y-3 overflow-y-auto px-5 py-4 text-slate-800 dark:text-zinc-200">
             <!-- Beranda -->
-            <a href="{{ route('home') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-semibold {{ request()->routeIs('home') ? 'text-[#4A6FA5] bg-blue-50/50' : 'text-slate-800' }} rounded-lg hover:bg-slate-50">
+            <a href="{{ route('home') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-semibold {{ request()->routeIs('home') ? 'text-[#4A6FA5] bg-blue-50/50 dark:bg-zinc-900' : 'text-slate-800 dark:text-zinc-200' }} rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                 Beranda
             </a>
 
             <!-- Accordion Produk -->
             <div>
-                <button @click="mobileProduk = !mobileProduk" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                <button @click="mobileProduk = !mobileProduk" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 dark:text-zinc-200 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>Produk Cloud</span>
                     <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileProduk ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div x-show="mobileProduk" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
-                    <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">Cloud VPS KVM</a>
-                    <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                <div x-show="mobileProduk" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-zinc-800 ml-3">
+                    <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5]">Cloud VPS KVM</a>
+                    <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5] flex items-center justify-between">
                         <span>AI Combo Packages</span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Baru</span>
                     </a>
-                    <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 hover:text-[#4A6FA5] flex items-center justify-between">
+                    <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5] flex items-center justify-between">
                         <span>Managed Database</span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#4A6FA5]">Baru</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-zinc-800 text-[#4A6FA5] dark:text-zinc-200">Baru</span>
                     </a>
                 </div>
             </div>
 
             <!-- Accordion Paket VPS -->
             <div>
-                <button @click="mobileVps = !mobileVps" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                <button @click="mobileVps = !mobileVps" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 dark:text-zinc-200 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>Paket VPS</span>
                     <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileVps ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div x-show="mobileVps" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                <div x-show="mobileVps" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-zinc-800 ml-3">
                     @foreach($navVpsSpecs as $spec)
-                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5]">
                             <span>{{ $spec->name }}</span>
-                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500 dark:text-zinc-400">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                         </a>
                     @endforeach
                     <a href="{{ route('home') }}#pricing" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Paket VPS &rarr;</a>
@@ -625,15 +640,15 @@
 
             <!-- Accordion AI Agent -->
             <div>
-                <button @click="mobileAi = !mobileAi" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                <button @click="mobileAi = !mobileAi" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 dark:text-zinc-200 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>AI Agent</span>
                     <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileAi ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div x-show="mobileAi" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                <div x-show="mobileAi" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-zinc-800 ml-3">
                     @foreach($navAiSpecs as $spec)
-                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5]">
                             <span>{{ $spec->name }}</span>
-                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500 dark:text-zinc-400">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                         </a>
                     @endforeach
                     <a href="{{ route('home') }}#ai-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur AI &rarr;</a>
@@ -642,15 +657,15 @@
 
             <!-- Accordion Database -->
             <div>
-                <button @click="mobileDb = !mobileDb" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                <button @click="mobileDb = !mobileDb" class="w-full flex justify-between items-center px-3 py-2 text-sm font-semibold text-slate-800 dark:text-zinc-200 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>Database (DB)</span>
                     <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="mobileDb ? 'rotate-180 text-[#4A6FA5]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div x-show="mobileDb" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 ml-3">
+                <div x-show="mobileDb" x-cloak class="pl-4 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-zinc-800 ml-3">
                     @foreach($navDbSpecs as $spec)
-                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-[#4A6FA5]">
+                        <a href="{{ route('checkout', $spec->id) }}" @click="mobileMenu = false" class="flex justify-between items-center px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:text-[#4A6FA5]">
                             <span>{{ $spec->name }}</span>
-                            <span class="text-[11px] font-bold font-mono-code text-slate-500">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
+                            <span class="text-[11px] font-bold font-mono-code text-slate-500 dark:text-zinc-400">Rp {{ number_format($spec->sell_price / 1000, 0) }}rb</span>
                         </a>
                     @endforeach
                     <a href="{{ route('home') }}#database-packages" @click="mobileMenu = false" class="block px-3 py-1.5 text-xs font-bold text-[#4A6FA5]">Lihat Semua Fitur Database &rarr;</a>
@@ -658,51 +673,51 @@
             </div>
 
             {{-- Direct Links --}}
-            <div class="border-t border-slate-100 pt-3 mt-2 space-y-1">
-                <a href="{{ route('docs') }}" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+            <div class="border-t border-slate-100 dark:border-zinc-800 pt-3 mt-2 space-y-1">
+                <a href="{{ route('docs') }}" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>Docs</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                     </svg>
                 </a>
-                <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                <a href="https://wa.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>WA Gateway</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                     </svg>
                 </a>
-                <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                <a href="https://build.vexahostcloud.my.id" target="_blank" rel="noopener noreferrer" @click="mobileMenu = false" class="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     <span>Jasa Web</span>
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7H7M17 7V17"/>
                     </svg>
                 </a>
-                <a href="{{ route('status') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-50">
+                <a href="{{ route('status') }}" @click="mobileMenu = false" class="block px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-900">
                     Status Sistem
                 </a>
             </div>
         </div>
 
         {{-- Bottom Bar: Fixed / Pinned Auth Actions (Persis Seperti VexaHost WA Gateway) --}}
-        <div class="shrink-0 border-t border-slate-200 bg-white/95 backdrop-blur-md p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+        <div class="shrink-0 border-t border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
             @auth
                 <div class="space-y-2">
-                    <a href="{{ route('dashboard.index') }}" @click="mobileMenu = false" class="block w-full text-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-neutral-800 transition-all">
+                    <a href="{{ route('dashboard.index') }}" @click="mobileMenu = false" class="block w-full text-center rounded-xl bg-[#4A6FA5] hover:bg-[#3D5E8C] px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all">
                         Dashboard
                     </a>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="block w-full text-center px-4 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700">
+                        <button type="submit" class="block w-full text-center px-4 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700">
                             Keluar dari Akun
                         </button>
                     </form>
                 </div>
             @else
                 <div class="grid grid-cols-2 gap-2.5">
-                    <a href="{{ route('login') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-all text-center">
+                    <a href="{{ route('login') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-slate-800 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all text-center">
                         Masuk
                     </a>
-                    <a href="{{ route('register') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-neutral-800 transition-all text-center">
+                    <a href="{{ route('register') }}" @click="mobileMenu = false" class="flex items-center justify-center rounded-xl bg-[#4A6FA5] hover:bg-[#3D5E8C] px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all text-center">
                         Buat Akun
                     </a>
                 </div>
@@ -811,11 +826,11 @@
 
     <!-- Enterprise 4-Column Footer -->
     @unless(request()->routeIs('checkout'))
-    <footer class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] text-slate-600 pt-16 pb-12 border-t border-slate-200/70">
+    <footer class="relative overflow-hidden bg-gradient-to-br from-[#F5F8FD] via-[#EBF2FA] to-[#DFEAF7] dark:from-[#09090b] dark:via-[#09090b] dark:to-zinc-950 text-slate-600 dark:text-zinc-400 pt-16 pb-12 border-t border-slate-200/70 dark:border-zinc-800">
 
         <!-- Ambient 3D Floating Orbs for Footer -->
-        <div class="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 filter blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-30 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 dark:opacity-5 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-30 dark:opacity-5 filter blur-3xl"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
@@ -824,65 +839,65 @@
                 <div class="lg:col-span-2 space-y-4">
                     <div class="flex items-center space-x-3">
                         <img src="{{ asset('images/logo.png') }}" alt="VexaHost" class="h-9 w-auto object-contain">
-                        <span class="text-xl font-bold tracking-tight text-slate-900">Vexa<span class="text-[#4A6FA5]">Host</span></span>
+                        <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Vexa<span class="text-[#4A6FA5]">Host</span></span>
                     </div>
-                    <p class="text-sm leading-relaxed text-slate-600 max-w-sm">
+                    <p class="text-sm leading-relaxed text-slate-600 dark:text-zinc-400 max-w-sm">
                         Platform cloud VPS KVM di Indonesia dengan akses root penuh, storage NVMe SSD, dan kemudahan 1-click control panel.
                     </p>
-                    <div class="space-y-1 text-xs text-slate-500">
-                        <p class="text-slate-500 font-normal">Created by <span class="text-slate-800 font-medium">vexahostcloud</span></p>
+                    <div class="space-y-1 text-xs text-slate-500 dark:text-zinc-400">
+                        <p class="text-slate-500 dark:text-zinc-400 font-normal">Created by <span class="text-slate-800 dark:text-zinc-200 font-medium">vexahostcloud</span></p>
                         <p>Infrastruktur: Tencent Cloud &amp; Lintasarta Cloudeka (Jakarta &amp; Singapore)</p>
                     </div>
                 </div>
 
                 <!-- Column 2: PRODUK -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Produk Cloud</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Produk Cloud</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Cloud VPS KVM</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Student Basic (Rp 80rb)</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Mahasiswa Basic (Rp 90rb)</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Standard Production</a></li>
-                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">AI &amp; Automation Stack</a></li>
-                        <li><span class="text-slate-400">Managed VPS (Segera)</span></li>
-                        <li><span class="text-slate-400">Bare Metal Server (Segera)</span></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Cloud VPS KVM</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Student Basic (Rp 80rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Mahasiswa Basic (Rp 90rb)</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Standard Production</a></li>
+                        <li><a href="{{ route('home') }}#pricing" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">AI &amp; Automation Stack</a></li>
+                        <li><span class="text-slate-400 dark:text-zinc-600">Managed VPS (Segera)</span></li>
+                        <li><span class="text-slate-400 dark:text-zinc-600">Bare Metal Server (Segera)</span></li>
                     </ul>
                 </div>
 
                 <!-- Column 3: DUKUNGAN & DOKUMENTASI -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Dukungan</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Dukungan</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('docs') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Dokumentasi Hub</a></li>
-                        <li><a href="{{ route('status') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors flex items-center gap-1.5">
+                        <li><a href="{{ route('docs') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Dokumentasi Hub</a></li>
+                        <li><a href="{{ route('status') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors flex items-center gap-1.5">
                             <span>Status Sistem</span>
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         </a></li>
-                        <li><a href="{{ route('docs.kelompok', 'keamanan') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Panduan SSH &amp; Security</a></li>
-                        <li><a href="{{ route('docs.kelompok', 'control-panel') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
-                        <li><a href="{{ route('home') }}#faq" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Pertanyaan Umum (FAQ)</a></li>
-                        <li><a href="{{ route('home') }}#kontak" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kontak Dukungan</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'keamanan') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Panduan SSH &amp; Security</a></li>
+                        <li><a href="{{ route('docs.kelompok', 'control-panel') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Tutorial Coolify &amp; Dokploy</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Pertanyaan Umum (FAQ)</a></li>
+                        <li><a href="{{ route('home') }}#kontak" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Kontak Dukungan</a></li>
                     </ul>
                 </div>
 
                 <!-- Column 4: LEGAL & KEBIJAKAN -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Legal &amp; Kebijakan</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Legal &amp; Kebijakan</h4>
                     <ul class="space-y-2.5 text-xs">
-                        <li><a href="{{ route('terms') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Ketentuan Layanan (ToS)</a></li>
-                        <li><a href="{{ route('privacy') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kebijakan Privasi</a></li>
-                        <li><a href="{{ route('refund') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Kebijakan Refund</a></li>
-                        <li><a href="{{ route('terms') }}#aup" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Acceptable Use (AUP)</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Ketentuan Layanan (ToS)</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="{{ route('refund') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Kebijakan Refund</a></li>
+                        <li><a href="{{ route('terms') }}#aup" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Acceptable Use (AUP)</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Payment Methods Banner -->
-            <div class="pt-8 pb-8 border-t border-slate-200/80">
+            <div class="pt-8 pb-8 border-t border-slate-200/80 dark:border-zinc-800">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div>
-                        <p class="text-xs font-semibold text-slate-800">Metode Pembayaran Resmi</p>
-                        <p class="text-[11px] text-slate-500">Mendukung otomatisasi instan QRIS, Virtual Account Bank, &amp; Toko Shopee</p>
+                        <p class="text-xs font-semibold text-slate-800 dark:text-zinc-200">Metode Pembayaran Resmi</p>
+                        <p class="text-[11px] text-slate-500 dark:text-zinc-400">Mendukung otomatisasi instan QRIS, Virtual Account Bank, &amp; Toko Shopee</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
                         @php
@@ -900,7 +915,7 @@
                             ];
                         @endphp
                         @foreach ($footerPayments as $pay)
-                            <div class="flex h-7 shrink-0 items-center justify-center rounded-lg border border-white/80 bg-white/85 backdrop-blur-xs px-2 shadow-2xs hover:bg-white transition-all"
+                            <div class="payment-badge-light flex h-7 shrink-0 items-center justify-center rounded-lg border border-white/80 dark:border-zinc-700 bg-white/90 dark:bg-white/95 backdrop-blur-xs px-2 shadow-2xs hover:bg-white transition-all"
                                  title="{{ $pay['label'] }}">
                                 <img src="{{ asset('images/payments/' . $pay['file']) }}"
                                      alt="{{ $pay['label'] }}"
@@ -913,14 +928,14 @@
             </div>
 
             <!-- Bottom Copyright -->
-            <div class="pt-6 border-t border-slate-200/80 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="pt-6 border-t border-slate-200/80 dark:border-zinc-800 text-[11px] text-slate-500 dark:text-zinc-400 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <p>&copy; {{ date('Y') }} VexaHost. All rights reserved. Created by vexahostcloud.</p>
                 <div class="flex items-center space-x-5 text-[11px]">
-                    <a href="{{ route('terms') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Terms of Service</a>
+                    <a href="{{ route('terms') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Terms of Service</a>
                     <span>&bull;</span>
-                    <a href="{{ route('privacy') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Privacy Policy</a>
+                    <a href="{{ route('privacy') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Privacy Policy</a>
                     <span>&bull;</span>
-                    <a href="{{ route('refund') }}" class="text-slate-600 hover:text-[#4A6FA5] transition-colors">Refund Policy</a>
+                    <a href="{{ route('refund') }}" class="text-slate-600 dark:text-zinc-400 hover:text-[#4A6FA5] dark:hover:text-[#6588BC] transition-colors">Refund Policy</a>
                 </div>
             </div>
         </div>

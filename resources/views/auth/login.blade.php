@@ -1,14 +1,14 @@
 @extends('layouts.auth', ['title' => 'Masuk ke Akun — VexaHost'])
 
 @section('content')
-<div class="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC] p-3 sm:p-4 lg:p-5 xl:p-6 overflow-y-auto lg:overflow-hidden">
+<div class="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC] dark:bg-[#09090b] p-3 sm:p-4 lg:p-5 xl:p-6 overflow-y-auto lg:overflow-hidden">
 
     <!-- Left Column: Midtrans-style Floating Card (Prominent Wide Card, rocket-focused) -->
-    <div class="hidden lg:flex lg:w-[48%] xl:w-[48%] 2xl:w-[48%] rounded-[2rem] bg-gradient-to-br from-[#1E3B66] via-[#2A5086] to-[#142846] text-white p-6 xl:p-10 flex-col items-center justify-center relative overflow-hidden shadow-2xl border border-slate-700/30 select-none">
+    <div class="hidden lg:flex lg:w-[48%] xl:w-[48%] 2xl:w-[48%] rounded-[2rem] bg-gradient-to-br from-[#1E3B66] via-[#2A5086] to-[#142846] dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-950 text-white p-6 xl:p-10 flex-col items-center justify-center relative overflow-hidden shadow-2xl border border-slate-700/30 dark:border-zinc-800 select-none">
         <!-- Ambient 3D Glowing Orbs -->
-        <div class="pointer-events-none absolute -top-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 filter blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-20 filter blur-3xl"></div>
-        <div class="pointer-events-none absolute top-1/2 -right-12 -translate-y-1/2 w-64 h-64 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-20 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -top-16 -left-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#CADFF8] via-[#8BB5E8] to-[#4A6FA5] opacity-25 dark:opacity-10 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#7EA7DB] via-[#A8C7F0] to-[#E3EFFF] opacity-20 dark:opacity-10 filter blur-3xl"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-12 -translate-y-1/2 w-64 h-64 rounded-full bg-gradient-to-bl from-[#9BBFE6] via-[#658EC4] to-[#3B5F90] opacity-20 dark:opacity-10 filter blur-3xl"></div>
 
         <!-- Headline above rocket -->
         <div class="relative z-10 text-center mb-4 sm:mb-6 px-4">
@@ -195,7 +195,7 @@
                     <div class="w-full border-t border-slate-200"></div>
                 </div>
                 <div class="relative flex justify-center text-xs uppercase tracking-wider">
-                    <span class="bg-[#F8FAFC] px-2.5 text-slate-400 font-medium text-[11px]">atau dengan email</span>
+                    <span class="bg-[#F8FAFC] dark:bg-[#09090b] px-2.5 text-slate-400 dark:text-zinc-400 font-medium text-[11px]">atau dengan email</span>
                 </div>
             </div>
 
@@ -213,7 +213,7 @@
                 <div x-data="{ showPassword: false }">
                     <div class="flex justify-between items-center mb-1">
                         <label for="password" class="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">Password</label>
-                        <a href="{{ route('home') }}#kontak" class="text-[11px] sm:text-xs text-[#4A6FA5] font-semibold hover:underline">Bantuan?</a>
+                        <a href="{{ route('password.request') }}" class="text-[11px] sm:text-xs text-[#4A6FA5] font-semibold hover:underline">Lupa Password?</a>
                     </div>
                     <div class="relative">
                         <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required placeholder="Masukkan password akun"

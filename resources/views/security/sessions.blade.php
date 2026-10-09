@@ -20,7 +20,7 @@
             <button class="rounded-lg border border-rose-300 px-3 py-2 text-sm font-semibold text-rose-700">Cabut semua lainnya</button>
         </form>
     </div>
-    <div class="bg-white border border-slate-200 rounded-xl divide-y">
+    <div class="bg-white border border-slate-200 rounded-lg divide-y">
         @forelse($sessions as $session)
             <div class="p-5 flex items-center justify-between gap-4">
                 <div>

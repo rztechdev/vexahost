@@ -412,10 +412,14 @@ class BillingService
                 'period_end' => $periodEnd,
             ]);
 
-            $subscription->update([
+            $subscriptionUpdates = [
                 'last_renewal_attempt_at' => now(),
-                'next_billing_at' => $periodEnd,
-            ]);
+            ];
+            if ($invoice->status === 'paid') {
+                $subscriptionUpdates['next_billing_at'] = $periodEnd;
+                $subscriptionUpdates['current_period_end'] = $periodEnd;
+            }
+            $subscription->update($subscriptionUpdates);
 
             return $invoice;
         });

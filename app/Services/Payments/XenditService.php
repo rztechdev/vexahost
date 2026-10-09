@@ -237,11 +237,33 @@ class XenditService
 
         $status = strtoupper($invoiceData['status'] ?? '');
         if (in_array($status, ['PAID', 'SETTLED'], true)) {
-            // Transisi order ke paid jika belum
-            $order->update([
-                'paid_at' => now(),
-                'payment_method' => $tx->payment_method ?: $order->payment_method,
-            ]);
+            // Transisi order ke paid via state machine jika belum
+            if ($order->status !== 'paid' && $order->status !== 'active') {
+                try {
+                    app(\App\Services\OrderStateMachine::class)->transition($order, 'paid', [
+                        'reason' => 'Xendit checkAndSyncStatus invoice settled.',
+                        'actor_type' => 'system',
+                        'metadata' => [
+                            'provider' => 'xendit',
+                            'provider_tx_id' => $tx->provider_transaction_id,
+                        ],
+                        'onLocked' => function (Order $locked) use ($tx) {
+                            $locked->paid_at = now();
+                            if ($tx->payment_method) {
+                                $locked->payment_method = $tx->payment_method;
+                            }
+                            $locked->save();
+                        },
+                    ]);
+                } catch (\App\Exceptions\InvalidStateTransitionException $e) {
+                    Log::warning('xendit.checkAndSyncStatus transition rejected: ' . $e->getMessage());
+                }
+            } else {
+                $order->update([
+                    'paid_at' => $order->paid_at ?: now(),
+                    'payment_method' => $tx->payment_method ?: $order->payment_method,
+                ]);
+            }
 
             if ($order->invoice && $order->invoice->status !== 'paid') {
                 $order->invoice->update([

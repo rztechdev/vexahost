@@ -71,71 +71,71 @@
 
     <!-- Unpaid Orders Section -->
     @if($unpaidOrders->count() > 0)
-    <div class="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+    <div class="bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 rounded-lg p-6 mb-6">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-full bg-slate-200/80 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
             </div>
             <div>
-                <h3 class="font-bold text-amber-800">Layanan Terkunci - Menunggu Pembayaran</h3>
-                <p class="text-sm text-amber-700">Anda memiliki {{ $unpaidOrders->count() }} pesanan yang belum dibayar</p>
+                <h3 class="font-bold text-slate-900 dark:text-white">Layanan Terkunci - Menunggu Pembayaran</h3>
+                <p class="text-sm text-slate-600 dark:text-zinc-400">Anda memiliki {{ $unpaidOrders->count() }} pesanan yang belum dibayar</p>
             </div>
         </div>
         
         <div class="space-y-4">
             @foreach($unpaidOrders as $order)
-            <div class="bg-white border border-amber-300 rounded-lg p-4">
+            <div class="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-lg p-4">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h4 class="font-semibold text-slate-900">{{ $order->vpsSpec->name }}</h4>
+                            <h4 class="font-semibold text-slate-900 dark:text-white">{{ $order->vpsSpec->name }}</h4>
                             @if($order->hostname)
-                                <span class="px-2 py-0.5 rounded text-[11px] font-mono-code font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-mono-code font-bold bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700">
                                     {{ $order->hostname }}
                                 </span>
                             @endif
                         </div>
-                        <div class="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                        <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-zinc-400 mt-1">
                             <span>{{ $order->vpsSpec->cpu }} vCPU &middot; {{ $order->vpsSpec->ram }} GB RAM &middot; {{ $order->vpsSpec->disk }} GB SSD</span>
-                            <span class="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded text-xs font-medium">
+                            <span class="px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 rounded text-xs font-semibold">
                                 TERKUNCI
                             </span>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-xs text-slate-500">Total Tagihan</div>
-                        <div class="font-bold text-lg font-mono-code">Rp {{ number_format($order->amount, 0, ',', '.') }}</div>
+                        <div class="text-xs text-slate-500 dark:text-zinc-400">Total Tagihan</div>
+                        <div class="font-bold text-lg font-mono-code text-slate-900 dark:text-white">Rp {{ number_format($order->amount, 0, ',', '.') }}</div>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
                     <div>
-                        <span class="text-slate-500">Provider & DC:</span>
-                        <span class="font-medium text-slate-900 block capitalize">{{ $order->provider_label }} · {{ $order->datacenter_location }}</span>
+                        <span class="text-slate-500 dark:text-zinc-400">Provider & DC:</span>
+                        <span class="font-medium text-slate-900 dark:text-zinc-100 block capitalize">{{ $order->provider_label }} · {{ $order->datacenter_location }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-500">OS & Stack:</span>
-                        <span class="font-medium text-slate-900 block">{{ $order->os_label }} · {{ $order->control_panel_label }}</span>
+                        <span class="text-slate-500 dark:text-zinc-400">OS & Stack:</span>
+                        <span class="font-medium text-slate-900 dark:text-zinc-100 block">{{ $order->os_label }} · {{ $order->control_panel_label }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-500">Metode Bayar:</span>
-                        <span class="font-medium text-slate-900 block">{{ strtoupper($order->payment_method) }}</span>
+                        <span class="text-slate-500 dark:text-zinc-400">Metode Bayar:</span>
+                        <span class="font-medium text-slate-900 dark:text-zinc-100 block">{{ strtoupper($order->payment_method) }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-500">Invoice:</span>
-                        <span class="font-mono-code font-medium block">{{ $order->invoice->invoice_number ?? 'INV-' . $order->id }}</span>
+                        <span class="text-slate-500 dark:text-zinc-400">Invoice:</span>
+                        <span class="font-mono-code font-medium text-slate-900 dark:text-zinc-100 block">{{ $order->invoice->invoice_number ?? 'INV-' . $order->id }}</span>
                     </div>
                 </div>
                 
                 <div class="flex gap-3">
                     <a href="{{ \App\Models\PaymentGateway::isMidtransMethod($order->payment_method) ? route('order.payment.status', $order->id) : route('order.payment', $order->id) }}" 
-                       class="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm text-center transition-colors">
+                       class="flex-1 py-2.5 px-4 rounded-lg bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-sm text-center transition-colors">
                         Selesaikan Pembayaran
                     </a>
                     <a href="{{ route('order.success', $order->id) }}" 
-                       class="py-2.5 px-4 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-sm transition-colors">
+                       class="py-2.5 px-4 rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-medium text-sm transition-colors">
                         Lihat Detail
                     </a>
                 </div>
@@ -143,9 +143,9 @@
             @endforeach
         </div>
         
-        <div class="mt-4 p-4 bg-amber-100 border border-amber-300 rounded-lg">
-            <p class="text-sm text-amber-800">
-                <span class="font-semibold">Catatan:</span> Layanan VPS akan terkunci sampai pembayaran Anda dikonfirmasi. 
+        <div class="mt-4 p-4 bg-slate-100/80 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 rounded-lg">
+            <p class="text-sm text-slate-600 dark:text-zinc-400">
+                <span class="font-semibold text-slate-900 dark:text-zinc-200">Catatan:</span> Layanan VPS akan terkunci sampai pembayaran Anda dikonfirmasi. 
                 Setelah pembayaran berhasil, tim teknis akan melakukan setup server dalam 1-2 jam kerja.
             </p>
         </div>
@@ -380,7 +380,7 @@
 
                             @if($instance->isAiPackage())
                                 <!-- Dedicated Web App Link Box for AI Agent Instance -->
-                                <div class="my-3 p-3 rounded-xl bg-blue-50/80 border border-blue-200 text-xs space-y-1.5">
+                                <div class="my-3 p-3 rounded-lg bg-blue-50/80 border border-blue-200 text-xs space-y-1.5">
                                     <div class="flex items-center justify-between">
                                         <span class="font-bold text-blue-900 flex items-center gap-1.5">
                                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -457,7 +457,7 @@
             title: '<div class="text-xl sm:text-2xl font-bold text-slate-900 mt-2">Pembayaran Berhasil Dikonfirmasi!</div>',
             html: `
                 <div class="text-left mt-3 space-y-3.5 text-xs text-slate-600">
-                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
                         <div>
                             <span class="text-[11px] text-emerald-800 font-semibold block">Status Pembayaran:</span>
                             <span class="text-sm font-bold text-emerald-800 flex items-center gap-1">
@@ -473,7 +473,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2">
                         <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
                             <span class="text-slate-500">Layanan:</span>
                             <span class="font-bold text-slate-900">{{ $paymentSuccessOrder->vpsSpec?->name ?? 'Cloud VPS' }}</span>
@@ -492,7 +492,7 @@
                         </div>
                     </div>
 
-                    <div class="p-3 bg-amber-50/90 border border-amber-200 rounded-xl text-amber-900 text-[11px] leading-relaxed">
+                    <div class="p-3 bg-amber-50/90 border border-amber-200 rounded-lg text-amber-900 text-[11px] leading-relaxed">
                         <div class="flex items-center gap-1.5 font-bold mb-1 text-amber-950">
                             <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -511,7 +511,7 @@
             cancelButtonText: 'Tutup',
             cancelButtonColor: '#64748b',
             customClass: {
-                popup: 'rounded-2xl border border-slate-200 shadow-2xl p-6 sm:p-7 max-w-lg',
+                popup: 'rounded-lg border border-slate-200 shadow-2xl p-6 sm:p-7 max-w-lg',
                 confirmButton: 'rounded-lg px-5 py-2.5 font-bold text-sm bg-black text-white hover:bg-neutral-800',
                 cancelButton: 'rounded-lg px-4 py-2.5 font-semibold text-sm',
             }

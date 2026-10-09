@@ -87,4 +87,29 @@ document.addEventListener('submit', (event) => {
     });
 }, true);
 
+// Global Theme Toggler
+window.toggleTheme = function() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark } }));
+};
+
+document.addEventListener('alpine:init', () => {
+    Alpine.store('theme', {
+        dark: document.documentElement.classList.contains('dark'),
+        toggle() {
+            window.toggleTheme();
+            this.dark = document.documentElement.classList.contains('dark');
+        }
+    });
+});
+
+window.addEventListener('theme-changed', (e) => {
+    if (window.Alpine?.store('theme')) {
+        Alpine.store('theme').dark = e.detail.isDark;
+    }
+});
+
 Alpine.start();
+

@@ -80,11 +80,10 @@ class PaymentGatewayAndWebhookLogTest extends TestCase
 
     public function test_seeder_keeps_previous_checkout_behaviour(): void
     {
-        $this->assertTrue(PaymentGateway::where('code', 'lynk')->value('is_active'));
+        $this->assertTrue(PaymentGateway::where('code', 'xendit')->value('is_active'));
         $this->assertTrue(PaymentGateway::where('code', 'qris')->value('is_active'));
         $this->assertFalse(PaymentGateway::where('code', 'midtrans')->value('is_active'));
-
-        $this->assertEqualsCanonicalizing(['lynk', 'qris'], PaymentGateway::activeMethods());
+        $this->assertFalse(PaymentGateway::where('code', 'lynk')->value('is_active'));
     }
 
     public function test_checkout_rejects_method_of_inactive_gateway(): void
@@ -197,8 +196,9 @@ class PaymentGatewayAndWebhookLogTest extends TestCase
 
     public function test_cannot_deactivate_last_active_gateway(): void
     {
-        PaymentGateway::where('code', 'qris')->update(['is_active' => false]);
+        PaymentGateway::where('code', '!=', 'lynk')->update(['is_active' => false]);
         $lynk = PaymentGateway::where('code', 'lynk')->first();
+        $lynk->update(['is_active' => true]);
 
         $this->actingAs($this->admin())
             ->put("/admin/payment-gateways/{$lynk->id}", ['mode' => 'production'])
