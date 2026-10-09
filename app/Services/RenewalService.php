@@ -133,4 +133,79 @@ class RenewalService
             default => 'VPS',
         };
     }
+
+    /**
+     * Proses perpanjangan instance VPS saat order bertipe renewal dibayar lunas.
+     *
+     * 1. Menghitung tanggal kedaluwarsa baru dari max(now(), expires_at)
+     *    sehingga sisa hari aktif pelanggan tidak pernah hangus.
+     * 2. Menghitung ulang masa tenggang via applyGracePeriod.
+     * 3. Mengembalikan status instance dari suspended kembali ke running jika sebelumnya disuspend.
+     * 4. Menandai stage order menjadi delivered dan beralih ke active.
+     * 5. Mencatat aktivitas perpanjangan ke VpsActivityLog.
+     */
+    public function handleRenewalPayment(\App\Models\Order $order): ?VpsInstance
+    {
+        $instance = $order->resolved_instance ?? ($order->vps_instance_id ? VpsInstance::find($order->vps_instance_id) : $order->vpsInstance);
+        if (!$instance) {
+            \Illuminate\Support\Facades\Log::warning('Renewal order paid but no vps_instance found', [
+                'order_id' => $order->id,
+                'vps_instance_id' => $order->vps_instance_id,
+            ]);
+            return null;
+        }
+
+        $baseDate = ($instance->expires_at && $instance->expires_at->isFuture())
+            ? $instance->expires_at->copy()
+            : now();
+
+        $cycle = $order->billing_cycle ?? $instance->billing_cycle ?? 'monthly';
+        $months = match ($cycle) {
+            'quarterly' => 3,
+            'semi_annual', 'semi_annually' => 6,
+            'annual', 'annually', 'yearly' => 12,
+            default => 1,
+        };
+
+        $newExpiresAt = $baseDate->addMonths($months);
+        $instance->expires_at = $newExpiresAt;
+
+        // Jika VPS sebelumnya suspended karena terlambat bayar, aktifkan kembali
+        if ($instance->status === 'suspended') {
+            $instance->status = 'running';
+        }
+
+        $this->applyGracePeriod($instance);
+        $instance->save();
+
+        // Tandai order fulfillment delivered
+        $order->fulfillment_stage = 'delivered';
+        $order->delivered_at = now();
+        $order->save();
+
+        // Transisi status order ke active via OrderStateMachine
+        try {
+            $stateMachine = app(OrderStateMachine::class);
+            if ($order->status !== 'active') {
+                $stateMachine->transition($order, 'active', [
+                    'reason' => 'Perpanjangan layanan berhasil diproses dan masa aktif diperbarui.',
+                    'actor_type' => 'system',
+                    'allowSame' => true,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::info('Order transition to active notice: ' . $e->getMessage());
+        }
+
+        // Catat di log aktivitas instance
+        $formattedDate = $newExpiresAt->timezone('Asia/Jakarta')->format('d M Y, H:i');
+        $instance->logActivity(
+            'renewal',
+            "Layanan diperpanjang hingga {$formattedDate} WIB melalui Order #{$order->id} ({$order->payment_method_name}).",
+            'completed',
+            $order->customer_id
+        );
+
+        return $instance;
+    }
 }

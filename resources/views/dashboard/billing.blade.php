@@ -2,6 +2,65 @@
 
 @section('content')
 <div class="space-y-6">
+    {{-- Card Daftar Instance VPS & Masa Aktif Perpanjangan (Pilar 4) --}}
+    @if(isset($instances) && $instances->isNotEmpty())
+        <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <div class="p-5 flex items-center justify-between border-b border-slate-100">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">Server & Masa Aktif Perpanjangan</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Kelola tanggal kedaluwarsa dan perpanjang server cloud Anda sebelum masa aktif habis.</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">{{ $instances->count() }} Server</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+                @foreach($instances as $instance)
+                    <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('dashboard.vps.show', $instance->id) }}" class="font-bold text-slate-900 hover:text-black hover:underline">
+                                    {{ $instance->hostname }}
+                                </a>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono-code bg-slate-100 text-slate-600 border border-slate-200">
+                                    {{ $instance->public_ip ?? 'IP Pending' }}
+                                </span>
+                                @if($instance->status === 'running')
+                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Aktif</span>
+                                @elseif($instance->status === 'suspended')
+                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase font-semibold bg-amber-50 text-amber-700 border border-amber-200">Suspended</span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded text-[10px] uppercase font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $instance->status }}</span>
+                                @endif
+                            </div>
+                            <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span>Paket: <strong class="text-slate-700">{{ $instance->renewal_spec->name ?? $instance->order?->vpsSpec?->name ?? 'Cloud VPS' }}</strong></span>
+                                <span>&bull;</span>
+                                <span>Jatuh Tempo: <strong class="text-slate-800">{{ $instance->expires_at ? $instance->expires_at->timezone('Asia/Jakarta')->format('d M Y, H:i') : 'Belum ditentukan' }}</strong></span>
+                                <span>&bull;</span>
+                                <span>Tarif Perpanjangan: <strong class="text-slate-900 font-mono-code">Rp {{ number_format($instance->renewal_price, 0, ',', '.') }}/bln</strong></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            @if($instance->canBeRenewed())
+                                <a href="{{ route('dashboard.vps.show', $instance->id) }}" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span>Perpanjang</span>
+                                </a>
+                            @elseif($instance->isEolWithoutReplacement())
+                                <a href="{{ route('dashboard.support') }}" class="px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors">
+                                    Migrasi Paket
+                                </a>
+                            @else
+                                <a href="{{ route('dashboard.vps.show', $instance->id) }}" class="px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors">
+                                    Lihat Detail
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <div class="p-5 flex items-center justify-between">
             <div>

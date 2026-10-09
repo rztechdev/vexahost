@@ -193,6 +193,17 @@ class AdminController extends Controller
                 );
             });
 
+            if ($order->isRenewal()) {
+                try {
+                    app(\App\Services\RenewalService::class)->handleRenewalPayment($order);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('admin.approve_payment.renewal_failed', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
             // Kirim email konfirmasi pembayaran lunas ke customer (sesuai template resmi)
             try {
                 $order->loadMissing(['customer', 'vpsSpec', 'invoice']);
@@ -1317,6 +1328,32 @@ class AdminController extends Controller
         return back()->with('success', "Link control panel {$serverName} berhasil disimpan.");
     }
 
+    /**
+     * PILAR 2 - Custom Renewal Price Override per-VPS Instance.
+     */
+    public function updateInstanceRenewalPrice(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'custom_renewal_price' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $instance = VpsInstance::findOrFail($id);
+        $newPrice = $request->filled('custom_renewal_price') ? (float) $validated['custom_renewal_price'] : null;
+
+        $instance->update([
+            'custom_renewal_price' => $newPrice,
+        ]);
+
+        $serverName = $instance->hostname ?? ('#' . $instance->id);
+        $msg = $newPrice !== null
+            ? "Tarif perpanjangan khusus server {$serverName} berhasil diatur ke Rp " . number_format($newPrice, 0, ',', '.') . "/bln."
+            : "Tarif perpanjangan server {$serverName} dikembalikan mengikuti katalog umum.";
+
+        $instance->logActivity('custom_renewal_price_updated', $msg, 'completed', Auth::id());
+
+        return back()->with('success', $msg);
+    }
+
     public function suspendInstance(Request $request, $id)
     {
         $instance = VpsInstance::findOrFail($id);
@@ -1622,7 +1659,8 @@ class AdminController extends Controller
      */
     public function packages()
     {
-        $specs = VpsSpec::withCount(['orders'])
+        $specs = VpsSpec::with(['replacementSpec'])
+            ->withCount(['orders'])
             ->orderBy('sell_price', 'asc')
             ->get();
 
@@ -1680,10 +1718,14 @@ class AdminController extends Controller
             'sell_price' => 'required|numeric|min:0',
             'payment_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
+            'is_renewable' => 'nullable|boolean',
+            'replacement_spec_id' => 'nullable|integer|exists:vps_specs,id',
         ]);
 
         $validated['category'] = $validated['category'] ?? 'vps';
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_renewable'] = $request->boolean('is_renewable', true);
+        $validated['replacement_spec_id'] = $request->filled('replacement_spec_id') ? (int) $request->input('replacement_spec_id') : null;
 
         // Format features if provided as string
         if (isset($validated['features']) && is_string($validated['features'])) {
@@ -1741,9 +1783,17 @@ class AdminController extends Controller
             'sell_price' => 'required|numeric|min:0',
             'payment_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
+            'is_renewable' => 'nullable|boolean',
+            'replacement_spec_id' => 'nullable|integer|exists:vps_specs,id',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_renewable'] = $request->boolean('is_renewable');
+        $replacementId = $request->filled('replacement_spec_id') ? (int) $request->input('replacement_spec_id') : null;
+        if ($replacementId === (int) $spec->id) {
+            $replacementId = null;
+        }
+        $validated['replacement_spec_id'] = $replacementId;
 
         // Format features if provided as string
         if (isset($validated['features']) && is_string($validated['features'])) {

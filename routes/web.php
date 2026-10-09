@@ -280,6 +280,7 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::post('/vps/{id}/requests/reinstall', [DashboardController::class, 'requestReinstall'])->middleware('permission:vps.reinstall')->middleware('maintenance:vps_actions')->middleware('throttle:10,1')->name('vps.request-reinstall');
         Route::post('/vps/{id}/requests/unreachable', [DashboardController::class, 'reportUnreachable'])->middleware('permission:vps.manage')->middleware('maintenance:vps_actions')->middleware('throttle:10,1')->name('vps.report-unreachable');
         Route::post('/vps/{id}/reveal-password', [DashboardController::class, 'revealPassword'])->middleware('permission:vps.credentials')->name('vps.reveal-password');
+        Route::post('/vps/{id}/renew', [DashboardController::class, 'renewVps'])->middleware('permission:vps.read')->name('vps.renew');
         Route::get('/billing', [DashboardController::class, 'billing'])->middleware('permission:billing.read')->name('billing');
         Route::post('/subscriptions/{id}/auto-renew', [DashboardController::class, 'toggleAutoRenew'])->middleware('permission:billing.read')->name('subscriptions.auto-renew');
         Route::post('/subscriptions/{id}/cancel', [DashboardController::class, 'cancelSubscription'])->middleware('permission:billing.read')->name('subscriptions.cancel');
@@ -319,6 +320,7 @@ Route::middleware(['auth', '2fa', 'org.context'])->group(function () {
         Route::get('/reports/export', [AdminController::class, 'exportReport'])->name('reports.export');
         Route::post('/instances/{id}/status', [AdminController::class, 'updateInstanceStatus'])->name('instances.status');
         Route::post('/instances/{id}/panel-url', [AdminController::class, 'updateInstancePanelUrl'])->name('instances.panel-url');
+        Route::post('/instances/{id}/renewal-price', [AdminController::class, 'updateInstanceRenewalPrice'])->name('instances.renewal-price');
         Route::post('/instances/{id}/suspend', [AdminController::class, 'suspendInstance'])->name('instances.suspend');
         Route::post('/instances/{id}/unsuspend', [AdminController::class, 'unsuspendInstance'])->name('instances.unsuspend');
         Route::post('/instances/{id}/terminate', [AdminController::class, 'terminateInstance'])->name('instances.terminate');

@@ -439,6 +439,11 @@ class OrderController extends Controller
 
         // Cek sinkronisasi real-time ke Xendit / Midtrans jika order masih pending
         if (!$order->paid_at) {
+            $revalidateResponse = $this->revalidatePendingOrder($order);
+            if ($revalidateResponse) {
+                return $revalidateResponse;
+            }
+
             if (PaymentGateway::isXenditMethod($order->payment_method)) {
                 \App\Services\Payments\XenditService::checkAndSyncStatus($order);
             } elseif (PaymentGateway::isMidtransMethod($order->payment_method)) {
@@ -553,8 +558,15 @@ class OrderController extends Controller
         }
 
         // Cek sinkronisasi real-time ke Midtrans jika masih pending
-        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
-            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+        if (!$order->paid_at) {
+            $revalidateResponse = $this->revalidatePendingOrder($order);
+            if ($revalidateResponse) {
+                return $revalidateResponse;
+            }
+
+            if (PaymentGateway::isMidtransMethod($order->payment_method)) {
+                \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            }
             $order->refresh();
         }
 
@@ -857,5 +869,126 @@ class OrderController extends Controller
 
         return redirect()->route('login')
             ->with('info', 'Silakan masuk ke akun VexaHost Anda untuk memantau status pesanan.');
+    }
+
+    /**
+     * PILAR 3 - Price & Availability Re-Validation untuk order yang masih pending.
+     *
+     * Mengecek apakah:
+     * 1. Order telah kedaluwarsa (> 24 jam belum dibayar).
+     * 2. Paket dinonaktifkan di supplier / katalog (is_active / is_renewable).
+     * 3. Harga katalog atau modal naik/berubah sejak order dibuat.
+     */
+    protected function revalidatePendingOrder(Order $order): ?\Illuminate\Http\RedirectResponse
+    {
+        if ($order->paid_at || $order->status !== 'pending') {
+            return null;
+        }
+
+        // Cek 1: TTL 24 Jam
+        if ($order->created_at && $order->created_at->lt(now()->subHours(24))) {
+            try {
+                $this->orderStateMachine->transition($order, 'expired', [
+                    'reason' => 'Batas waktu pembayaran 24 jam telah berakhir.',
+                    'actor_type' => 'system',
+                ]);
+            } catch (\Throwable $e) {
+                $order->update(['status' => 'expired']);
+            }
+            return redirect()->route('dashboard.index')
+                ->with('error', "Pesanan #{$order->id} telah kedaluwarsa karena tidak diselesaikan dalam 24 jam.");
+        }
+
+        // Cek 2: Ketersediaan & Siklus Produk
+        if ($order->isRenewal()) {
+            $instance = $order->resolved_instance ?? ($order->vps_instance_id ? \App\Models\VpsInstance::find($order->vps_instance_id) : $order->vpsInstance);
+            $spec = $order->vpsSpec;
+
+            if ($spec && !$spec->is_renewable) {
+                // Paket lama End-of-Life
+                if ($spec->replacement_spec_id) {
+                    $replacement = $spec->replacementSpec ?? \App\Models\VpsSpec::find($spec->replacement_spec_id);
+                    if ($replacement) {
+                        if ($order->vps_spec_id !== $replacement->id) {
+                            $order->vps_spec_id = $replacement->id;
+                            $order->save();
+                        }
+                    }
+                } else {
+                    // EOL permanen tanpa pengganti: batalkan order
+                    try {
+                        $this->orderStateMachine->transition($order, 'cancelled', [
+                            'reason' => 'Paket VPS telah dihentikan secara permanen (End-of-Life) oleh penyedia upstream.',
+                            'actor_type' => 'system',
+                        ]);
+                    } catch (\Throwable $e) {
+                        $order->update(['status' => 'cancelled']);
+                    }
+
+                    $targetRedirect = $instance ? route('dashboard.vps.show', $instance->id) : route('dashboard.billing');
+                    return redirect($targetRedirect)->with('error', 'Maaf, paket VPS untuk server ini telah dihentikan (End-of-Life) oleh penyedia infrastruktur dan tidak dapat diperpanjang lagi. Silakan hubungi tim dukungan kami untuk proses migrasi.');
+                }
+            }
+
+            // Hitung harga perpanjangan yang diharapkan saat ini
+            $expectedPrice = (float) ($instance ? $instance->renewal_price : ($spec ? $spec->effectiveRenewalPrice() : $order->amount));
+            if ($expectedPrice > 0 && abs((float) $order->amount - $expectedPrice) > 0.01) {
+                $order->amount = $expectedPrice;
+                $order->save();
+
+                if ($order->invoice) {
+                    $order->invoice->update([
+                        'amount' => $expectedPrice,
+                        'subtotal' => $expectedPrice,
+                        'total' => $expectedPrice,
+                    ]);
+                }
+
+                // Invalidate transaksi/token pending lama
+                PaymentTransaction::where('order_id', $order->id)
+                    ->where('status', 'pending')
+                    ->delete();
+
+                session()->flash('warning', 'Tarif perpanjangan telah disesuaikan dengan skema katalog terbaru (Rp ' . number_format($expectedPrice, 0, ',', '.') . '). Silakan lanjutkan pembayaran dengan nominal terbaru.');
+            }
+        } else {
+            // Order Baru
+            $spec = $order->vpsSpec;
+            if (!$spec || !$spec->is_active) {
+                try {
+                    $this->orderStateMachine->transition($order, 'cancelled', [
+                        'reason' => 'Paket VPS tidak lagi aktif untuk pendaftaran baru.',
+                        'actor_type' => 'system',
+                    ]);
+                } catch (\Throwable $e) {
+                    $order->update(['status' => 'cancelled']);
+                }
+
+                return redirect()->route('order.checkout')
+                    ->with('error', 'Maaf, ketersediaan paket pada pesanan yang belum dibayar ini telah ditutup oleh penyedia infrastruktur. Pesanan dibatalkan otomatis.');
+            }
+
+            $expectedPrice = (float) $spec->sell_price;
+            if (abs((float) $order->amount - $expectedPrice) > 0.01) {
+                $order->amount = $expectedPrice;
+                $order->save();
+
+                if ($order->invoice) {
+                    $order->invoice->update([
+                        'amount' => $expectedPrice,
+                        'subtotal' => $expectedPrice,
+                        'total' => $expectedPrice,
+                    ]);
+                }
+
+                PaymentTransaction::where('order_id', $order->id)
+                    ->where('status', 'pending')
+                    ->delete();
+
+                session()->flash('warning', 'Penyesuaian tarif infrastruktur: nominal tagihan telah disesuaikan ke harga terbaru Rp ' . number_format($expectedPrice, 0, ',', '.') . '.');
+            }
+        }
+
+        return null;
     }
 }
