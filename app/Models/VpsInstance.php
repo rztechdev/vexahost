@@ -72,6 +72,7 @@ class VpsInstance extends Model
         'expires_at',
         'grace_period_ends_at',
         'auto_renew',
+        'custom_renewal_price',
     ];
 
     public function isAiPackage(): bool
@@ -200,6 +201,7 @@ class VpsInstance extends Model
         'grace_period_ends_at' => 'datetime',
         'last_reconciled_at' => 'datetime',
         'auto_renew' => 'boolean',
+        'custom_renewal_price' => 'decimal:2',
         'ssh_port' => 'integer',
         'uptime_percent' => 'float',
         'provider_meta' => 'array',
@@ -464,5 +466,89 @@ class VpsInstance extends Model
         return collect(Order::stackLabels())
             ->except(['managed_database', 'claude_opencode', 'dify_ollama'])
             ->all();
+    }
+
+    /**
+     * Harga perpanjangan efektif:
+     * 1. custom_renewal_price jika diisi oleh admin.
+     * 2. sell_price paket asli (jika masih renewable).
+     * 3. sell_price paket pengganti jika paket asli discontinued/EOL.
+     */
+    public function getRenewalPriceAttribute(): float
+    {
+        if ($this->custom_renewal_price !== null) {
+            return (float) $this->custom_renewal_price;
+        }
+
+        if ($this->order && $this->order->vpsSpec) {
+            return $this->order->vpsSpec->effectiveRenewalPrice();
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Paket spesifikasi efektif untuk perpanjangan.
+     */
+    public function getRenewalSpecAttribute(): ?VpsSpec
+    {
+        if ($this->order && $this->order->vpsSpec) {
+            return $this->order->vpsSpec->effectiveRenewalSpec();
+        }
+
+        return null;
+    }
+
+    /**
+     * Apakah instance ini dapat diperpanjang secara mandiri oleh pelanggan.
+     */
+    public function canBeRenewed(): bool
+    {
+        if (in_array($this->status, ['terminated', 'provisioning'], true)) {
+            return false;
+        }
+
+        $spec = $this->order?->vpsSpec;
+        if ($spec) {
+            return $spec->canRenew();
+        }
+
+        return true;
+    }
+
+    /**
+     * Apakah paket lama EOL namun memiliki paket pengganti otomatis.
+     */
+    public function isEolWithReplacement(): bool
+    {
+        $spec = $this->order?->vpsSpec;
+        return $spec && !$spec->is_renewable && !empty($spec->replacement_spec_id);
+    }
+
+    /**
+     * Apakah paket lama EOL permanen tanpa paket pengganti (harus hubungi support).
+     */
+    public function isEolWithoutReplacement(): bool
+    {
+        $spec = $this->order?->vpsSpec;
+        return $spec && !$spec->is_renewable && empty($spec->replacement_spec_id);
+    }
+
+    /**
+     * Paket pengganti jika dalam kondisi EOL.
+     */
+    public function getEolReplacementSpecAttribute(): ?VpsSpec
+    {
+        return $this->order?->vpsSpec?->replacementSpec;
+    }
+
+    /**
+     * Semua pesanan perpanjangan untuk instance ini.
+     */
+    public function renewalOrders()
+    {
+        return $this->hasMany(Order::class, 'vps_instance_id')
+            ->where('order_type', 'renewal')
+            ->orderBy('created_at', 'desc');
     }
 }

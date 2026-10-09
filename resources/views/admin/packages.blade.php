@@ -43,7 +43,9 @@
         cost_price: 0,
         sell_price: 0,
         payment_url: '',
-        is_active: true
+        is_active: true,
+        is_renewable: true,
+        replacement_spec_id: ''
     },
     deleteData: {
         id: '',
@@ -81,7 +83,9 @@
             cost_price: spec.cost_price,
             sell_price: spec.sell_price,
             payment_url: spec.payment_url || '',
-            is_active: Boolean(spec.is_active)
+            is_active: Boolean(spec.is_active),
+            is_renewable: spec.is_renewable !== undefined ? Boolean(spec.is_renewable) : true,
+            replacement_spec_id: spec.replacement_spec_id || ''
         };
         this.editModalOpen = true;
     },
@@ -333,10 +337,19 @@
 
                             <!-- Margin -->
                             <td class="px-5 py-3.5">
-                                <span class="font-mono-code font-semibold text-slate-900 block">
-                                    +Rp {{ number_format($margin, 0, ',', '.') }}
-                                </span>
-                                <span class="text-[10px] text-slate-500 font-mono-code">({{ $marginPercent }}%)</span>
+                                @if($margin < 0)
+                                    <span class="font-mono-code font-bold text-slate-900 block">
+                                        -Rp {{ number_format(abs($margin), 0, ',', '.') }}
+                                    </span>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-900 text-white mt-0.5" title="Harga jual di bawah modal supplier!">
+                                        Rugi / Defisit
+                                    </span>
+                                @else
+                                    <span class="font-mono-code font-semibold text-slate-900 block">
+                                        +Rp {{ number_format($margin, 0, ',', '.') }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-500 font-mono-code">({{ $marginPercent }}%)</span>
+                                @endif
                             </td>
 
                             <!-- Total Order -->
@@ -346,16 +359,30 @@
 
                             <!-- Status -->
                             <td class="px-5 py-3.5 text-center">
-                                @if($spec->is_active)
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-900 border border-slate-200">
+                                @if($spec->is_active && $spec->is_renewable)
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-900 border border-slate-200" title="Aktif: Tersedia untuk checkout baru & perpanjangan">
                                         <span class="w-1.5 h-1.5 rounded-full bg-slate-900"></span>
                                         Aktif
                                     </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-400 border border-slate-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                                        Nonaktif
+                                @elseif(!$spec->is_active && $spec->is_renewable)
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-300" title="Legacy / Stop Selling: Tutup order baru, hanya perpanjangan pelanggan lama">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                                        Legacy
                                     </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-400 border border-slate-200" title="Discontinued / End-of-Life: Paket dihentikan permanen">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                        Discontinued
+                                    </span>
+                                    @if($spec->replacementSpec)
+                                        <span class="text-[10px] text-slate-600 font-medium block mt-0.5 truncate max-w-[120px]" title="Fallback ke {{ $spec->replacementSpec->name }}">
+                                            &rarr; {{ $spec->replacementSpec->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-[10px] text-slate-400 block mt-0.5">
+                                            Tanpa Pengganti
+                                        </span>
+                                    @endif
                                 @endif
                             </td>
 
@@ -606,23 +633,45 @@
                     </div>
                 </div>
 
-                <!-- Sticky Footer -->
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 rounded-b-lg">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="is_active" id="create_is_active" value="1" checked
-                               class="w-4 h-4 rounded border-slate-300 text-black focus:ring-black">
-                        <label for="create_is_active" class="text-xs font-medium text-slate-700 cursor-pointer">
-                            Aktifkan paket segera (tampil & bisa dipesan)
+                <!-- Sticky Footer with 3-Tier Lifecycle Controls -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 space-y-3 rounded-b-lg">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_active" id="create_is_active" value="1" checked
+                                   class="w-4 h-4 mt-0.5 rounded border-slate-300 text-black focus:ring-black">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-900 block">Buka Checkout Baru</span>
+                                <span class="text-[11px] text-slate-500 block">Paket tampil di katalog & dapat dipesan pelanggan baru.</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_renewable" id="create_is_renewable" value="1" checked
+                                   class="w-4 h-4 mt-0.5 rounded border-slate-300 text-black focus:ring-black">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-900 block">Izinkan Perpanjangan</span>
+                                <span class="text-[11px] text-slate-500 block">Pelanggan lama yang memiliki server ini dapat perpanjang.</span>
+                            </div>
                         </label>
                     </div>
 
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Paket Pengganti (Fallback jika Dihentikan/EOL)</label>
+                        <select name="replacement_spec_id" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-black bg-white">
+                            <option value="">-- Tanpa Paket Pengganti (Wajib Hubungi Support jika EOL) --</option>
+                            @foreach($specs as $otherSpec)
+                                <option value="{{ $otherSpec->id }}">{{ $otherSpec->name }} (Rp {{ number_format($otherSpec->sell_price, 0, ',', '.') }}/bln)</option>
+                            @endforeach
+                        </select>
+                        <span class="text-[11px] text-slate-500 mt-1 block">Jika perpanjangan dinonaktifkan (EOL), pelanggan otomatis dialihkan ke skema paket pengganti ini.</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full justify-end pt-2 border-t border-slate-200">
                         <button @click="createModalOpen = false" type="button"
                                 class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                             Batal
                         </button>
                         <button type="submit"
-                                class="px-5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm">
+                                class="px-5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-xs">
                             Simpan Paket
                         </button>
                     </div>
@@ -806,23 +855,47 @@
                     </div>
                 </div>
 
-                <!-- Sticky Footer -->
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 rounded-b-lg">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="is_active" id="edit_is_active" value="1" :checked="editData.is_active"
-                               class="w-4 h-4 rounded border-slate-300 text-black focus:ring-black">
-                        <label for="edit_is_active" class="text-xs font-medium text-slate-700 cursor-pointer">
-                            Paket Aktif (tampil di form pemesanan pelanggan)
+                <!-- Sticky Footer with 3-Tier Lifecycle Controls -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 space-y-3 rounded-b-lg">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_active" id="edit_is_active" value="1" :checked="editData.is_active"
+                                   class="w-4 h-4 mt-0.5 rounded border-slate-300 text-black focus:ring-black">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-900 block">Buka Checkout Baru</span>
+                                <span class="text-[11px] text-slate-500 block">Tampil di katalog & dapat dipesan pelanggan baru.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_renewable" id="edit_is_renewable" value="1" :checked="editData.is_renewable"
+                                   class="w-4 h-4 mt-0.5 rounded border-slate-300 text-black focus:ring-black">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-900 block">Izinkan Perpanjangan</span>
+                                <span class="text-[11px] text-slate-500 block">Pelanggan lama yang memiliki server ini dapat perpanjang.</span>
+                            </div>
                         </label>
                     </div>
 
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Paket Pengganti (Fallback jika Dihentikan/EOL)</label>
+                        <select name="replacement_spec_id" x-model="editData.replacement_spec_id"
+                                class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-black bg-white">
+                            <option value="">-- Tanpa Paket Pengganti (Wajib Hubungi Support jika EOL) --</option>
+                            @foreach($specs as $otherSpec)
+                                <option value="{{ $otherSpec->id }}">{{ $otherSpec->name }} (Rp {{ number_format($otherSpec->sell_price, 0, ',', '.') }}/bln)</option>
+                            @endforeach
+                        </select>
+                        <span class="text-[11px] text-slate-500 mt-1 block">Jika perpanjangan dinonaktifkan (Mode EOL), pelanggan otomatis dialihkan ke skema paket pengganti ini.</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full justify-end pt-2 border-t border-slate-200">
                         <button @click="editModalOpen = false" type="button"
                                 class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                             Batal
                         </button>
                         <button type="submit"
-                                class="px-5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm">
+                                class="px-5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-xs">
                             Simpan Perubahan
                         </button>
                     </div>

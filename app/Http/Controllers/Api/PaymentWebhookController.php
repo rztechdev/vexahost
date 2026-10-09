@@ -373,6 +373,17 @@ class PaymentWebhookController extends Controller
             'processed_at' => now(),
             'payment_transaction_id' => $tx->id,
         ]);
+
+        if ($order->isRenewal()) {
+            try {
+                app(\App\Services\RenewalService::class)->handleRenewalPayment($order);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('handleSettlement.renewal_failed', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**

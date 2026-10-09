@@ -80,6 +80,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return CreditTransaction::balanceFor($this->id);
     }
 
+    public function getCreditBalanceAttribute(): float
+    {
+        return $this->creditBalance();
+    }
+
     // ============================================================
     // Organizations (Poin 6)
     // ============================================================

@@ -20,6 +20,8 @@ class VpsSpec extends Model
         'sell_price',
         'payment_url',
         'is_active',
+        'is_renewable',
+        'replacement_spec_id',
         'tagline',
         'target_audience',
         'features',
@@ -34,6 +36,8 @@ class VpsSpec extends Model
         'features' => 'array',
         'allowed_providers' => 'array',
         'is_active' => 'boolean',
+        'is_renewable' => 'boolean',
+        'replacement_spec_id' => 'integer',
         'cpu' => 'integer',
         'ram' => 'integer',
         'disk' => 'integer',
@@ -48,6 +52,8 @@ class VpsSpec extends Model
         'is_ai_package',
         'is_database_package',
         'is_direct_checkout',
+        'lifecycle_status',
+        'lifecycle_label',
     ];
 
     protected static function booted(): void
@@ -161,5 +167,88 @@ class VpsSpec extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function replacementSpec()
+    {
+        return $this->belongsTo(self::class, 'replacement_spec_id');
+    }
+
+    public function legacyReplacedSpecs()
+    {
+        return $this->hasMany(self::class, 'replacement_spec_id');
+    }
+
+    public function getLifecycleStatusAttribute(): string
+    {
+        if ($this->is_active && $this->is_renewable) {
+            return 'active';
+        }
+        if (!$this->is_active && $this->is_renewable) {
+            return 'legacy';
+        }
+        if (!$this->is_active && !$this->is_renewable) {
+            return 'discontinued';
+        }
+        return 'new_only';
+    }
+
+    public function getLifecycleLabelAttribute(): string
+    {
+        return match ($this->lifecycle_status) {
+            'active' => 'Aktif (Katalog & Perpanjangan)',
+            'legacy' => 'Legacy (Hanya Perpanjangan)',
+            'discontinued' => 'Discontinued / EOL',
+            default => 'Pendaftaran Baru Saja',
+        };
+    }
+
+    public function canNewCheckout(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function canRenew(): bool
+    {
+        return (bool) ($this->is_renewable || !empty($this->replacement_spec_id));
+    }
+
+    public function effectiveRenewalSpec(): self
+    {
+        if ($this->is_renewable) {
+            return $this;
+        }
+
+        if ($this->replacement_spec_id && $this->relationLoaded('replacementSpec') && $this->replacementSpec) {
+            return $this->replacementSpec->effectiveRenewalSpec();
+        }
+
+        if ($this->replacement_spec_id) {
+            $replacement = self::find($this->replacement_spec_id);
+            if ($replacement) {
+                return $replacement->effectiveRenewalSpec();
+            }
+        }
+
+        return $this;
+    }
+
+    public function effectiveRenewalPrice(): float
+    {
+        return (float) $this->effectiveRenewalSpec()->sell_price;
+    }
+
+    /**
+     * PILAR 2: Margin Guardrail (Anti-Boncos Alert).
+     * Mengecek apakah modal (cost_price) >= harga jual (sell_price).
+     */
+    public function hasDeficitMargin(): bool
+    {
+        return (float) $this->cost_price >= (float) $this->sell_price;
+    }
+
+    public function getIsDeficitMarginAttribute(): bool
+    {
+        return $this->hasDeficitMargin();
     }
 }
