@@ -119,31 +119,42 @@ class PaymentGateway extends Model
 
     /**
      * Metode di checkout dan gateway yang menanganinya.
-     * VA dan e-wallet berjalan lewat Midtrans.
+     * Xendit menjadi gateway utama untuk seluruh transaksi aktif.
      */
     public const METHOD_GATEWAY = [
+        'online_payment' => 'xendit',
+        'qris' => 'xendit',
+        'indomaret' => 'xendit',
+        'mandiri_va' => 'xendit',
+        'bni_va' => 'xendit',
+        'astrapay' => 'xendit',
+        'bri_va' => 'xendit',
+        'cimb_va' => 'xendit',
+        'permata_va' => 'xendit',
+        'akulaku' => 'xendit',
+        'midtrans_snap' => 'xendit',
         'lynk' => 'lynk',
-        'qris' => 'qris',
-        'midtrans_snap' => 'midtrans',
-        'bca_va' => 'midtrans',
-        'mandiri_va' => 'midtrans',
-        'bni_va' => 'midtrans',
-        'bri_va' => 'midtrans',
-        'cimb_va' => 'midtrans',
-        'permata_va' => 'midtrans',
-        'other_va' => 'midtrans',
-        'gopay' => 'midtrans',
-        'bsi_va' => 'midtrans',
-        'danamon_va' => 'midtrans',
-        'seabank_va' => 'midtrans',
-        'credit_card' => 'midtrans',
-        'ovo' => 'midtrans',
-        'dana' => 'midtrans',
-        'shopeepay' => 'midtrans',
+        'bca_va' => 'disabled',
+        'bsi_va' => 'disabled',
+        'danamon_va' => 'disabled',
+        'seabank_va' => 'disabled',
+        'credit_card' => 'disabled',
+        'gopay' => 'disabled',
+        'ovo' => 'disabled',
+        'dana' => 'disabled',
+        'shopeepay' => 'disabled',
     ];
 
     /**
-     * Cek apakah suatu metode pembayaran ditangani oleh Midtrans.
+     * Cek apakah suatu metode pembayaran ditangani oleh Xendit.
+     */
+    public static function isXenditMethod(string $method): bool
+    {
+        return (self::METHOD_GATEWAY[$method] ?? null) === 'xendit';
+    }
+
+    /**
+     * Cek apakah suatu metode pembayaran ditangani oleh Midtrans (legacy fallback).
      */
     public static function isMidtransMethod(string $method): bool
     {
@@ -152,25 +163,22 @@ class PaymentGateway extends Model
 
     /**
      * Metode checkout yang boleh dipilih saat ini.
-     *
-     * Bila registry belum ada (migrasi belum jalan), dipakai nilai lama
-     * yang dulu tertulis langsung di blade: hanya lynk dan qris.
      */
     public static function activeMethods(): array
     {
         try {
             if (!Schema::hasTable('payment_gateways') || !self::query()->exists()) {
-                return ['midtrans_snap'];
+                return ['online_payment', 'qris', 'indomaret', 'mandiri_va', 'bni_va', 'astrapay', 'bri_va', 'cimb_va', 'permata_va', 'akulaku'];
             }
 
             $activeCodes = self::active()->pluck('code')->all();
 
-            // Bila MIDTRANS_SERVER_KEY ada di .env, aktifkan metode Midtrans secara otomatis
-            if (!in_array('midtrans', $activeCodes, true) && !empty(config('services.midtrans.server_key'))) {
-                $activeCodes[] = 'midtrans';
+            // Bila Xendit diatur di services/env, aktifkan metode Xendit
+            if (!empty(config('services.xendit.secret_key'))) {
+                $activeCodes[] = 'xendit';
             }
         } catch (\Throwable $e) {
-            return ['midtrans_snap'];
+            return ['online_payment', 'qris', 'indomaret', 'mandiri_va', 'bni_va', 'astrapay', 'bri_va', 'cimb_va', 'permata_va', 'akulaku'];
         }
 
         return array_keys(array_filter(

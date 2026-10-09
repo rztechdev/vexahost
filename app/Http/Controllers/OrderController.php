@@ -130,7 +130,7 @@ class OrderController extends Controller
             'billing_cycle' => 'nullable|string|in:monthly',
             'hostname' => ['required', 'string', 'max:63', 'regex:/^[A-Za-z0-9][A-Za-z0-9-]*$/'],
             'root_password' => 'required|string|min:8|max:255',
-            'payment_method' => 'required|string|in:midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,other_va,bsi_va,danamon_va,seabank_va,credit_card,gopay,shopeepay,ovo,dana',
+            'payment_method' => 'required|string|in:online_payment,midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,other_va,bsi_va,danamon_va,seabank_va,credit_card,gopay,shopeepay,ovo,dana,indomaret,astrapay,akulaku',
             'db_engine' => 'nullable|string|in:postgres,mysql,redis,mongodb,vector',
             'db_manager' => 'nullable|string|in:cloudbeaver,cli_only',
             // Guest fields if not logged in
@@ -361,8 +361,15 @@ class OrderController extends Controller
 
         $snapToken = null;
         $snapRedirectUrl = null;
+        $xenditInvoiceUrl = null;
 
-        if (PaymentGateway::isMidtransMethod($order->payment_method)) {
+        // Xendit Gateway (Gateway Utama)
+        if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
+            $xenditResult = \App\Services\Payments\XenditService::createInvoice($order, $order->payment_method);
+            if (!empty($xenditResult['success'])) {
+                $xenditInvoiceUrl = $xenditResult['invoice_url'] ?? null;
+            }
+        } elseif (PaymentGateway::isMidtransMethod($order->payment_method)) {
             $snapResult = \App\Services\Payments\MidtransService::createSnapTransaction($order);
             if (!empty($snapResult['success'])) {
                 $snapToken = $snapResult['token'] ?? null;
@@ -372,7 +379,7 @@ class OrderController extends Controller
 
         $redirectUrl = ($order->payment_method === 'lynk' && !empty($spec->payment_url))
             ? $spec->payment_url
-            : ($snapRedirectUrl ?: route('order.payment', $order->id));
+            : ($xenditInvoiceUrl ?: ($snapRedirectUrl ?: route('order.payment', $order->id)));
 
         // If user explicitly chose to postpone payment and view dashboard (locked state)
         if ($request->filled('redirect_to_dashboard') && $request->input('redirect_to_dashboard') == '1') {
@@ -392,6 +399,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => true,
                 'order_id' => $order->id,
+                'invoice_url' => $xenditInvoiceUrl,
                 'snap_token' => $snapToken,
                 'snap_redirect_url' => $snapRedirectUrl,
                 'redirect_url' => $redirectUrl,
@@ -401,6 +409,11 @@ class OrderController extends Controller
         // Jika metode pembayaran Lynk dan paket memiliki payment_url, langsung alihkan ke Lynk checkout
         if ($order->payment_method === 'lynk' && !empty($spec->payment_url)) {
             return redirect()->away($spec->payment_url);
+        }
+
+        // Jika ada Xendit Invoice URL, langsung alihkan ke halaman invoice Xendit
+        if ($xenditInvoiceUrl) {
+            return redirect()->away($xenditInvoiceUrl);
         }
 
         // Jika metode Midtrans dan ada snap redirect url, alihkan langsung ke halaman pembayaran Midtrans
@@ -420,9 +433,13 @@ class OrderController extends Controller
             abort(403);
         }
 
-        // Cek sinkronisasi real-time ke Midtrans jika order masih pending
-        if (!$order->paid_at && PaymentGateway::isMidtransMethod($order->payment_method)) {
-            \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+        // Cek sinkronisasi real-time ke Xendit / Midtrans jika order masih pending
+        if (!$order->paid_at) {
+            if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
+                \App\Services\Payments\XenditService::checkAndSyncStatus($order);
+            } elseif (PaymentGateway::isMidtransMethod($order->payment_method)) {
+                \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
+            }
             $order->refresh();
         }
 
@@ -431,15 +448,28 @@ class OrderController extends Controller
             return redirect()->route('order.success', $order->id);
         }
 
-        // Untuk metode pembayaran Midtrans, jangan pernah tampilkan halaman perantara lama (payment-gateway).
-        // Alihkan langsung ke halaman status pembayaran (order.payment.status).
+        // Untuk Xendit, jika sudah ada invoice URL, langsung buka atau alihkan ke status
+        if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
+            $tx = PaymentTransaction::where('order_id', $order->id)->where('provider', 'xendit')->latest()->first();
+            $invoiceUrl = $tx?->raw_payload['invoice_url'] ?? null;
+            if ($invoiceUrl) {
+                return redirect()->away($invoiceUrl);
+            }
+            return redirect()->route('order.payment.status', $order->id);
+        }
+
+        // Untuk metode pembayaran Midtrans, alihkan langsung ke halaman status pembayaran
         if (PaymentGateway::isMidtransMethod($order->payment_method)) {
             return redirect()->route('order.payment.status', $order->id);
         }
 
         $paymentMethodNames = [
+            'online_payment' => 'Pembayaran Otomatis Online (Instan)',
+            'qris' => 'QRIS Instan',
+            'indomaret' => 'Indomaret Retail',
+            'astrapay' => 'AstraPay E-Wallet',
+            'akulaku' => 'Akulaku PayLater',
             'midtrans_snap' => 'QRIS Otomatis',
-            'qris' => 'QRIS Manual',
             'lynk' => 'Lynk.id Checkout',
             'bca_va' => 'BCA Virtual Account',
             'bsi_va' => 'BSI Virtual Account',

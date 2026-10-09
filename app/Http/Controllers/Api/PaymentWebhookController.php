@@ -493,4 +493,261 @@ class PaymentWebhookController extends Controller
             default => 'pending',
         };
     }
+
+    /**
+     * Webhook sentral Xendit:
+     * 1. Validasi token (x-callback-token).
+     * 2. Periksa prefix external_id:
+     *    - 'WAG-' ➔ Teruskan (forward) ke WAGateway via HTTP internal
+     *    - 'BC-'  ➔ Teruskan (forward) ke BuildClient via HTTP internal
+     *    - 'VH-'  ➔ Proses langsung di VexaHost (Order VPS & Layanan)
+     */
+    public function handleXendit(Request $request)
+    {
+        // Respond to GET requests (ping / health check)
+        if ($request->isMethod('get')) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'VexaHost Central Xendit webhook endpoint is active and healthy.',
+            ], 200);
+        }
+
+        $callbackToken = $request->header('x-callback-token')
+            ?? $request->header('X-CALLBACK-TOKEN')
+            ?? $request->input('callback_token');
+
+        $expectedToken = config('services.xendit.webhook_token')
+            ?: PaymentGateway::credential('xendit', 'callback_token', env('XENDIT_WEBHOOK_TOKEN'));
+
+        if (empty($callbackToken) || !hash_equals((string) $expectedToken, (string) $callbackToken)) {
+            Log::warning('Xendit webhook rejected: Invalid callback token', [
+                'ip' => $request->ip(),
+                'provided_token' => $callbackToken ? substr($callbackToken, 0, 4) . '***' : 'null',
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or missing callback token.',
+            ], 403);
+        }
+
+        $payload = $request->all();
+        $externalId = (string) ($payload['external_id'] ?? '');
+        $invoiceId = (string) ($payload['id'] ?? '');
+        $status = strtoupper((string) ($payload['status'] ?? ''));
+        $grossAmount = (string) ($payload['amount'] ?? ($payload['paid_amount'] ?? '0'));
+
+        Log::info('Xendit central webhook received', [
+            'external_id' => $externalId,
+            'invoice_id' => $invoiceId,
+            'status' => $status,
+            'amount' => $grossAmount,
+        ]);
+
+        // ==========================================
+        // ROUTE 1: FORWARD KE WAGATEWAY (Prefix WAG-)
+        // ==========================================
+        if (str_starts_with($externalId, 'WAG-')) {
+            $wagUrl = config('services.xendit.wagateway_webhook_url') ?: env('WAGATEWAY_WEBHOOK_URL', 'https://wa.vexahostcloud.my.id/api/payment/xendit/callback');
+            try {
+                $forwardRes = \Illuminate\Support\Facades\Http::timeout(12)
+                    ->withHeaders([
+                        'X-Internal-Token' => config('services.xendit.internal_secret'),
+                        'x-callback-token' => $callbackToken,
+                    ])
+                    ->post($wagUrl, $payload);
+
+                Log::info('Xendit webhook forwarded to WAGateway', [
+                    'external_id' => $externalId,
+                    'status_code' => $forwardRes->status(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Notification forwarded to WAGateway.',
+                    'target_response_code' => $forwardRes->status(),
+                ], 200);
+            } catch (\Throwable $e) {
+                Log::error('Xendit webhook forward to WAGateway failed', [
+                    'external_id' => $externalId,
+                    'error' => $e->getMessage(),
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to forward to WAGateway: ' . $e->getMessage(),
+                ], 502);
+            }
+        }
+
+        // ==========================================
+        // ROUTE 2: FORWARD KE BUILDCLIENT (Prefix BC-)
+        // ==========================================
+        if (str_starts_with($externalId, 'BC-')) {
+            $bcUrl = config('services.xendit.buildclient_webhook_url') ?: env('BUILDCLIENT_WEBHOOK_URL', 'https://client.vexahostcloud.my.id/api/payment/xendit/callback');
+            try {
+                $forwardRes = \Illuminate\Support\Facades\Http::timeout(12)
+                    ->withHeaders([
+                        'X-Internal-Token' => config('services.xendit.internal_secret'),
+                        'x-callback-token' => $callbackToken,
+                    ])
+                    ->post($bcUrl, $payload);
+
+                Log::info('Xendit webhook forwarded to BuildClient', [
+                    'external_id' => $externalId,
+                    'status_code' => $forwardRes->status(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Notification forwarded to BuildClient.',
+                    'target_response_code' => $forwardRes->status(),
+                ], 200);
+            } catch (\Throwable $e) {
+                Log::error('Xendit webhook forward to BuildClient failed', [
+                    'external_id' => $externalId,
+                    'error' => $e->getMessage(),
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to forward to BuildClient: ' . $e->getMessage(),
+                ], 502);
+            }
+        }
+
+        // ==========================================
+        // ROUTE 3: PROSES LOKAL VEXAHOST (Prefix VH-)
+        // ==========================================
+        $order = null;
+        if (preg_match('/^(?:VH[-_])?(?:ORD|ORDER)[-_](\d+)/i', $externalId, $m)) {
+            $order = Order::with('invoice')->find((int) $m[1]);
+        }
+        if (!$order && is_numeric($externalId)) {
+            $order = Order::with('invoice')->find((int) $externalId);
+        }
+        if (!$order) {
+            $tx = PaymentTransaction::where('provider', 'xendit')
+                ->where(function ($q) use ($externalId, $invoiceId) {
+                    $q->where('provider_order_ref', $externalId)
+                      ->orWhere('provider_transaction_id', $invoiceId);
+                })
+                ->with('order.invoice')
+                ->first();
+            if ($tx && $tx->order) {
+                $order = $tx->order;
+            }
+        }
+
+        if (!$order) {
+            $this->recordWebhook('xendit', $invoiceId ?: $externalId, strtolower($status), (string) $callbackToken, $request, null, null, 'ignored', 'Order not found');
+            return response()->json([
+                'success' => true,
+                'message' => 'Xendit notification acknowledged (order not found).',
+            ], 200);
+        }
+
+        $provider = 'xendit';
+        $providerTxId = $invoiceId ?: $externalId;
+        $paymentStatus = strtolower($status);
+        $needsNotification = false;
+
+        try {
+            $result = DB::transaction(function () use (
+                $provider, $providerTxId, $paymentStatus, $callbackToken,
+                $request, $order, $payload, $grossAmount, &$needsNotification
+            ) {
+                $existingEvent = WebhookEvent::where('provider', $provider)
+                    ->where('event_id', $providerTxId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($existingEvent && $existingEvent->processing_status === 'processed') {
+                    return [
+                        'status' => 'duplicate',
+                        'message' => 'Webhook already processed (idempotent).',
+                        'order_status' => $order->status,
+                    ];
+                }
+
+                $event = $existingEvent ?: WebhookEvent::create([
+                    'provider' => $provider,
+                    'event_id' => $providerTxId,
+                    'event_type' => $paymentStatus,
+                    'signature' => (string) $callbackToken,
+                    'ip_address' => $request->ip(),
+                    'payload' => $payload,
+                    'processing_status' => 'received',
+                    'order_id' => $order->id,
+                ]);
+
+                $tx = PaymentTransaction::where('provider', $provider)
+                    ->where('provider_transaction_id', $providerTxId)
+                    ->lockForUpdate()
+                    ->first();
+
+                $channel = $payload['payment_channel'] ?? ($payload['payment_method'] ?? 'xendit');
+
+                if (!$tx) {
+                    $tx = PaymentTransaction::create([
+                        'order_id' => $order->id,
+                        'invoice_id' => $order->invoice?->id,
+                        'provider' => $provider,
+                        'provider_transaction_id' => $providerTxId,
+                        'provider_order_ref' => $payload['external_id'] ?? $order->id,
+                        'payment_method' => $channel,
+                        'amount' => $grossAmount,
+                        'currency' => 'IDR',
+                        'status' => 'pending',
+                        'signature_key' => (string) $callbackToken,
+                        'raw_payload' => $payload,
+                    ]);
+                }
+
+                if (in_array($paymentStatus, ['paid', 'settled'], true)) {
+                    $this->handleSettlement($order, $tx, $event, [
+                        'payment_type' => $channel,
+                        'gross_amount' => $grossAmount,
+                    ]);
+                    $needsNotification = true;
+                    return [
+                        'status' => 'settled',
+                        'message' => 'Payment recorded via Xendit. Order transitioned to paid.',
+                        'order_status' => 'paid',
+                    ];
+                }
+
+                if (in_array($paymentStatus, ['expired', 'failed'], true)) {
+                    $this->handleFailure($order, $tx, $event, $paymentStatus);
+                    return [
+                        'status' => 'cancelled',
+                        'message' => 'Payment expired/failed recorded.',
+                        'order_status' => 'cancelled',
+                    ];
+                }
+
+                return [
+                    'status' => 'pending',
+                    'message' => 'Pending payment recorded.',
+                    'order_status' => $order->status,
+                ];
+            });
+
+            if ($needsNotification) {
+                $this->dispatchPostPaymentNotifications($order);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+                'order_id' => $order->id,
+                'order_status' => $result['order_status'],
+            ], 200);
+
+        } catch (\Throwable $e) {
+            Log::error('xendit_webhook_processing_error', ['error' => $e->getMessage(), 'order_id' => $order->id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal processing error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }
+

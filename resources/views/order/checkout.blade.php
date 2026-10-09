@@ -19,9 +19,9 @@
              ======================================================== --}}
         {{-- Desktop & Tablet Stepper (sm:block) --}}
         <div class="hidden sm:block mb-8">
-            {{-- Direct Checkout Stepper (3 Steps: AI / Managed DB) --}}
+            {{-- Direct Checkout Stepper (2 Steps: AI / Managed DB) --}}
             <template x-if="isDirectCheckout">
-                <div class="flex items-center justify-between max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+                <div class="flex items-center justify-between max-w-xl mx-auto px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
                     <div class="flex items-center gap-2.5 shrink-0">
                         <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
                               :class="currentSlide === 1 ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > 1 ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
@@ -36,29 +36,17 @@
                     <div class="flex-1 h-0.5 mx-3 md:mx-5 transition-colors" :class="currentSlide > 1 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
                     <div class="flex items-center gap-2.5 shrink-0">
                         <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                              :class="currentSlide === 2 ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > 2 ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
-                            <template x-if="currentSlide > 2">
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            </template>
-                            <template x-if="currentSlide <= 2"><span>2</span></template>
-                        </span>
+                              :class="currentSlide === 2 ? 'bg-black text-white ring-4 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">2</span>
                         <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
-                              :class="currentSlide === 2 ? 'text-black' : (currentSlide > 2 ? 'text-emerald-700' : 'text-slate-400')">Pilih Pembayaran</span>
-                    </div>
-                    <div class="flex-1 h-0.5 mx-3 md:mx-5 transition-colors" :class="currentSlide > 2 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
-                    <div class="flex items-center gap-2.5 shrink-0">
-                        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                              :class="currentSlide === 3 ? 'bg-black text-white ring-4 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">3</span>
-                        <span class="text-xs md:text-sm font-bold whitespace-nowrap transition-colors"
-                              :class="currentSlide === 3 ? 'text-black' : 'text-slate-400'">Konfirmasi Pembayaran</span>
+                              :class="currentSlide === 2 ? 'text-black' : 'text-slate-400'">Konfirmasi Pembayaran</span>
                     </div>
                 </div>
             </template>
 
-            {{-- Standard VPS Stepper (4 Steps) --}}
+            {{-- Standard VPS Stepper (3 Steps) --}}
             <template x-if="!isDirectCheckout">
                 <div class="flex items-center justify-between max-w-4xl mx-auto px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-                    @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'] as $index => $step)
+                    @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Konfirmasi Pembayaran'] as $index => $step)
                         <div class="flex items-center gap-2.5 shrink-0">
                             <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
                                   :class="currentSlide === {{ $index }} ? 'bg-black text-white ring-4 ring-black/10' : (currentSlide > {{ $index }} ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-400 border border-slate-300')">
@@ -74,7 +62,7 @@
                                 {{ $step }}
                             </span>
                         </div>
-                        @if($index < 3)
+                        @if($index < 2)
                             <div class="flex-1 h-0.5 mx-2 md:mx-4 transition-colors"
                                  :class="currentSlide > {{ $index }} ? 'bg-emerald-500' : 'bg-slate-200'"></div>
                         @endif
@@ -89,7 +77,7 @@
             <div class="flex items-center justify-between gap-1 mb-3">
                 <template x-if="!isDirectCheckout">
                     <div class="flex items-center justify-between w-full">
-                        @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'] as $index => $step)
+                        @foreach(['Konfigurasi VPS', 'Informasi Akun', 'Konfirmasi Pembayaran'] as $index => $step)
                             <div class="flex items-center gap-1 shrink-0">
                                 <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
                                       :class="currentSlide === {{ $index }} ? 'bg-black text-white ring-3 ring-black/10' : (currentSlide > {{ $index }} ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300')">
@@ -101,7 +89,7 @@
                                     </template>
                                 </span>
                             </div>
-                            @if($index < 3)
+                            @if($index < 2)
                                 <div class="flex-1 h-0.5 mx-1.5 transition-colors"
                                      :class="currentSlide > {{ $index }} ? 'bg-emerald-500' : 'bg-slate-200'"></div>
                             @endif
@@ -122,18 +110,8 @@
                         <div class="flex-1 h-0.5 mx-1.5 transition-colors" :class="currentSlide > 1 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
                         <div class="flex items-center gap-1 shrink-0">
                             <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
-                                  :class="currentSlide === 2 ? 'bg-black text-white ring-3 ring-black/10' : (currentSlide > 2 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300')">
-                                <template x-if="currentSlide > 2">
-                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                </template>
-                                <template x-if="currentSlide <= 2"><span>2</span></template>
-                            </span>
-                        </div>
-                        <div class="flex-1 h-0.5 mx-1.5 transition-colors" :class="currentSlide > 2 ? 'bg-emerald-500' : 'bg-slate-200'"></div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all"
-                                  :class="currentSlide === 3 ? 'bg-black text-white ring-3 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">
-                                <span>3</span>
+                                  :class="currentSlide === 2 ? 'bg-black text-white ring-3 ring-black/10' : 'bg-white text-slate-400 border border-slate-300'">
+                                <span>2</span>
                             </span>
                         </div>
                     </div>
@@ -490,17 +468,8 @@
                         @include('order.partials.slide-account')
                     </div>
 
-                    {{-- Slide 3: Metode Pembayaran --}}
+                    {{-- Slide 3: Konfirmasi Pembayaran (Langkah Terakhir - Menggantikan Slide 4) --}}
                     <div x-show="currentSlide === 2" x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-x-10" x-transition:enter-end="opacity-100 translate-x-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-10"
-                         class="space-y-6">
-                        @include('order.partials.slide-payment')
-                    </div>
-
-                    {{-- Slide 4: Konfirmasi Pembayaran & Full Harga --}}
-                    <div x-show="currentSlide === 3" x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 translate-x-10" x-transition:enter-end="opacity-100 translate-x-0"
                          x-transition:leave="transition ease-in duration-200"
                          x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-10"
@@ -517,7 +486,7 @@
                             <div>
                                 <button type="button" @click="previousSlide()" x-show="currentSlide > 1"
                                         class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
-                                    ← <span x-text="currentSlide === 3 ? 'Kembali ke Pilih Pembayaran' : 'Kembali ke Informasi Akun'"></span>
+                                    ← <span>Kembali ke Informasi Akun</span>
                                 </button>
                             </div>
                         </template>
@@ -526,12 +495,13 @@
                         <template x-if="!isDirectCheckout">
                             <button type="button" @click="previousSlide()" x-show="currentSlide > 0"
                                     class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
-                                ← Kembali
+                                ← <span x-text="currentSlide === 2 ? 'Kembali ke Informasi Akun' : 'Kembali ke Konfigurasi VPS'"></span>
                             </button>
                         </template>
                     </div>
 
                     {{-- Tombol Lanjut / Submit --}}
+                    {{-- Slide 0 (VPS biasa): Menuju Slide 1 --}}
                     <div x-show="!isDirectCheckout && currentSlide === 0" class="w-full sm:w-auto sm:ml-auto">
                         <button type="button" @click="isPackageInactive ? null : nextSlide()"
                                 :disabled="isPackageInactive"
@@ -544,19 +514,9 @@
                             </span>
                         </button>
                     </div>
+
+                    {{-- Slide 1: Menuju Slide 2 (Konfirmasi Pembayaran) --}}
                     <div x-show="currentSlide === 1" class="w-full sm:w-auto sm:ml-auto">
-                        <button type="button" @click="isPackageInactive ? null : nextSlide()"
-                                :disabled="isPackageInactive"
-                                :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
-                                class="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl sm:rounded-lg text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-xs">
-                            <span x-show="!isPackageInactive">Lanjut ke Pilih Pembayaran →</span>
-                            <span x-show="isPackageInactive" class="inline-flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                Pemesanan Dikunci
-                            </span>
-                        </button>
-                    </div>
-                    <div x-show="currentSlide === 2" class="w-full sm:w-auto sm:ml-auto">
                         <button type="button" @click="isPackageInactive ? null : nextSlide()"
                                 :disabled="isPackageInactive"
                                 :class="isPackageInactive ? 'opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : 'bg-black hover:bg-neutral-800'"
@@ -568,7 +528,9 @@
                             </span>
                         </button>
                     </div>
-                    <div x-show="currentSlide === 3" class="w-full sm:w-auto sm:ml-auto flex flex-col items-stretch sm:items-end gap-1.5">
+
+                    {{-- Slide 2: Eksekusi Langsung Pembayaran (Bayar Sekarang) --}}
+                    <div x-show="currentSlide === 2" class="w-full sm:w-auto sm:ml-auto flex flex-col items-stretch sm:items-end gap-1.5">
                         <p x-show="!termsAccepted && !isPackageInactive" x-cloak class="text-xs font-semibold text-slate-500 text-center sm:text-right">
                             Centang persetujuan ketentuan untuk melanjutkan.
                         </p>
@@ -761,23 +723,25 @@ function checkoutState() {
             },
             cloudeka: { ubuntu2404: 'Ubuntu Server 24.04 LTS 64bit', ubuntu2204: 'Ubuntu Server 22.04 LTS 64bit' }
         },
-        paymentMethod: 'midtrans_snap',
+        paymentMethod: 'online_payment',
         selectedPaymentImage: 'qris.svg',
         paymentMethods: {
-            midtrans_snap: { name: 'QRIS Otomatis', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
-            qris: { name: 'QRIS Manual', image: 'qris.svg', description: 'Scan barcode QRIS VexaHost' },
-            gopay: { name: 'GoPay', image: 'gopay.svg', description: 'Aplikasi GoPay & Gojek' },
+            online_payment: { name: 'Pembayaran Otomatis Online (Instan)', image: 'qris.svg', description: 'QRIS, Mandiri VA, BNI VA, BRI VA, CIMB Niaga, Permata, Indomaret, AstraPay, Akulaku' },
+            qris: { name: 'QRIS', image: 'qris.svg', description: 'Semua e-wallet & mobile banking instan' },
             mandiri_va: { name: 'Mandiri Virtual Account', image: 'va_mandiri.svg', description: 'Virtual Account otomatis 24 jam' },
             bni_va: { name: 'BNI Virtual Account', image: 'va_bni.svg', description: 'Virtual Account otomatis 24 jam' },
             bri_va: { name: 'BRI Virtual Account', image: 'va_bri.svg', description: 'Virtual Account otomatis 24 jam' },
-            permata_va: { name: 'Permata Virtual Account', image: 'va_permata.svg', description: 'Virtual Account otomatis 24 jam' },
             cimb_va: { name: 'CIMB Niaga VA', image: 'va_cimb.svg', description: 'Virtual Account otomatis 24 jam' },
-            other_va: { name: 'Bank Lainnya (VA)', image: 'va_permata.svg', description: 'Transfer ATM & Bank Lainnya' },
+            permata_va: { name: 'Permata Virtual Account', image: 'va_permata.svg', description: 'Virtual Account otomatis 24 jam' },
+            indomaret: { name: 'Indomaret', image: 'indomaret.svg', description: 'Bayar tunai di gerai Indomaret' },
+            astrapay: { name: 'AstraPay', image: 'astrapay.svg', description: 'Aplikasi AstraPay & Dompet Digital' },
+            akulaku: { name: 'Akulaku PayLater', image: 'akulaku.svg', description: 'Cicilan & PayLater tanpa kartu' },
             bca_va: { name: 'BCA Virtual Account', image: 'va_bca.svg', description: 'Sedang dinonaktifkan' },
             bsi_va: { name: 'BSI Virtual Account', image: 'va_bsi.svg', description: 'Sedang dinonaktifkan' },
             danamon_va: { name: 'Danamon Virtual Account', image: 'va_danamon.svg', description: 'Sedang dinonaktifkan' },
             seabank_va: { name: 'SeaBank Virtual Account', image: 'va_seabank.svg', description: 'Sedang dinonaktifkan' },
             credit_card: { name: 'Kartu Kredit / Debit', image: 'credit_card.svg', description: 'Sedang dinonaktifkan' },
+            gopay: { name: 'GoPay', image: 'gopay.svg', description: 'Sedang dinonaktifkan' },
             ovo: { name: 'OVO', image: 'ewallet_ovo.svg', description: 'Sedang dinonaktifkan' },
             dana: { name: 'DANA', image: 'dana.svg', description: 'Sedang dinonaktifkan' },
             shopeepay: { name: 'ShopeePay', image: 'ewallet_shopeepay.svg', description: 'Sedang dinonaktifkan' }
@@ -844,25 +808,19 @@ function checkoutState() {
             return this.isAiPackage || this.isDatabasePackage;
         },
         get totalStepCount() {
-            return this.isDirectCheckout ? 3 : 4;
+            return this.isDirectCheckout ? 2 : 3;
         },
         get currentStepNumber() {
             if (this.isDirectCheckout) {
-                if (this.currentSlide === 1) return 1;
-                if (this.currentSlide === 2) return 2;
-                if (this.currentSlide === 3) return 3;
-                return 1;
+                return this.currentSlide === 1 ? 1 : 2;
             }
             return this.currentSlide + 1;
         },
         get currentStepTitle() {
             if (this.isDirectCheckout) {
-                if (this.currentSlide === 1) return 'Informasi Akun';
-                if (this.currentSlide === 2) return 'Pilih Pembayaran';
-                if (this.currentSlide === 3) return 'Konfirmasi Pembayaran';
-                return 'Informasi Akun';
+                return this.currentSlide === 1 ? 'Informasi Akun' : 'Konfirmasi Pembayaran';
             }
-            const titles = ['Konfigurasi VPS', 'Informasi Akun', 'Pilih Pembayaran', 'Konfirmasi Pembayaran'];
+            const titles = ['Konfigurasi VPS', 'Informasi Akun', 'Konfirmasi Pembayaran'];
             return titles[this.currentSlide] || 'Konfigurasi VPS';
         },
         get dbEngineLabel() {
@@ -1102,7 +1060,11 @@ function checkoutState() {
                 if (draft.os && !this.isDirectCheckout) this.os = draft.os;
                 if (draft.dbEngine && this.isDatabasePackage) this.dbEngine = draft.dbEngine;
                 if (draft.dbManager && this.isDatabasePackage) this.dbManager = draft.dbManager;
-                if (draft.paymentMethod) this.paymentMethod = draft.paymentMethod;
+                if (draft.paymentMethod && this.paymentMethods[draft.paymentMethod]) {
+                    this.paymentMethod = draft.paymentMethod;
+                } else {
+                    this.paymentMethod = 'online_payment';
+                }
                 if (!this.isLoggedIn) {
                     if (draft.registerFullName) this.registerFullName = draft.registerFullName;
                     if (draft.registerUsername) this.registerUsername = draft.registerUsername;
@@ -1222,10 +1184,7 @@ function checkoutState() {
 
         previousSlide() {
             if (this.isDirectCheckout) {
-                if (this.currentSlide === 3) {
-                    this.currentSlide = 2;
-                    this.scrollToWizardTop();
-                } else if (this.currentSlide === 2) {
+                if (this.currentSlide === 2) {
                     this.currentSlide = 1;
                     this.scrollToWizardTop();
                 } else if (this.currentSlide === 1) {
@@ -1261,36 +1220,28 @@ function checkoutState() {
                     if (!await this.validateAccount()) {
                         return;
                     }
-                }
-                if (this.currentSlide === 2) {
-                    if (!this.paymentMethod) {
-                        showAlert('Silakan pilih salah satu metode pembayaran terlebih dahulu.');
-                        return;
-                    }
-                    this.currentSlide = 3;
+                    this.currentSlide = 2;
                     this.scrollToWizardTop();
+                }
+                return;
+            }
+
+            if (this.currentSlide === 0) {
+                if (!this.validateConfiguration()) {
+                    return;
+                }
+                this.currentSlide = 1;
+                this.scrollToWizardTop();
+                return;
+            }
+
+            if (this.currentSlide === 1) {
+                if (!await this.validateAccount()) {
                     return;
                 }
                 this.currentSlide = 2;
                 this.scrollToWizardTop();
                 return;
-            }
-
-            if (this.currentSlide < 3) {
-                if (this.currentSlide === 0 && !this.validateConfiguration()) {
-                    return;
-                }
-                if (this.currentSlide === 1 && !await this.validateAccount()) {
-                    return;
-                }
-                if (this.currentSlide === 2) {
-                    if (!this.paymentMethod) {
-                        showAlert('Silakan pilih salah satu metode pembayaran terlebih dahulu.');
-                        return;
-                    }
-                }
-                this.currentSlide++;
-                this.scrollToWizardTop();
             }
         },
         
