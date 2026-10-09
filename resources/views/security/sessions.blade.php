@@ -2,6 +2,13 @@
 
 @section('content')
 <div class="max-w-5xl space-y-5">
+    <div>
+        <a href="{{ route('security.settings') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors py-1 group">
+            <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke Pengaturan Keamanan</span>
+        </a>
+    </div>
+
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-xl font-bold">Session aktif</h2>

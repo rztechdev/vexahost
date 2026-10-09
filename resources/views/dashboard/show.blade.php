@@ -57,6 +57,14 @@
         }
     }
 }">
+    <!-- Back to Instances -->
+    <div>
+        <a href="{{ route('dashboard.index') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors py-1 group">
+            <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Kembali ke VPS Instances</span>
+        </a>
+    </div>
+
     <!-- Lifecycle & Status Warning Alerts -->
     @if($vps->status === 'suspended')
         <div class="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 flex items-start gap-3">

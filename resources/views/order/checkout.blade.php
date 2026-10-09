@@ -243,166 +243,115 @@
 
                         {{-- Alert khusus paket AI Combo: Konfigurasi Otomatis --}}
                         <template x-if="isAiPackage && currentSpec">
-                            <div class="p-5 sm:p-6 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 space-y-3 shadow-xs">
+                            <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 space-y-2 shadow-xs">
                                 <div class="flex items-center justify-between flex-wrap gap-2">
                                     <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Paket AI Combo</span>
                                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white text-slate-800 border border-slate-200" x-text="currentSpec.badge || 'AI Combo'"></span>
                                 </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-slate-900" x-text="currentSpec.name"></h2>
-                                    <p class="text-xs text-slate-500 mt-0.5" x-text="currentSpec.tagline"></p>
-                                </div>
-                                <div class="flex items-center gap-2 text-xs text-slate-600 bg-white px-3.5 py-2.5 rounded-lg border border-slate-200">
-                                    <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span>Konfigurasi server otomatis: OS, runtime AI, stack, dan swap memory telah disiapkan.</span>
-                                </div>
+                                <h2 class="text-lg font-bold text-slate-900" x-text="currentSpec.name"></h2>
                             </div>
                         </template>
 
                         {{-- Alert khusus paket Managed Database: Konfigurasi Otomatis & Pilihan Engine/Tools --}}
                         <template x-if="isDatabasePackage && currentSpec">
                             <div class="space-y-6 mb-6">
-                                <div class="p-5 sm:p-6 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 space-y-3 shadow-xs">
+                                <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 space-y-2 shadow-xs">
                                     <div class="flex items-center justify-between flex-wrap gap-2">
                                         <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Paket Managed Database</span>
                                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200" x-text="currentSpec.badge || 'Dedicated DB'"></span>
                                     </div>
-                                    <div>
-                                        <h2 class="text-xl font-bold text-slate-900" x-text="currentSpec.name"></h2>
-                                        <p class="text-xs text-slate-500 mt-0.5" x-text="currentSpec.tagline"></p>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-                                        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                                            <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Server database khusus, terpisah dari aplikasi</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                                            <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Datacenter Jakarta</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                                            <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Dedicated IPv4 (Remote client ready)</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                                            <svg class="w-4 h-4 text-[#4A6FA5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Kredensial koneksi siap pakai di dashboard</span>
-                                        </div>
-                                    </div>
+                                    <h2 class="text-lg font-bold text-slate-900" x-text="currentSpec.name"></h2>
                                 </div>
 
                                 {{-- Pilihan Database Engine (Visual Radio Selector) --}}
-                                <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white space-y-4 shadow-xs">
+                                <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-3.5 shadow-xs">
                                     <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="text-sm font-bold text-slate-900">Pilih Database Engine</h3>
-                                            <p class="text-xs text-slate-500 mt-0.5">Engine database siap pakai yang akan langsung aktif di server Anda.</p>
-                                        </div>
+                                        <h3 class="text-sm font-bold text-slate-900">Pilih Database Engine</h3>
                                         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Wajib</span>
                                     </div>
 
                                     <div class="grid grid-cols-1 gap-2.5">
                                         {{-- PostgreSQL 16 --}}
-                                        <label @click="dbEngine = 'postgres'" class="flex items-start gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbEngine = 'postgres'" class="flex items-center gap-3.5 p-3 rounded-lg border cursor-pointer transition-all"
                                                :class="dbEngine === 'postgres' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_engine" value="postgres" :checked="dbEngine === 'postgres'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/postgres.svg') }}" alt="PostgreSQL" class="w-6 h-6 object-contain shrink-0 mt-0.5">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <span class="text-xs font-bold text-slate-900">PostgreSQL 16</span>
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Default Recommended</span>
-                                                </div>
-                                                <p class="text-[11px] text-slate-500 mt-0.5">Default recommended untuk backend modern &amp; Supabase style (Prisma, Drizzle, Node.js, Go, Python).</p>
+                                            <input type="radio" name="_radio_db_engine" value="postgres" :checked="dbEngine === 'postgres'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/postgres.svg') }}" alt="PostgreSQL" class="w-6 h-6 object-contain shrink-0">
+                                            <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                <span class="text-xs font-bold text-slate-900">PostgreSQL 16</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Default Recommended</span>
                                             </div>
                                         </label>
 
                                         {{-- MySQL 8.0 / MariaDB 11 --}}
-                                        <label @click="dbEngine = 'mysql'" class="flex items-start gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbEngine = 'mysql'" class="flex items-center gap-3.5 p-3 rounded-lg border cursor-pointer transition-all"
                                                :class="dbEngine === 'mysql' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_engine" value="mysql" :checked="dbEngine === 'mysql'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/mysql.svg') }}" alt="MySQL" class="w-6 h-6 object-contain shrink-0 mt-0.5">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <span class="text-xs font-bold text-slate-900">MySQL 8.0 / MariaDB 11</span>
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Rekomendasi PHP &amp; CMS</span>
-                                                </div>
-                                                <p class="text-[11px] text-slate-500 mt-0.5">Rekomendasi Laravel, WordPress, WooCommerce, PHP native &amp; e-commerce.</p>
+                                            <input type="radio" name="_radio_db_engine" value="mysql" :checked="dbEngine === 'mysql'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/mysql.svg') }}" alt="MySQL" class="w-6 h-6 object-contain shrink-0">
+                                            <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                <span class="text-xs font-bold text-slate-900">MySQL 8.0 / MariaDB 11</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">PHP &amp; CMS</span>
                                             </div>
                                         </label>
 
                                         {{-- Redis 7 --}}
-                                        <label @click="dbEngine = 'redis'" class="flex items-start gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbEngine = 'redis'" class="flex items-center gap-3.5 p-3 rounded-lg border cursor-pointer transition-all"
                                                :class="dbEngine === 'redis' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_engine" value="redis" :checked="dbEngine === 'redis'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/redis.svg') }}" alt="Redis" class="w-6 h-6 object-contain shrink-0 mt-0.5">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <span class="text-xs font-bold text-slate-900">Redis 7 In-Memory Cache</span>
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Session &amp; Queue Booster</span>
-                                                </div>
-                                                <p class="text-[11px] text-slate-500 mt-0.5">Rekomendasi session/queue booster, high-speed key-value cache, dan pub/sub messaging.</p>
+                                            <input type="radio" name="_radio_db_engine" value="redis" :checked="dbEngine === 'redis'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/redis.svg') }}" alt="Redis" class="w-6 h-6 object-contain shrink-0">
+                                            <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                <span class="text-xs font-bold text-slate-900">Redis 7 In-Memory Cache</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Cache &amp; Queue</span>
                                             </div>
                                         </label>
 
                                         {{-- MongoDB 7 --}}
-                                        <label @click="dbEngine = 'mongodb'" class="flex items-start gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbEngine = 'mongodb'" class="flex items-center gap-3.5 p-3 rounded-lg border cursor-pointer transition-all"
                                                :class="dbEngine === 'mongodb' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_engine" value="mongodb" :checked="dbEngine === 'mongodb'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/mongodb.svg') }}" alt="MongoDB" class="w-6 h-6 object-contain shrink-0 mt-0.5">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <span class="text-xs font-bold text-slate-900">MongoDB 7 Community</span>
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">NoSQL Document</span>
-                                                </div>
-                                                <p class="text-[11px] text-slate-500 mt-0.5">Khusus MERN / JSON Document dengan skema dinamis dan agregasi dokumen cepat.</p>
+                                            <input type="radio" name="_radio_db_engine" value="mongodb" :checked="dbEngine === 'mongodb'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/mongodb.svg') }}" alt="MongoDB" class="w-6 h-6 object-contain shrink-0">
+                                            <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                <span class="text-xs font-bold text-slate-900">MongoDB 7 Community</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">NoSQL Document</span>
                                             </div>
                                         </label>
 
                                         {{-- Qdrant / pgvector --}}
-                                        <label @click="dbEngine = 'vector'" class="flex items-start gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbEngine = 'vector'" class="flex items-center gap-3.5 p-3 rounded-lg border cursor-pointer transition-all"
                                                :class="dbEngine === 'vector' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_engine" value="vector" :checked="dbEngine === 'vector'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/qdrant.svg') }}" alt="Qdrant" class="w-6 h-6 object-contain shrink-0 mt-0.5">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center justify-between gap-2">
-                                                    <span class="text-xs font-bold text-slate-900">Qdrant / pgvector</span>
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">Khusus AI &amp; RAG</span>
-                                                </div>
-                                                <p class="text-[11px] text-slate-500 mt-0.5">Khusus tier Enterprise untuk AI &amp; RAG, indexing vector similarity, dan semantic search dokumen.</p>
+                                            <input type="radio" name="_radio_db_engine" value="vector" :checked="dbEngine === 'vector'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/qdrant.svg') }}" alt="Qdrant" class="w-6 h-6 object-contain shrink-0">
+                                            <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                <span class="text-xs font-bold text-slate-900">Qdrant / pgvector</span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black text-white">AI &amp; RAG</span>
                                             </div>
                                         </label>
                                     </div>
                                 </div>
 
                                 {{-- Pilihan Tools Pengelola Web (Opsional) --}}
-                                <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white space-y-4 shadow-xs">
+                                <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-3.5 shadow-xs">
                                     <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="text-sm font-bold text-slate-900">Pilih Tools Pengelola Web (Opsional)</h3>
-                                            <p class="text-xs text-slate-500 mt-0.5">Antarmuka visual untuk mengelola tabel dan query data lewat browser.</p>
-                                        </div>
+                                        <h3 class="text-sm font-bold text-slate-900">Pilih Tools Pengelola Web (Opsional)</h3>
                                     </div>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {{-- CloudBeaver --}}
-                                        <label @click="dbManager = 'cloudbeaver'" class="flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbManager = 'cloudbeaver'" class="flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all"
                                                :class="dbManager === 'cloudbeaver' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_manager" value="cloudbeaver" :checked="dbManager === 'cloudbeaver'" class="mt-1 text-black focus:ring-black">
-                                            <img src="{{ asset('images/logos/databases/cloudbeaver.svg') }}" alt="CloudBeaver" class="w-6 h-6 object-contain shrink-0 mt-0.5">
+                                            <input type="radio" name="_radio_db_manager" value="cloudbeaver" :checked="dbManager === 'cloudbeaver'" class="text-black focus:ring-black">
+                                            <img src="{{ asset('images/logos/databases/cloudbeaver.svg') }}" alt="CloudBeaver" class="w-6 h-6 object-contain shrink-0">
                                             <div class="flex-1 min-w-0">
-                                                <span class="text-xs font-bold text-slate-900 block">CloudBeaver / Adminer Web GUI</span>
-                                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Akses browser aman via HTTPS &amp; port 8080. Siap kelola tabel, query data, dan pantau database secara visual.</p>
+                                                <span class="text-xs font-bold text-slate-900 block">CloudBeaver Web GUI</span>
                                             </div>
                                         </label>
 
                                         {{-- CLI Only --}}
-                                        <label @click="dbManager = 'cli_only'" class="flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all"
+                                        <label @click="dbManager = 'cli_only'" class="flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all"
                                                :class="dbManager === 'cli_only' ? 'border-black bg-slate-50 ring-1 ring-black' : 'border-slate-200 hover:border-slate-300 bg-white'">
-                                            <input type="radio" name="_radio_db_manager" value="cli_only" :checked="dbManager === 'cli_only'" class="mt-1 text-black focus:ring-black">
-                                            <div class="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5 font-mono text-xs font-bold text-slate-800 bg-slate-100 rounded">&gt;_</div>
+                                            <input type="radio" name="_radio_db_manager" value="cli_only" :checked="dbManager === 'cli_only'" class="text-black focus:ring-black">
+                                            <div class="w-6 h-6 flex items-center justify-center shrink-0 font-mono text-xs font-bold text-slate-800 bg-slate-100 rounded">&gt;_</div>
                                             <div class="flex-1 min-w-0">
                                                 <span class="text-xs font-bold text-slate-900 block">CLI Only (Headless)</span>
-                                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Hanya port database terbuka via password / whitelist IP. Tanpa beban GUI browser, murni efisiensi memori.</p>
                                             </div>
                                         </label>
                                     </div>
@@ -412,12 +361,9 @@
 
                         {{-- Konfigurasi Hostname & Root Password (Khusus AI Combo & Managed Database) --}}
                         <template x-if="isDirectCheckout">
-                            <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white space-y-4 shadow-xs mb-6">
+                            <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-4 shadow-xs mb-6">
                                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                                    <div>
-                                        <h3 class="text-sm font-bold text-slate-900">Nama Server &amp; Kredensial Root</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Tentukan hostname server dan password akses root/administrator Anda.</p>
-                                    </div>
+                                    <h3 class="text-sm font-bold text-slate-900">Nama Server &amp; Kredensial Root</h3>
                                     <span class="text-xs font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">Wajib</span>
                                 </div>
 
@@ -426,8 +372,7 @@
                                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                                             Hostname / Server Name <span class="text-rose-600">*</span>
                                         </label>
-                                        <input type="text" x-model="vpsName" required minlength="3" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9-]*" placeholder="misal: ai-runner-01" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
-                                        <p class="text-[11px] text-slate-400 mt-1">Gunakan huruf, angka, dan tanda hubung.</p>
+                                        <input type="text" x-model="vpsName" required minlength="3" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9-]*" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
                                     </div>
 
                                     <div>
@@ -443,7 +388,6 @@
                                                    x-model="rootPassword" 
                                                    required 
                                                    minlength="8" 
-                                                   placeholder="Ketik password root/admin" 
                                                    class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black" 
                                                    autocomplete="new-password">
                                             <button type="button" 
@@ -459,7 +403,6 @@
                                                 </svg>
                                             </button>
                                         </div>
-                                        <p class="text-[11px] text-slate-400 mt-1" x-text="isDatabasePackage ? 'Password ini juga menjadi password root user database Anda.' : 'Password untuk akses SSH user root ke node AI.'"></p>
                                     </div>
                                 </div>
                             </div>
@@ -663,7 +606,6 @@
                             <span>Total Pembayaran</span>
                             <span class="font-mono-code text-lg" x-text="formatRupiah(totalPrice)"></span>
                         </div>
-                        <p class="text-[11px] text-slate-400 text-right">Tarif flat perpanjangan bulanan</p>
                     </div>
 
                     {{-- Payment Logos --}}
