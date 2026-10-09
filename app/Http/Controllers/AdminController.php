@@ -399,6 +399,7 @@ class AdminController extends Controller
             'public_ip' => 'required|ip',
             'private_ip' => 'nullable|ip',
             'ssh_port' => 'nullable|integer|min:1|max:65535',
+            'root_password' => 'required|string|min:8|max:128',
         ];
 
         // Link panel wajib berformat URL lengkap agar tautan di dashboard pelanggan
@@ -436,7 +437,7 @@ class AdminController extends Controller
                 // Parameter pesanan pelanggan yang terkunci (tidak diubah admin)
                 $hostname = $order->hostname ?: ('vps-' . $order->id);
                 $os = $order->os ?: 'Ubuntu 24.04 LTS';
-                $rootPassword = $order->root_password ?: Str::password(16, true, true, false, false);
+                $rootPassword = $validated['root_password'];
 
                 $dbEngine = $order->db_engine ?: ($isDb ? 'postgres' : null);
                 $dbManager = $order->db_manager ?: ($isDb ? 'cloudbeaver' : null);
@@ -510,10 +511,14 @@ class AdminController extends Controller
                     'reason' => 'Provisioning sukses.',
                     'actor_type' => 'admin',
                     'metadata' => ['vps_instance_id' => $instance->id],
-                    'onLocked' => function (Order $locked) use ($startsAt, $expiresAt, $graceEndsAt) {
+                    'onLocked' => function (Order $locked) use ($startsAt, $expiresAt, $graceEndsAt, $rootPassword, $isDb, $dbPassword) {
                         $locked->starts_at = $startsAt;
                         $locked->expires_at = $expiresAt;
                         $locked->grace_period_ends_at = $graceEndsAt;
+                        $locked->root_password = $rootPassword;
+                        if ($isDb && empty($locked->db_password)) {
+                            $locked->db_password = $dbPassword;
+                        }
                         $locked->save();
                     },
                 ]);
@@ -1660,6 +1665,13 @@ class AdminController extends Controller
             'category' => 'nullable|string|in:vps,ai_combo,managed_db',
             'tagline' => 'nullable|string|max:255',
             'badge' => 'nullable|string|max:100',
+            'target_audience' => 'nullable|string|max:255',
+            'solution' => 'nullable|string|max:1000',
+            'default_stack' => 'nullable|string|max:50',
+            'allowed_providers' => 'nullable|array',
+            'allowed_providers.*' => 'in:tencent,cloudeka',
+            'default_provider' => 'nullable|string|in:tencent,cloudeka',
+            'features' => 'nullable',
             'cpu' => 'required|integer|min:1|max:128',
             'ram' => 'required|integer|min:1|max:1024',
             'disk' => 'required|integer|min:5|max:10000',
@@ -1673,7 +1685,21 @@ class AdminController extends Controller
         $validated['category'] = $validated['category'] ?? 'vps';
         $validated['is_active'] = $request->boolean('is_active', true);
 
+        // Format features if provided as string
+        if (isset($validated['features']) && is_string($validated['features'])) {
+            $validated['features'] = array_values(array_filter(array_map('trim', explode("\n", $validated['features']))));
+        }
+
+        // Format allowed providers & default provider
+        if (empty($validated['allowed_providers'])) {
+            $validated['allowed_providers'] = ['tencent'];
+        }
+        if (empty($validated['default_provider']) || !in_array($validated['default_provider'], $validated['allowed_providers'], true)) {
+            $validated['default_provider'] = $validated['allowed_providers'][0];
+        }
+
         VpsSpec::create($validated);
+        \Illuminate\Support\Facades\Cache::forget('landing.specs');
 
         return back()->with('success', "Paket '{$validated['name']}' berhasil ditambahkan.");
     }
@@ -1700,6 +1726,13 @@ class AdminController extends Controller
             'category' => 'nullable|string|in:vps,ai_combo,managed_db',
             'tagline' => 'nullable|string|max:255',
             'badge' => 'nullable|string|max:100',
+            'target_audience' => 'nullable|string|max:255',
+            'solution' => 'nullable|string|max:1000',
+            'default_stack' => 'nullable|string|max:50',
+            'allowed_providers' => 'nullable|array',
+            'allowed_providers.*' => 'in:tencent,cloudeka',
+            'default_provider' => 'nullable|string|in:tencent,cloudeka',
+            'features' => 'nullable',
             'cpu' => 'required|integer|min:1|max:128',
             'ram' => 'required|integer|min:1|max:1024',
             'disk' => 'required|integer|min:5|max:10000',
@@ -1712,7 +1745,20 @@ class AdminController extends Controller
 
         $validated['is_active'] = $request->boolean('is_active');
 
+        // Format features if provided as string
+        if (isset($validated['features']) && is_string($validated['features'])) {
+            $validated['features'] = array_values(array_filter(array_map('trim', explode("\n", $validated['features']))));
+        }
+
+        // Format allowed providers & default provider
+        if (!empty($validated['allowed_providers'])) {
+            if (empty($validated['default_provider']) || !in_array($validated['default_provider'], $validated['allowed_providers'], true)) {
+                $validated['default_provider'] = $validated['allowed_providers'][0];
+            }
+        }
+
         $spec->update($validated);
+        \Illuminate\Support\Facades\Cache::forget('landing.specs');
 
         return back()->with('success', "Paket '{$spec->name}' berhasil diperbarui.");
     }
@@ -1752,6 +1798,7 @@ class AdminController extends Controller
 
         $specName = $spec->name;
         $spec->delete();
+        \Illuminate\Support\Facades\Cache::forget('landing.specs');
 
         return back()->with('success', "Paket '{$specName}' berhasil dihapus.");
     }

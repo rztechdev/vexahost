@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
         <h2 class="text-xl font-bold">Aktifkan authenticator</h2>
         <p class="text-sm text-slate-500 mt-2">Tambahkan secret ini ke Google Authenticator, Authy, atau aplikasi TOTP lain.</p>
         <div class="mt-5 rounded-lg bg-slate-50 border p-4">

@@ -172,6 +172,7 @@ class ControlPanelLinkTest extends TestCase
             ->post("/admin/orders/{$order->id}/provision", [
                 'public_ip' => '103.150.10.6',
                 'app_url' => 'http://103.150.10.6:8000',
+                'root_password' => 'VexaSecretPass123!',
             ])
             ->assertSessionHas('success');
 

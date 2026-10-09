@@ -349,7 +349,7 @@
                 </div>
 
                 <div class="relative group">
-                    <pre class="bg-slate-950 text-slate-100 p-4 sm:p-5 rounded-xl font-mono-code text-xs sm:text-sm overflow-x-auto leading-relaxed border border-slate-800 shadow-inner select-all"><code>DB_CONNECTION={{ $dbConn }}
+                    <pre class="bg-slate-950 text-slate-100 p-4 sm:p-5 rounded-lg font-mono-code text-xs sm:text-sm overflow-x-auto leading-relaxed border border-slate-800 shadow-inner select-all"><code>DB_CONNECTION={{ $dbConn }}
 DB_HOST={{ $dbHost }}
 DB_PORT={{ $dbPort }}
 DB_DATABASE={{ $dbName }}

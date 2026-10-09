@@ -23,7 +23,7 @@
      }">
 
     <!-- Top Action & Filter Bar -->
-    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2.5">
@@ -95,7 +95,7 @@
 
                     <div x-show="exportDropdownOpen"
                          x-transition
-                         class="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl py-2 z-30 text-xs divide-y divide-slate-100"
+                         class="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-lg shadow-xl py-2 z-30 text-xs divide-y divide-slate-100"
                          style="display:none;">
 
                         <div class="px-3.5 py-2 text-2xs font-bold uppercase tracking-wider text-slate-400">
@@ -252,7 +252,7 @@
     <!-- Executive KPI Grid -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Revenue -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Omzet Lunas</span>
                 <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
@@ -264,7 +264,7 @@
         </div>
 
         <!-- Paid Invoices -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Invoice Terbit</span>
                 <span class="p-1.5 rounded-lg bg-blue-50 text-blue-600">
@@ -276,7 +276,7 @@
         </div>
 
         <!-- Total Orders -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Pesanan Layanan</span>
                 <span class="p-1.5 rounded-lg bg-slate-100 text-slate-700">
@@ -288,7 +288,7 @@
         </div>
 
         <!-- SLA Response -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kecepatan SLA</span>
                 <span class="p-1.5 rounded-lg bg-purple-50 text-purple-600">
@@ -311,7 +311,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- 1. Cloud VPS -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -347,7 +347,7 @@
             </div>
 
             <!-- 2. AI Agent & Combo -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -383,7 +383,7 @@
             </div>
 
             <!-- 3. Managed Database Server -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -423,7 +423,7 @@
     <!-- Status Breakdown Grid -->
     <div class="grid lg:grid-cols-2 gap-6">
         <!-- Status Order -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <h3 class="font-bold text-sm text-slate-900">Distribusi Status Pesanan</h3>
@@ -458,7 +458,7 @@
         </div>
 
         <!-- Status Tiket -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <h3 class="font-bold text-sm text-slate-900">Distribusi Status Tiket Support</h3>
@@ -494,7 +494,7 @@
     </div>
 
     <!-- Daily Revenue Table -->
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+    <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs">
         <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
             <div>
                 <h3 class="font-bold text-sm text-slate-900">Rincian Omzet Harian</h3>
@@ -567,7 +567,7 @@
 
         <!-- Modal Dialog -->
         <div class="min-h-full flex items-center justify-center p-2 sm:p-4">
-            <div class="relative w-full max-w-6xl h-[94vh] bg-slate-900 rounded-xl shadow-2xl flex flex-col overflow-hidden z-10"
+            <div class="relative w-full max-w-6xl h-[94vh] bg-slate-900 rounded-lg shadow-2xl flex flex-col overflow-hidden z-10"
                  @click.stop>
 
                 <!-- Slim Minimal Header (No template card, just title & close) -->

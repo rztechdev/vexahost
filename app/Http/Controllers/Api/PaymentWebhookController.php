@@ -649,6 +649,23 @@ class PaymentWebhookController extends Controller
         $paymentStatus = strtolower($status);
         $needsNotification = false;
 
+        // Guard: amount match untuk status sukses (paid/settled)
+        $webhookAmount = (float) $grossAmount;
+        $orderAmount = (float) $order->amount;
+        if (in_array($paymentStatus, ['paid', 'settled'], true) && abs($webhookAmount - $orderAmount) > 0.01) {
+            Log::critical('Xendit payment webhook amount mismatch', [
+                'order_id' => $order->id,
+                'webhook_amount' => $webhookAmount,
+                'order_amount' => $orderAmount,
+                'ip' => $request->ip(),
+            ]);
+            $this->recordWebhook($provider, $providerTxId, $paymentStatus, (string) $callbackToken, $request, $order->id, null, 'failed', 'Amount mismatch');
+            return response()->json([
+                'success' => false,
+                'message' => 'Amount mismatch.',
+            ], 422);
+        }
+
         try {
             $result = DB::transaction(function () use (
                 $provider, $providerTxId, $paymentStatus, $callbackToken,
@@ -741,6 +758,16 @@ class PaymentWebhookController extends Controller
                 'order_status' => $result['order_status'],
             ], 200);
 
+        } catch (InvalidStateTransitionException $e) {
+            Log::warning('Xendit webhook state transition rejected', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+            $this->recordWebhook($provider, $providerTxId, $paymentStatus, (string) $callbackToken, $request, $order->id, null, 'ignored', $e->getMessage());
+            return response()->json([
+                'success' => true,
+                'message' => 'Webhook received but state transition ignored: ' . $e->getMessage(),
+            ], 200);
         } catch (\Throwable $e) {
             Log::error('xendit_webhook_processing_error', ['error' => $e->getMessage(), 'order_id' => $order->id]);
             return response()->json([

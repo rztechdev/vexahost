@@ -5,7 +5,7 @@
 ])
 
 @section('content')
-<div class="pt-6 sm:pt-10 pb-28 sm:pb-20 bg-white min-h-screen" id="checkout-wizard-top" x-data="checkoutState()" x-init="init()">
+<div class="pt-6 sm:pt-10 pb-36 sm:pb-20 bg-white min-h-screen" id="checkout-wizard-top" x-data="checkoutState()" x-init="init()">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Back link --}}
@@ -124,83 +124,6 @@
             </div>
         </div>
 
-        {{-- Mobile Collapsible Order Summary (< lg) --}}
-        <div class="lg:hidden mb-6 bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-xs" x-data="{ mobileSummaryOpen: false }">
-            <button type="button" @click="mobileSummaryOpen = !mobileSummaryOpen" class="w-full px-4 py-3 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors text-left">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-xs font-bold text-slate-900">Ringkasan Pesanan</span>
-                            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200" :class="mobileSummaryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <span class="text-[11px] text-slate-500 line-clamp-1" x-text="specs[selectedSpec] ? specs[selectedSpec].name : 'Pilih Paket'"></span>
-                    </div>
-                </div>
-                <div class="text-right shrink-0">
-                    <span class="text-[10px] text-slate-400 block">Total</span>
-                    <span class="font-mono-code font-bold text-slate-900 text-sm" x-text="formatRupiah(totalPrice)"></span>
-                </div>
-            </button>
-            <div x-show="mobileSummaryOpen" x-cloak class="px-4 pb-4 pt-2 border-t border-slate-200/70 space-y-2.5 text-xs bg-white">
-                <div class="flex justify-between">
-                    <span class="text-slate-500">Paket</span>
-                    <span class="font-semibold text-slate-900" x-text="currentSpec ? currentSpec.name : '-'"></span>
-                </div>
-                <template x-if="!isDirectCheckout">
-                    <div class="space-y-2 border-t border-slate-100 pt-2">
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Hostname / VPS</span>
-                            <span class="font-mono-code text-slate-800" x-text="vpsName || '-'"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Provider</span>
-                            <span class="text-slate-800" x-text="provider === 'tencent' ? 'Tencent Cloud' : 'Cloudeka'"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Datacenter</span>
-                            <span class="capitalize text-slate-800" x-text="datacenter"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">OS</span>
-                            <span class="text-slate-800" x-text="os === 'ubuntu2404' ? 'Ubuntu 24.04 LTS' : 'Ubuntu 22.04 LTS'"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Stack</span>
-                            <span class="text-slate-800" x-text="controlPanelLabel"></span>
-                        </div>
-                    </div>
-                </template>
-                <template x-if="isDirectCheckout && currentSpec">
-                    <div class="space-y-2 border-t border-slate-100 pt-2">
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Resource</span>
-                            <span class="font-medium text-slate-800" x-text="currentSpec.cpu + ' Core vCPU · ' + currentSpec.ram + ' GB RAM'"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Storage</span>
-                            <span class="font-medium text-slate-800" x-text="currentSpec.disk + ' GB NVMe'"></span>
-                        </div>
-                        <template x-if="isDatabasePackage">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Database Engine</span>
-                                <span class="font-bold text-[#4A6FA5]" x-text="dbEngineLabel"></span>
-                            </div>
-                        </template>
-                    </div>
-                </template>
-                <div class="flex justify-between pt-2 border-t border-slate-200 text-slate-900 font-bold">
-                    <span>Total Tagihan Bersih</span>
-                    <span class="font-mono-code text-sm text-emerald-600" x-text="formatRupiah(totalPrice)"></span>
-                </div>
-            </div>
-        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Left: Configuration Slides --}}
@@ -367,43 +290,15 @@
                                     <span class="text-xs font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">Wajib</span>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                                            Hostname / Server Name <span class="text-rose-600">*</span>
-                                        </label>
-                                        <input type="text" x-model="vpsName" required minlength="3" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9-]*" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
-                                    </div>
-
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1.5">
-                                            <label class="text-xs font-semibold text-slate-700 flex items-center gap-1">
-                                                <span>Root Password Server</span>
-                                                <span class="text-rose-600">*</span>
-                                            </label>
-                                            <span class="text-[11px] text-slate-400 font-mono-code">Min. 8 char</span>
-                                        </div>
-                                        <div class="relative">
-                                            <input :type="showRootPassword ? 'text' : 'password'" 
-                                                   x-model="rootPassword" 
-                                                   required 
-                                                   minlength="8" 
-                                                   class="w-full pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black" 
-                                                   autocomplete="new-password">
-                                            <button type="button" 
-                                                    @click="showRootPassword = !showRootPassword" 
-                                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                                                    tabindex="-1">
-                                                <svg x-show="!showRootPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
-                                                <svg x-show="showRootPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                                        Hostname / Server Name <span class="text-rose-600">*</span>
+                                    </label>
+                                    <input type="text" x-model="vpsName" required minlength="3" maxlength="63" pattern="[A-Za-z0-9][A-Za-z0-9-]*" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono-code focus:border-black focus:ring-1 focus:ring-black">
+                                    <p class="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                        <span>Password root akan dibuat secara otomatis &amp; aman oleh retail provider kami dan dikirimkan saat instance aktif.</span>
+                                    </p>
                                 </div>
                             </div>
                         </template>
@@ -635,12 +530,197 @@
             </div>
         </div>
     </div>
+
+    {{-- ========================================================
+         MOBILE FLOATING BOTTOM NAV & ORDER SUMMARY (< lg)
+         ======================================================== --}}
+    <!-- Backdrop Overlay saat Bottom Summary Dibuka -->
+    <div x-show="mobileSummaryOpen" x-cloak
+         x-transition:enter="transition-opacity ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="mobileSummaryOpen = false"
+         class="lg:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-40"></div>
+
+    <!-- Floating Bottom Nav Bar & Expandable Drawer Container -->
+    <div class="lg:hidden fixed bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-4 z-50 max-w-lg mx-auto pointer-events-none">
+        <div class="pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-900/15 overflow-hidden transition-all duration-300">
+            
+            <!-- Expanded Content Drawer (Buka / Tutup) -->
+            <div x-show="mobileSummaryOpen" x-cloak
+                 x-transition:enter="transition-all ease-out duration-250"
+                 x-transition:enter-start="opacity-0 -translate-y-2 max-h-0"
+                 x-transition:enter-end="opacity-100 translate-y-0 max-h-[75vh]"
+                 x-transition:leave="transition-all ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 max-h-[75vh]"
+                 x-transition:leave-end="opacity-0 -translate-y-2 max-h-0"
+                 class="border-b border-slate-100 overflow-hidden flex flex-col">
+                
+                <!-- Drawer Top Bar & Header -->
+                <div class="px-4 pt-2.5 pb-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Ringkasan Pesanan</h3>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                              :class="isDatabasePackage ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : (isAiPackage ? 'bg-blue-50 text-[#4A6FA5] border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200')"
+                              x-text="isDatabasePackage ? 'Managed DB' : (isAiPackage ? 'AI Combo' : 'Cloud VPS')"></span>
+                    </div>
+                    <button type="button" @click="mobileSummaryOpen = false"
+                            class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors flex items-center justify-center"
+                            aria-label="Tutup Rincian">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Drawer Scrollable Content -->
+                <div class="p-4 space-y-3 max-h-[55vh] overflow-y-auto text-xs bg-white">
+                    <!-- Paket & Spesifikasi Utama -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Paket Layanan</span>
+                                <span class="font-bold text-slate-900 text-sm block" x-text="currentSpec ? currentSpec.name : 'Pilih Paket'"></span>
+                                <span class="text-[11px] text-slate-500 italic" x-text="currentSpec ? currentSpec.tagline : ''"></span>
+                            </div>
+                            <span class="font-mono-code font-bold text-slate-900 text-xs shrink-0" x-text="formatRupiah(totalPrice)"></span>
+                        </div>
+
+                        <div class="border-t border-slate-200/70 pt-2 grid grid-cols-2 gap-2 text-[11px]">
+                            <div>
+                                <span class="text-slate-400 block">Resource:</span>
+                                <span class="font-semibold text-slate-800" x-text="currentSpec ? (currentSpec.cpu + ' vCPU · ' + currentSpec.ram + ' GB RAM') : '-'"></span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block">Storage:</span>
+                                <span class="font-semibold text-slate-800" x-text="currentSpec ? (currentSpec.disk + ' GB NVMe SSD') : '-'"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Checkout Specifics (Database & AI) -->
+                    <template x-if="isDirectCheckout && currentSpec">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
+                            <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Spesifikasi Layanan</span>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Nama Host / Instance:</span>
+                                    <span class="font-mono-code text-slate-800 font-semibold" x-text="vpsName || '-'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Konfigurasi Setup:</span>
+                                    <span class="text-slate-800 font-medium">Pre-configured (Otomatis)</span>
+                                </div>
+                                <template x-if="isDatabasePackage">
+                                    <div class="space-y-1 border-t border-slate-200/70 pt-1.5">
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Database Engine:</span>
+                                            <span class="font-bold text-[#4A6FA5]" x-text="dbEngineLabel"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Panel Kelola Web:</span>
+                                            <span class="font-medium text-slate-800" x-text="dbManager === 'cloudbeaver' ? 'CloudBeaver Web GUI' : 'CLI Only'"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Standard Cloud VPS Specifics -->
+                    <template x-if="!isDirectCheckout">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
+                            <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Konfigurasi Server</span>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Hostname / VPS:</span>
+                                    <span class="font-mono-code text-slate-800 font-semibold" x-text="vpsName || '-'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Provider:</span>
+                                    <span class="text-slate-800 font-medium" x-text="provider === 'tencent' ? 'Tencent Cloud' : 'Cloudeka by Lintasarta'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Datacenter:</span>
+                                    <span class="capitalize text-slate-800 font-medium" x-text="datacenter"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Sistem Operasi:</span>
+                                    <span class="text-slate-800 font-medium" x-text="operatingSystems[provider] && operatingSystems[provider][os] ? operatingSystems[provider][os] : (os === 'ubuntu2404' ? 'Ubuntu 24.04 LTS' : 'Ubuntu 22.04 LTS')"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Control Panel / Stack:</span>
+                                    <span class="text-slate-800 font-medium" x-text="controlPanelLabel"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Biaya & Total -->
+                    <div class="border-t border-slate-200/80 pt-2.5 space-y-1.5">
+                        <div class="flex justify-between text-slate-600 text-xs">
+                            <span>Siklus Penagihan</span>
+                            <span class="capitalize font-medium text-slate-900" x-text="billingCycle === 'monthly' ? 'Bulanan' : (billingCycle === 'annually' ? 'Tahunan' : 'Triwulanan')"></span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-200 text-slate-900 font-bold">
+                            <span class="text-xs">Total Tagihan Bersih</span>
+                            <span class="font-mono-code text-base text-slate-900 font-extrabold" x-text="formatRupiah(totalPrice)"></span>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Tutup Rincian -->
+                    <button type="button" @click="mobileSummaryOpen = false"
+                            class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-semibold transition-colors text-center cursor-pointer">
+                        Tutup Rincian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Persistent Collapsed Floating Bar (Tampil di Bawah, Floating & Klik untuk Buka) -->
+            <button type="button"
+                    @click="mobileSummaryOpen = !mobileSummaryOpen"
+                    class="w-full px-4 py-3 flex items-center justify-between bg-white hover:bg-slate-50 active:bg-slate-100 transition-colors text-left select-none cursor-pointer">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-900 truncate">Ringkasan Pesanan</span>
+                            <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0"
+                                  x-text="isDatabasePackage ? 'DB' : (isAiPackage ? 'AI' : 'VPS')"></span>
+                        </div>
+                        <span class="text-[11px] text-slate-500 block truncate" x-text="specs[selectedSpec] ? specs[selectedSpec].name : 'Pilih Paket'"></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5 shrink-0 pl-2">
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 block leading-tight">Total</span>
+                        <span class="font-mono-code font-bold text-slate-900 text-sm" x-text="formatRupiah(totalPrice)"></span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 transition-transform duration-200"
+                         :class="mobileSummaryOpen ? 'rotate-180 bg-slate-200 text-slate-900' : ''">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                        </svg>
+                    </div>
+                </div>
+            </button>
+
+        </div>
+    </div>
 </div>
 
 <script>
 function checkoutState() {
     return {
         currentSlide: 0,
+        mobileSummaryOpen: false,
         isSubmitting: false,
         // PHASE 2 - persetujuan ketentuan wajib dicentang sebelum pesanan dikirim.
         termsAccepted: false,
@@ -911,7 +991,6 @@ function checkoutState() {
 
             // Watchers untuk auto-save draft ke localStorage
             this.$watch('vpsName', () => this.saveDraft());
-            this.$watch('rootPassword', () => this.saveDraft());
             this.$watch('provider', () => this.saveDraft());
             this.$watch('datacenter', () => this.saveDraft());
             this.$watch('os', () => this.saveDraft());
@@ -933,7 +1012,6 @@ function checkoutState() {
                     billingCycle: this.billingCycle,
                     provider: this.provider,
                     vpsName: this.vpsName,
-                    rootPassword: this.rootPassword,
                     controlPanel: this.controlPanel,
                     datacenter: this.datacenter,
                     os: this.os,
@@ -981,8 +1059,6 @@ function checkoutState() {
                         this.vpsName = draft.vpsName;
                     }
                 }
-
-                if (draft.rootPassword) this.rootPassword = draft.rootPassword;
                 if (draft.controlPanel && !this.isDirectCheckout) {
                     if (draft.controlPanel === 'managed_database') {
                         this.controlPanel = 'none';
@@ -1125,6 +1201,7 @@ function checkoutState() {
         },
 
         previousSlide() {
+            this.mobileSummaryOpen = false;
             if (this.isDirectCheckout) {
                 if (this.currentSlide === 2) {
                     this.currentSlide = 1;
@@ -1141,6 +1218,7 @@ function checkoutState() {
         },
         
         async nextSlide() {
+            this.mobileSummaryOpen = false;
             if (this.isPackageInactive) {
                 showAlert('Paket layanan ini sedang dinonaktifkan sementara untuk pemeliharaan sistem.', {
                     icon: 'warning',
@@ -1153,10 +1231,6 @@ function checkoutState() {
                 if (this.currentSlide === 1) {
                     if (!this.vpsName || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(this.vpsName)) {
                         showAlert('Hostname / Nama Server wajib diisi (gunakan huruf, angka, dan tanda hubung).');
-                        return;
-                    }
-                    if (!this.rootPassword || this.rootPassword.length < 8) {
-                        showAlert('Root Password Server wajib diisi (minimal 8 karakter).');
                         return;
                     }
                     if (!await this.validateAccount()) {
@@ -1190,10 +1264,6 @@ function checkoutState() {
         validateConfiguration() {
             if (!this.vpsName || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(this.vpsName)) {
                 showAlert('VPS Name wajib diisi dengan huruf, angka, atau tanda hubung.');
-                return false;
-            }
-            if (!this.rootPassword || this.rootPassword.length < 8) {
-                showAlert('Root Password Server wajib diisi (minimal 8 karakter).');
                 return false;
             }
             if (!this.selectedSpec) {
@@ -1297,7 +1367,6 @@ function checkoutState() {
                     db_engine: this.isDatabasePackage ? this.dbEngine : null,
                     db_manager: this.isDatabasePackage ? this.dbManager : null,
                     hostname: this.vpsName,
-                    root_password: this.rootPassword,
                     terms_accepted: this.termsAccepted ? 1 : 0,
                     phone: this.isLoggedIn
                         ? (this.currentUser?.phone || '') 

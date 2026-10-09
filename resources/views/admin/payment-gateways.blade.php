@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-200">
+    <div class="bg-emerald-50 p-5 rounded-lg border border-emerald-200">
         <div class="flex items-start gap-3">
             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
                 Sistem Terpadu (.env)
@@ -68,7 +68,7 @@
     <!-- Tabel Gateway -->
     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-100">
-            <h3 class="font-bold text-slate-900 text-base">Status Payment Gateway</h3>
+            <h3 class="font-bold text-slate-900 text-base">Daftar Payment Gateway</h3>
             <p class="text-xs text-slate-500">Xendit beroperasi sebagai gateway tunggal. Nilai kredensial utama dibaca dari environment (.env).</p>
         </div>
 
@@ -161,7 +161,7 @@
          style="display: none;" @keydown.escape.window="editModalOpen = false">
 
         <div @click.away="editModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-900 text-base">Atur Gateway</h3>

@@ -901,8 +901,8 @@ Terima kasih telah mempercayakan kebutuhan server Anda di VexaHost!</div>
                                class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
                     </div>
                     <div>
-                        <label class="block font-medium text-slate-700 mb-1">Password Root</label>
-                        <input type="text" name="root_password" x-model="provRootPassword" placeholder="Auto-generate"
+                        <label class="block font-medium text-slate-700 mb-1">Password Root <span class="text-rose-600">*</span></label>
+                        <input type="text" name="root_password" required minlength="8" x-model="provRootPassword" placeholder="Password root dari retail"
                                class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none bg-white">
                     </div>
                 </div>

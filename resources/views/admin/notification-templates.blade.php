@@ -144,7 +144,7 @@
          style="display: none;" @keydown.escape.window="editModalOpen = false">
 
         <div @click.away="editModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-2xl w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-2xl w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-900 text-base">Sunting Template Surel</h3>

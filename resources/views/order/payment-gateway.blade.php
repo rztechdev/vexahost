@@ -43,7 +43,7 @@
                         @if($order->payment_method === 'lynk')
                         <div class="text-center mb-8 flex flex-col items-center justify-center">
                             {{-- Lynk Logo Container --}}
-                            <div class="w-48 h-20 mx-auto flex items-center justify-center p-3 bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
+                            <div class="light-isolated w-48 h-20 mx-auto flex items-center justify-center p-3 bg-white dark:bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
                                 <img src="{{ asset('images/payments/lynk.svg') }}" alt="Lynk.id Checkout" class="max-h-12 max-w-full object-contain">
                             </div>
 
@@ -151,8 +151,8 @@
                         {{-- QRIS Payment (Centered & Prominent) --}}
                         @if(in_array($order->payment_method, ['qris']))
                         <div class="text-center mb-8 flex flex-col items-center justify-center">
-                            {{-- QR Code Image (Tanpa Garis Frame) --}}
-                            <div class="w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center p-2 bg-white rounded-lg">
+                            {{-- QR Code Image (Wajib tetap putih agar kamera scanner mobile banking dapat mendeteksi QR) --}}
+                            <div class="qris-light-box w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center p-4 bg-white dark:bg-white rounded-xl shadow-xs">
                                 <img src="{{ $qrisDataUri }}" alt="QRIS Payment VexaHost" class="max-w-full max-h-full object-contain">
                             </div>
 
@@ -258,7 +258,7 @@
                                 <p class="text-xs text-slate-500">Mendukung semua aplikasi mobile banking &amp; e-wallet:</p>
                                 <div class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto">
                                     @foreach(['va_bca' => 'BCA', 'va_mandiri' => 'Mandiri', 'va_bri' => 'BRI', 'va_bni' => 'BNI', 'gopay' => 'GoPay', 'ewallet_ovo' => 'OVO', 'dana' => 'DANA', 'ewallet_shopeepay' => 'ShopeePay'] as $file => $app)
-                                        <div class="w-11 h-7 bg-white border border-slate-200 rounded-md flex items-center justify-center p-1 shadow-2xs" title="{{ $app }}">
+                                        <div class="light-isolated w-11 h-7 bg-white dark:bg-white border border-slate-200 rounded-md flex items-center justify-center p-1 shadow-2xs" title="{{ $app }}">
                                             <img src="{{ asset('images/payments/' . $file . '.svg') }}" alt="{{ $app }}" class="max-h-4 max-w-full object-contain">
                                         </div>
                                     @endforeach
@@ -271,7 +271,7 @@
                         @if(!empty($isMidtrans))
                         <div class="text-center mb-8 flex flex-col items-center justify-center">
                             {{-- Midtrans Logo Container --}}
-                            <div class="w-48 h-16 mx-auto flex items-center justify-center p-3 bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
+                            <div class="light-isolated w-48 h-16 mx-auto flex items-center justify-center p-3 bg-white dark:bg-white border border-slate-200 rounded-xl shadow-2xs mb-4">
                                 @php
                                     $midtransMethodIcons = [
                                         'mandiri_va' => 'va_mandiri.svg',
@@ -431,7 +431,7 @@
                         @if(empty($isMidtrans) && in_array($order->payment_method, ['gopay', 'ovo', 'dana', 'shopeepay']))
                         <div class="text-center mb-8">
                             <div class="flex flex-col items-center">
-                                <div class="w-32 h-32 mb-6 bg-white border-2 border-slate-300 rounded-lg flex items-center justify-center p-4">
+                                <div class="qris-light-box w-32 h-32 mb-6 bg-white dark:bg-white border-2 border-slate-300 rounded-lg flex items-center justify-center p-4">
                                     @php
                                         $walletImages = [
                                             'gopay' => 'gopay.svg',

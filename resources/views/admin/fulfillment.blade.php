@@ -93,9 +93,20 @@
                                 </div>
 
                                 <div class="text-[11px] text-slate-600 space-y-0.5 mb-3">
-                                    <div class="truncate">{{ $order->customer?->full_name ?? '-' }}</div>
+                                    <div class="truncate font-medium text-slate-800">
+                                        {{ $order->customer?->full_name ?? '-' }}
+                                        @if($order->customer?->phone)
+                                            <span class="text-slate-400 font-normal">({{ $order->customer->phone }})</span>
+                                        @endif
+                                    </div>
                                     <div class="font-mono-code text-slate-500 truncate">{{ $order->hostname ?? '-' }}</div>
-                                    <div class="text-slate-500">{{ $order->provider_label }} · {{ $order->control_panel_label }}</div>
+                                    <div class="text-slate-500">{{ $order->provider_label }} · {{ ucfirst($order->datacenter_location) }} · {{ $order->os_label ?? $order->os }}</div>
+                                    <div class="text-slate-500">{{ $order->control_panel_label }}</div>
+                                    @if($order->isDatabasePackage())
+                                        <div class="text-[10px] bg-slate-100 rounded px-1.5 py-0.5 text-slate-700 font-mono-code w-fit">
+                                            DB: {{ strtoupper($order->db_engine ?? 'PG') }} · Mgr: {{ $order->db_manager }}
+                                        </div>
+                                    @endif
                                     <div class="font-mono-code text-slate-900 font-semibold">Rp {{ number_format((float) $order->amount, 0, ',', '.') }}</div>
                                     @if($waited !== null && $columnKey !== 'delivered')
                                         <div class="{{ $overdue ? 'text-red-700 font-semibold' : 'text-slate-500' }}">
@@ -233,7 +244,7 @@
          style="display: none;" @keydown.escape.window="purchaseModalOpen = false">
 
         <div @click.away="purchaseModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="font-bold text-slate-900 text-base">Catat Pembelian Supplier</h3>
                 <p class="text-xs text-slate-500">Untuk <span class="font-semibold text-slate-800" x-text="target.label"></span></p>
@@ -285,7 +296,7 @@
          style="display: none;" @keydown.escape.window="deliverModalOpen = false">
 
         <div @click.away="deliverModalOpen = false"
-             class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
+             class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="font-bold text-slate-900 text-base">Kirim Kredensial ke Pelanggan</h3>
                 <p class="text-xs text-slate-500">
@@ -299,6 +310,11 @@
                 <div>
                     <label class="{{ $labelClass }}">IP Publik</label>
                     <input type="text" name="public_ip" required placeholder="103.150.xxx.xxx" class="{{ $inputClass }} font-mono-code">
+                </div>
+                <div>
+                    <label class="{{ $labelClass }}">Root Password Server <span class="text-rose-600">*</span></label>
+                    <input type="text" name="root_password" required minlength="8" placeholder="Password root dari retail (min 8 karakter)" class="{{ $inputClass }} font-mono-code">
+                    <p class="text-[10px] text-slate-400 mt-1">Kredensial root yang diterbitkan oleh provider retail.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>

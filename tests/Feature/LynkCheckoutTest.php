@@ -16,6 +16,7 @@ class LynkCheckoutTest extends TestCase
     {
         parent::setUp();
         $this->seed(\Database\Seeders\DatabaseSeeder::class);
+        \App\Models\PaymentGateway::where('code', 'lynk')->update(['is_active' => true]);
     }
 
     public function test_checkout_with_lynk_redirects_to_payment_url_when_configured()

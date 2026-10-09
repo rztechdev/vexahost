@@ -123,26 +123,27 @@ class PaymentGateway extends Model
      */
     public const METHOD_GATEWAY = [
         'online_payment' => 'xendit',
-        'qris' => 'xendit',
+        'qris' => 'qris',
         'indomaret' => 'xendit',
-        'mandiri_va' => 'xendit',
-        'bni_va' => 'xendit',
+        'mandiri_va' => 'midtrans',
+        'bni_va' => 'midtrans',
         'astrapay' => 'xendit',
-        'bri_va' => 'xendit',
-        'cimb_va' => 'xendit',
-        'permata_va' => 'xendit',
+        'bri_va' => 'midtrans',
+        'cimb_va' => 'midtrans',
+        'permata_va' => 'midtrans',
+        'other_va' => 'midtrans',
         'akulaku' => 'xendit',
-        'midtrans_snap' => 'xendit',
+        'midtrans_snap' => 'midtrans',
         'lynk' => 'lynk',
-        'bca_va' => 'disabled',
-        'bsi_va' => 'disabled',
-        'danamon_va' => 'disabled',
-        'seabank_va' => 'disabled',
-        'credit_card' => 'disabled',
-        'gopay' => 'disabled',
-        'ovo' => 'disabled',
-        'dana' => 'disabled',
-        'shopeepay' => 'disabled',
+        'bca_va' => 'midtrans',
+        'bsi_va' => 'midtrans',
+        'danamon_va' => 'midtrans',
+        'seabank_va' => 'midtrans',
+        'credit_card' => 'midtrans',
+        'gopay' => 'midtrans',
+        'ovo' => 'midtrans',
+        'dana' => 'midtrans',
+        'shopeepay' => 'midtrans',
     ];
 
     /**
@@ -150,7 +151,7 @@ class PaymentGateway extends Model
      */
     public static function isXenditMethod(string $method): bool
     {
-        return (self::METHOD_GATEWAY[$method] ?? null) === 'xendit';
+        return (self::METHOD_GATEWAY[$method] ?? null) === 'xendit' || $method === 'online_payment';
     }
 
     /**
@@ -158,7 +159,7 @@ class PaymentGateway extends Model
      */
     public static function isMidtransMethod(string $method): bool
     {
-        return (self::METHOD_GATEWAY[$method] ?? null) === 'midtrans';
+        return (self::METHOD_GATEWAY[$method] ?? null) === 'midtrans' || $method === 'midtrans_snap';
     }
 
     /**
@@ -176,6 +177,11 @@ class PaymentGateway extends Model
             // Bila Xendit diatur di services/env, aktifkan metode Xendit
             if (!empty(config('services.xendit.secret_key'))) {
                 $activeCodes[] = 'xendit';
+            }
+
+            // Bila Midtrans diatur di services/env, aktifkan metode Midtrans
+            if (!empty(config('services.midtrans.server_key'))) {
+                $activeCodes[] = 'midtrans';
             }
         } catch (\Throwable $e) {
             return ['online_payment', 'qris', 'indomaret', 'mandiri_va', 'bni_va', 'astrapay', 'bri_va', 'cimb_va', 'permata_va', 'akulaku'];

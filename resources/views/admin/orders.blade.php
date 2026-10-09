@@ -37,18 +37,18 @@
     publicIp: '',
     privateIp: '',
     sshPort: 22,
+    rootPassword: '',
+    showRootPassword: true,
     appUrl: '',
-    showPassword: false,
-    copiedPw: false,
     ordersData: window.ordersPayload || {},
     openProvision(orderId) {
         this.currentOrder = (this.ordersData && this.ordersData[orderId]) || null;
         this.publicIp = '';
         this.privateIp = '';
         this.sshPort = 22;
+        this.rootPassword = '';
+        this.showRootPassword = true;
         this.appUrl = '';
-        this.showPassword = false;
-        this.copiedPw = false;
         this.provisionModal = true;
     },
     hasPanel() {
@@ -57,13 +57,6 @@
             return this.currentOrder.db_manager === 'cloudbeaver';
         }
         return this.currentOrder.control_panel && this.currentOrder.control_panel !== 'none';
-    },
-    copyPassword() {
-        if (this.currentOrder && this.currentOrder.root_password) {
-            navigator.clipboard.writeText(this.currentOrder.root_password);
-            this.copiedPw = true;
-            setTimeout(() => { this.copiedPw = false; }, 2000);
-        }
     }
 }">
     <!-- Top Filter Tabs (No lines under title) -->
@@ -271,7 +264,7 @@
          onclick="if(event.target === this) closeProvisionModal()"
          @click.self="provisionModal = false"
          @keydown.escape.window="provisionModal = false">
-        <div class="bg-white rounded-xl border border-slate-200 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl" 
+        <div class="bg-white rounded-lg border border-slate-200 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl" 
              @click.stop
              onclick="event.stopPropagation()">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
@@ -285,7 +278,7 @@
             </div>
 
             <!-- Detail Pembeli & Pesanan (Terkunci Sesuai Pesanan Pelanggan) -->
-            <div id="modalOrderDetailsCard" x-show="currentOrder" class="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2.5">
+            <div id="modalOrderDetailsCard" x-show="currentOrder" class="mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-2.5">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
                     <span class="font-bold text-slate-900 uppercase tracking-wider text-[10px]">Spesifikasi &amp; Kredensial Pelanggan</span>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-white text-slate-700 border border-slate-200">Terkunci</span>
@@ -302,22 +295,9 @@
                     </div>
                 </div>
 
-                <!-- Root Password Pelanggan (Read-only + Copy Button) -->
-                <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between gap-2">
-                    <div class="min-w-0 flex-1">
-                        <span class="text-[11px] text-slate-500 block">Root Password Server (Dibuat Pelanggan):</span>
-                        <span id="modalPasswordText" class="font-mono-code font-bold text-xs text-slate-900 tracking-wide" 
-                              x-text="showPassword ? (currentOrder?.root_password || 'Tersimpan di database') : '••••••••••••'">••••••••••••</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button id="modalPasswordToggle" type="button" onclick="toggleModalPassword()" @click="showPassword = !showPassword" class="text-xs text-slate-600 hover:text-black font-medium underline px-1.5 py-0.5 cursor-pointer">
-                            <span x-text="showPassword ? 'Sembunyikan' : 'Lihat'">Lihat</span>
-                        </button>
-                        <button id="modalPasswordCopy" type="button" onclick="copyModalPassword()" @click="copyPassword()" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-2.5 py-1 rounded font-medium flex items-center gap-1 shadow-2xs cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                            <span id="modalCopyBtnText" x-text="copiedPw ? 'Tersalin!' : 'Salin'">Salin</span>
-                        </button>
-                    </div>
+                <div class="p-2.5 bg-blue-50/60 rounded-lg border border-blue-200 text-slate-700 text-xs flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-[11px] text-blue-900 leading-tight">Root Password server digenerate upstream dan wajib diinput manual oleh Admin pada form di bawah.</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 text-[11px]">
@@ -346,6 +326,18 @@
                     <input id="modalPublicIp" type="text" name="public_ip" required x-model="publicIp" placeholder="Contoh: 103.150.xxx.xxx"
                            class="w-full px-3 py-2 rounded-lg border border-slate-300 font-mono-code focus:outline-none focus:ring-1 focus:ring-black">
                     <p class="text-[11px] text-slate-400 mt-0.5">Alamat IP publik yang dialokasikan dari provider datacenter.</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-800 mb-1">Root Password Server <span class="text-rose-600">*</span></label>
+                    <div class="relative">
+                        <input id="modalRootPassword" :type="showRootPassword ? 'text' : 'password'" name="root_password" required minlength="8" x-model="rootPassword" placeholder="Masukkan password root dari retail (min 8 karakter)"
+                               class="w-full px-3 py-2 pr-20 rounded-lg border border-slate-300 font-mono-code focus:outline-none focus:ring-1 focus:ring-black">
+                        <button type="button" @click="showRootPassword = !showRootPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-500 hover:text-slate-800 cursor-pointer font-medium">
+                            <span x-text="showRootPassword ? 'Sembunyikan' : 'Lihat'">Sembunyikan</span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Password root server yang digenerate otomatis oleh provider retail upstream.</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -409,17 +401,8 @@ window.openProvisionModal = function(orderId) {
     var osElem = document.getElementById('modalOs');
     if (osElem) osElem.textContent = order.os_label || order.os || '-';
     
-    var pwElem = document.getElementById('modalPasswordText');
-    if (pwElem) {
-        pwElem.textContent = '••••••••••••';
-        pwElem.setAttribute('data-raw', order.root_password || '');
-        pwElem.setAttribute('data-masked', 'true');
-    }
-    var toggleBtn = document.getElementById('modalPasswordToggle');
-    if (toggleBtn) {
-        var span = toggleBtn.querySelector('span');
-        if (span) { span.textContent = 'Lihat'; } else { toggleBtn.textContent = 'Lihat'; }
-    }
+    var pwInput = document.getElementById('modalRootPassword');
+    if (pwInput) pwInput.value = '';
 
     var pdElem = document.getElementById('modalProviderDatacenter');
     if (pdElem) pdElem.textContent = (order.provider || '') + ' · ' + (order.datacenter || '');
@@ -475,37 +458,6 @@ window.closeProvisionModal = function() {
     if (modal) {
         modal.style.display = 'none';
     }
-};
-
-window.toggleModalPassword = function() {
-    var pwElem = document.getElementById('modalPasswordText');
-    var toggleBtn = document.getElementById('modalPasswordToggle');
-    if (!pwElem) return;
-    var isMasked = pwElem.getAttribute('data-masked') === 'true';
-    if (isMasked) {
-        pwElem.textContent = pwElem.getAttribute('data-raw') || 'Tidak ada password';
-        pwElem.setAttribute('data-masked', 'false');
-        var span = toggleBtn ? toggleBtn.querySelector('span') : null;
-        if (span) { span.textContent = 'Sembunyikan'; } else if (toggleBtn) { toggleBtn.textContent = 'Sembunyikan'; }
-    } else {
-        pwElem.textContent = '••••••••••••';
-        pwElem.setAttribute('data-masked', 'true');
-        var span = toggleBtn ? toggleBtn.querySelector('span') : null;
-        if (span) { span.textContent = 'Lihat'; } else if (toggleBtn) { toggleBtn.textContent = 'Lihat'; }
-    }
-};
-
-window.copyModalPassword = function() {
-    var pwElem = document.getElementById('modalPasswordText');
-    if (!pwElem || !pwElem.getAttribute('data-raw')) return;
-    navigator.clipboard.writeText(pwElem.getAttribute('data-raw')).then(function() {
-        var textElem = document.getElementById('modalCopyBtnText');
-        if (textElem) {
-            var oldText = textElem.textContent;
-            textElem.textContent = 'Tersalin!';
-            setTimeout(function() { textElem.textContent = oldText; }, 2000);
-        }
-    });
 };
 
 document.addEventListener('keydown', function(e) {

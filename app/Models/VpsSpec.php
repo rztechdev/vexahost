@@ -26,10 +26,13 @@ class VpsSpec extends Model
         'solution',
         'badge',
         'default_stack',
+        'allowed_providers',
+        'default_provider',
     ];
 
     protected $casts = [
         'features' => 'array',
+        'allowed_providers' => 'array',
         'is_active' => 'boolean',
         'cpu' => 'integer',
         'ram' => 'integer',
@@ -46,6 +49,17 @@ class VpsSpec extends Model
         'is_database_package',
         'is_direct_checkout',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('landing.specs');
+        });
+
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('landing.specs');
+        });
+    }
 
     public function isAiPackage(): bool
     {
@@ -88,6 +102,18 @@ class VpsSpec extends Model
 
     public function allowedProviders(): array
     {
+        // Jika admin secara eksplisit menyimpan allowed_providers di DB, gunakan itu
+        $raw = $this->attributes['allowed_providers'] ?? null;
+        if (!empty($raw)) {
+            $dbVal = is_string($raw) ? json_decode($raw, true) : (array) $raw;
+            if (is_array($dbVal)) {
+                $filtered = array_values(array_filter($dbVal, fn($p) => in_array($p, ['tencent', 'cloudeka'], true)));
+                if (!empty($filtered)) {
+                    return $filtered;
+                }
+            }
+        }
+
         $name = strtolower($this->name);
 
         if ($this->isDatabasePackage()) {
@@ -114,7 +140,12 @@ class VpsSpec extends Model
 
     public function defaultProvider(): string
     {
-        return $this->allowedProviders()[0];
+        $dbDefault = $this->attributes['default_provider'] ?? null;
+        if (!empty($dbDefault) && $this->isProviderAllowed($dbDefault)) {
+            return $dbDefault;
+        }
+
+        return $this->allowedProviders()[0] ?? 'tencent';
     }
 
     public function getAllowedProvidersAttribute(): array

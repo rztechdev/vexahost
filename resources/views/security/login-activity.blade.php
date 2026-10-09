@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <div class="bg-white border border-slate-200 rounded-lg overflow-hidden">
         <div class="p-6">
             <h2 class="text-xl font-bold">Riwayat login</h2>
             <p class="text-sm text-slate-500 mt-1">Aktivitas autentikasi terakhir pada akun Anda.</p>

@@ -137,4 +137,72 @@ class CheckoutQuickLoginTest extends TestCase
         $this->assertSame('budipratama99', $createdUser->username);
         $this->assertSame('Budi Pratama', $createdUser->full_name);
     }
+
+    public function test_login_and_quick_login_succeed_with_case_insensitivity_and_email_typo(): void
+    {
+        $user = User::create([
+            'username' => 'TestClient',
+            'email' => 'myclient@gmail.com',
+            'full_name' => 'Case Test Client',
+            'password' => Hash::make('MyPassword123!'),
+            'channel' => 'website',
+            'is_admin' => false,
+        ]);
+
+        // 1. Quick login with uppercase email
+        $res1 = $this->postJson(route('checkout.quick-login'), [
+            'login' => 'MYCLIENT@GMAIL.COM',
+            'password' => 'MyPassword123!',
+        ]);
+        $res1->assertStatus(200);
+        $res1->assertJson(['success' => true]);
+        $this->assertSame($user->id, Auth::id());
+        Auth::logout();
+
+        // 2. Quick login with comma typo in domain (@gmail,com)
+        $res2 = $this->postJson(route('checkout.quick-login'), [
+            'login' => 'myclient@gmail,com',
+            'password' => 'MyPassword123!',
+        ]);
+        $res2->assertStatus(200);
+        $res2->assertJson(['success' => true]);
+        $this->assertSame($user->id, Auth::id());
+        Auth::logout();
+
+        // 3. Quick login with lowercase username
+        $res3 = $this->postJson(route('checkout.quick-login'), [
+            'login' => 'testclient',
+            'password' => 'MyPassword123!',
+        ]);
+        $res3->assertStatus(200);
+        $res3->assertJson(['success' => true]);
+        $this->assertSame($user->id, Auth::id());
+        Auth::logout();
+
+        // 4. Main /login with uppercase email
+        $res4 = $this->post(route('login'), [
+            'username' => 'MYCLIENT@GMAIL.COM',
+            'password' => 'MyPassword123!',
+        ]);
+        $res4->assertRedirect(route('dashboard.index'));
+        $this->assertSame($user->id, Auth::id());
+        Auth::logout();
+
+        // 5. Main /login with comma typo (@gmail,com)
+        $res5 = $this->post(route('login'), [
+            'username' => 'myclient@gmail,com',
+            'password' => 'MyPassword123!',
+        ]);
+        $res5->assertRedirect(route('dashboard.index'));
+        $this->assertSame($user->id, Auth::id());
+        Auth::logout();
+
+        // 6. Main /login with lowercase username
+        $res6 = $this->post(route('login'), [
+            'username' => 'testclient',
+            'password' => 'MyPassword123!',
+        ]);
+        $res6->assertRedirect(route('dashboard.index'));
+        $this->assertSame($user->id, Auth::id());
+    }
 }

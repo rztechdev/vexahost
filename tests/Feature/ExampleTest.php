@@ -330,6 +330,7 @@ class ExampleTest extends TestCase
         $response = $this->actingAs($admin)->post('/admin/orders/'.$pendingOrder->id.'/provision', [
             'public_ip' => '139.180.222.111',
             'app_url' => 'https://139.180.222.111:8000',
+            'root_password' => 'VexaSecretPass123!',
         ]);
 
         $response->assertSessionHas('success');

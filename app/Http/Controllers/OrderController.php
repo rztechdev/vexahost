@@ -48,10 +48,11 @@ class OrderController extends Controller
             'password' => 'required|string',
         ]);
 
-        $login = trim($request->input('login'));
-        $user = str_contains($login, '@')
-            ? User::where('email', $login)->first()
-            : User::where('username', $login)->first();
+        $login = trim((string) $request->input('login'));
+        $normalizedLogin = strtolower(preg_replace('/@([a-zA-Z0-9.-]+),([a-zA-Z]{2,})/i', '@$1.$2', $login));
+        $user = User::whereRaw('LOWER(email) = ?', [$normalizedLogin])
+            ->orWhereRaw('LOWER(username) = ?', [strtolower($login)])
+            ->first();
 
         if (!$user || !Hash::check($request->input('password'), $user->password)) {
             return response()->json([
@@ -129,7 +130,7 @@ class OrderController extends Controller
             'os' => 'required|string',
             'billing_cycle' => 'nullable|string|in:monthly',
             'hostname' => ['required', 'string', 'max:63', 'regex:/^[A-Za-z0-9][A-Za-z0-9-]*$/'],
-            'root_password' => 'required|string|min:8|max:255',
+            'root_password' => 'nullable|string|max:255',
             'payment_method' => 'required|string|in:online_payment,midtrans_snap,qris,lynk,bca_va,mandiri_va,bni_va,bri_va,cimb_va,permata_va,other_va,bsi_va,danamon_va,seabank_va,credit_card,gopay,shopeepay,ovo,dana,indomaret,astrapay,akulaku',
             'db_engine' => 'nullable|string|in:postgres,mysql,redis,mongodb,vector',
             'db_manager' => 'nullable|string|in:cloudbeaver,cli_only',
@@ -200,7 +201,10 @@ class OrderController extends Controller
                 'password' => 'required|string|min:8',
             ]);
 
-            $existingUser = User::where('email', $validated['email'])->first();
+            $cleanEmail = strtolower(trim((string)$validated['email']));
+            $cleanEmail = preg_replace('/@([a-zA-Z0-9.-]+),([a-zA-Z]{2,})/i', '@$1.$2', $cleanEmail);
+
+            $existingUser = User::whereRaw('LOWER(email) = ?', [$cleanEmail])->first();
             if ($existingUser) {
                 if (!Hash::check($validated['password'], $existingUser->password)) {
                     if ($request->expectsJson()) {
@@ -230,7 +234,7 @@ class OrderController extends Controller
                 $user = User::create([
                     'full_name' => $validated['full_name'],
                     'username' => $generatedUsername,
-                    'email' => strtolower($validated['email']),
+                    'email' => $cleanEmail,
                     'phone' => $validated['phone'] ?? null,
                     'password' => Hash::make($validated['password']),
                     'channel' => 'website',
@@ -284,7 +288,7 @@ class OrderController extends Controller
                 'db_manager' => $spec->isDatabasePackage() ? ($validated['db_manager'] ?? 'cloudbeaver') : null,
                 'db_name' => $spec->isDatabasePackage() ? 'vexadb_production' : null,
                 'db_user' => $spec->isDatabasePackage() ? 'admin_vexa' : null,
-                'db_password' => $spec->isDatabasePackage() ? ($validated['root_password'] ?? Str::password(16, true, true, false, false)) : null,
+                'db_password' => $spec->isDatabasePackage() ? ($validated['root_password'] ?? null) : null,
                 'db_port' => $spec->isDatabasePackage() ? match($validated['db_engine'] ?? 'postgres') {
                     'mysql' => 3306,
                     'redis' => 6379,
@@ -294,7 +298,7 @@ class OrderController extends Controller
                 } : null,
                 'provider' => $validated['provider'],
                 'hostname' => strtolower($validated['hostname']),
-                'root_password' => $validated['root_password'],
+                'root_password' => $validated['root_password'] ?? null,
                 'datacenter_location' => $validated['datacenter_location'],
                 'os' => $validated['os'],
                 'billing_cycle' => $cycle,
@@ -363,17 +367,17 @@ class OrderController extends Controller
         $snapRedirectUrl = null;
         $xenditInvoiceUrl = null;
 
-        // Xendit Gateway (Gateway Utama)
-        if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
-            $xenditResult = \App\Services\Payments\XenditService::createInvoice($order, $order->payment_method);
-            if (!empty($xenditResult['success'])) {
-                $xenditInvoiceUrl = $xenditResult['invoice_url'] ?? null;
-            }
-        } elseif (PaymentGateway::isMidtransMethod($order->payment_method)) {
+        // Dispatch ke Gateway yang sesuai dengan metode pembayaran yang dipilih
+        if (PaymentGateway::isMidtransMethod($order->payment_method)) {
             $snapResult = \App\Services\Payments\MidtransService::createSnapTransaction($order);
             if (!empty($snapResult['success'])) {
                 $snapToken = $snapResult['token'] ?? null;
                 $snapRedirectUrl = $snapResult['redirect_url'] ?? null;
+            }
+        } elseif (PaymentGateway::isXenditMethod($order->payment_method) && \App\Services\Payments\XenditService::isConfigured()) {
+            $xenditResult = \App\Services\Payments\XenditService::createInvoice($order, $order->payment_method);
+            if (!empty($xenditResult['success'])) {
+                $xenditInvoiceUrl = $xenditResult['invoice_url'] ?? null;
             }
         }
 
@@ -435,7 +439,7 @@ class OrderController extends Controller
 
         // Cek sinkronisasi real-time ke Xendit / Midtrans jika order masih pending
         if (!$order->paid_at) {
-            if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
+            if (PaymentGateway::isXenditMethod($order->payment_method)) {
                 \App\Services\Payments\XenditService::checkAndSyncStatus($order);
             } elseif (PaymentGateway::isMidtransMethod($order->payment_method)) {
                 \App\Services\Payments\MidtransService::checkAndSyncStatus($order);
@@ -449,7 +453,7 @@ class OrderController extends Controller
         }
 
         // Untuk Xendit, jika sudah ada invoice URL, langsung buka atau alihkan ke status
-        if (PaymentGateway::isXenditMethod($order->payment_method) || \App\Services\Payments\XenditService::isConfigured()) {
+        if (PaymentGateway::isXenditMethod($order->payment_method)) {
             $tx = PaymentTransaction::where('order_id', $order->id)->where('provider', 'xendit')->latest()->first();
             $invoiceUrl = $tx?->raw_payload['invoice_url'] ?? null;
             if ($invoiceUrl) {

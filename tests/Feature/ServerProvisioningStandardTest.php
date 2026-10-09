@@ -19,45 +19,11 @@ class ServerProvisioningStandardTest extends TestCase
         $this->seed(\Database\Seeders\DatabaseSeeder::class);
     }
 
-    public function test_checkout_requires_root_password_minimum_8_characters(): void
+    public function test_checkout_allows_null_root_password_from_client(): void
     {
         $spec = VpsSpec::first();
 
-        // 1. Without root_password
-        $response = $this->post('/checkout', [
-            'vps_spec_id' => $spec->id,
-            'control_panel' => 'none',
-            'provider' => 'cloudeka',
-            'datacenter_location' => 'indonesia',
-            'os' => 'ubuntu2404',
-            'hostname' => 'test-vps-server',
-            'payment_method' => 'qris',
-            'full_name' => 'John Doe',
-            'email' => 'john.pwd@test.com',
-            'password' => 'UserAccountPass123!',
-        ]);
-
-        $response->assertSessionHasErrors('root_password');
-
-        // 2. With root_password < 8 chars
-        $responseShort = $this->post('/checkout', [
-            'vps_spec_id' => $spec->id,
-            'control_panel' => 'none',
-            'provider' => 'cloudeka',
-            'datacenter_location' => 'indonesia',
-            'os' => 'ubuntu2404',
-            'hostname' => 'test-vps-server',
-            'root_password' => 'short7',
-            'terms_accepted' => 1,
-            'payment_method' => 'qris',
-            'full_name' => 'John Doe',
-            'email' => 'john.pwd2@test.com',
-            'password' => 'UserAccountPass123!',
-        ]);
-
-        $responseShort->assertSessionHasErrors('root_password');
-
-        // 3. With valid root_password (>= 8 chars)
+        // 1. Client checkout does NOT require root_password (generated upstream by retail provider)
         $responseValid = $this->post('/checkout', [
             'vps_spec_id' => $spec->id,
             'control_panel' => 'none',
@@ -65,7 +31,6 @@ class ServerProvisioningStandardTest extends TestCase
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'hostname' => 'test-vps-server',
-            'root_password' => 'MyVexaRootPass@2026',
             'terms_accepted' => 1,
             'payment_method' => 'qris',
             'full_name' => 'John Doe',
@@ -76,10 +41,10 @@ class ServerProvisioningStandardTest extends TestCase
         $responseValid->assertSessionHasNoErrors();
         $order = Order::whereHas('customer', fn($q) => $q->where('email', 'john.valid@test.com'))->first();
         $this->assertNotNull($order);
-        $this->assertEquals('MyVexaRootPass@2026', $order->root_password);
+        $this->assertNull($order->root_password);
     }
 
-    public function test_admin_provision_locks_customer_parameters_and_uses_order_root_password(): void
+    public function test_admin_provision_locks_customer_parameters_and_requires_root_password(): void
     {
         $admin = User::where('email', 'vexahostcloudtech@gmail.com')->first();
 
@@ -95,7 +60,7 @@ class ServerProvisioningStandardTest extends TestCase
 
         $spec = VpsSpec::first();
 
-        // Order with NO control panel ('none')
+        // Order with NO control panel ('none'), initially no root password
         $orderNoPanel = Order::create([
             'customer_id' => $customer->id,
             'organization_id' => $org->id,
@@ -103,7 +68,7 @@ class ServerProvisioningStandardTest extends TestCase
             'control_panel' => 'none',
             'provider' => 'cloudeka',
             'hostname' => 'custom-client-hostname',
-            'root_password' => 'ClientSpecifiedPassword#99',
+            'root_password' => null,
             'datacenter_location' => 'indonesia',
             'os' => 'ubuntu2404',
             'status' => 'paid',
@@ -113,9 +78,16 @@ class ServerProvisioningStandardTest extends TestCase
             'paid_at' => now(),
         ]);
 
-        // When order has control_panel 'none', app_url is NOT required
+        // When admin provisions without root_password, validation fails
+        $responseMissingPw = $this->actingAs($admin)->post('/admin/orders/' . $orderNoPanel->id . '/provision', [
+            'public_ip' => '103.150.10.1',
+        ]);
+        $responseMissingPw->assertSessionHasErrors('root_password');
+
+        // When order has control_panel 'none', app_url is NOT required, root_password IS required
         $responseNoPanel = $this->actingAs($admin)->post('/admin/orders/' . $orderNoPanel->id . '/provision', [
             'public_ip' => '103.150.10.1',
+            'root_password' => 'AdminRetailPass@99',
         ]);
 
         $responseNoPanel->assertSessionHas('success');
@@ -124,9 +96,12 @@ class ServerProvisioningStandardTest extends TestCase
         $instance = VpsInstance::where('order_id', $orderNoPanel->id)->first();
         $this->assertNotNull($instance);
         $this->assertEquals('custom-client-hostname', $instance->hostname);
-        $this->assertEquals('ClientSpecifiedPassword#99', $instance->initial_root_password);
+        $this->assertEquals('AdminRetailPass@99', $instance->initial_root_password);
         $this->assertEquals('ubuntu2404', $instance->os);
         $this->assertNull($instance->app_url);
+
+        $orderNoPanel->refresh();
+        $this->assertEquals('AdminRetailPass@99', $orderNoPanel->root_password);
 
         // Order WITH control panel ('coolify')
         $orderWithPanel = Order::create([
@@ -136,7 +111,7 @@ class ServerProvisioningStandardTest extends TestCase
             'control_panel' => 'coolify',
             'provider' => 'tencent',
             'hostname' => 'coolify-app-node',
-            'root_password' => 'CustomerSuperPass2026!',
+            'root_password' => null,
             'datacenter_location' => 'singapore',
             'os' => 'ubuntu2404',
             'status' => 'paid',
@@ -149,12 +124,14 @@ class ServerProvisioningStandardTest extends TestCase
         // When order has panel, app_url IS required
         $responseMissingAppUrl = $this->actingAs($admin)->post('/admin/orders/' . $orderWithPanel->id . '/provision', [
             'public_ip' => '103.150.10.2',
+            'root_password' => 'CustomerSuperPass2026!',
         ]);
         $responseMissingAppUrl->assertSessionHasErrors('app_url');
 
-        // With app_url provided
+        // With app_url and root_password provided
         $responseWithAppUrl = $this->actingAs($admin)->post('/admin/orders/' . $orderWithPanel->id . '/provision', [
             'public_ip' => '103.150.10.2',
+            'root_password' => 'CustomerSuperPass2026!',
             'app_url' => 'https://103.150.10.2:8000',
         ]);
         $responseWithAppUrl->assertSessionHas('success');

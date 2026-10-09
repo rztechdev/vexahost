@@ -149,12 +149,12 @@ class WhatsAppNotifier
         $message = implode("\n", [
             "Halo *{$namaPelanggan}*,",
             '',
-            '❌ *VERIFIKASI PEMBAYARAN BELUM BERHASIL*',
-            "Mohon maaf, bukti pembayaran untuk pesanan #{$order->id} belum dapat kami verifikasi.",
+            '❌ *PEMBAYARAN DIBATALKAN / KADALUARSA*',
+            "Transaksi pembayaran untuk pesanan #{$order->id} belum terkonfirmasi oleh gateway atau telah dibatalkan.",
             '',
             "• *Alasan:* {$reason}",
             '',
-            'Silakan periksa kembali dan unggah ulang bukti transfer yang valid melalui tautan berikut:',
+            'Silakan periksa detail pesanan Anda melalui tautan berikut:',
             $bayarUrl,
             '',
             'Jika Anda memerlukan bantuan, silakan hubungi tim support VexaHost.',
@@ -254,8 +254,8 @@ class WhatsAppNotifier
      */
     public static function billingReminder(Subscription $subscription, int $daysUntil): bool
     {
-        $subscription->loadMissing(['user', 'vpsSpec']);
-        $user = $subscription->user;
+        $subscription->loadMissing(['customer', 'vpsSpec']);
+        $user = $subscription->customer;
 
         if (! $user || ! $user->phone) {
             return false;
@@ -327,8 +327,8 @@ class WhatsAppNotifier
      */
     public static function serviceSuspended(Subscription $subscription): bool
     {
-        $subscription->loadMissing(['user', 'vpsSpec']);
-        $user = $subscription->user;
+        $subscription->loadMissing(['customer', 'vpsSpec']);
+        $user = $subscription->customer;
 
         if (! $user || ! $user->phone) {
             return false;
@@ -362,8 +362,8 @@ class WhatsAppNotifier
      */
     public static function serviceTerminated(Subscription $subscription): bool
     {
-        $subscription->loadMissing(['user', 'vpsSpec']);
-        $user = $subscription->user;
+        $subscription->loadMissing(['customer', 'vpsSpec']);
+        $user = $subscription->customer;
 
         if (! $user || ! $user->phone) {
             return false;

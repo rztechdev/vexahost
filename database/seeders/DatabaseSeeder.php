@@ -24,20 +24,33 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::where('email', $adminEmail)
             ->orWhere('username', $adminUsername)
-            ->first() ?? new User();
+            ->first();
 
-        $admin->forceFill([
-            'email' => $adminEmail,
-            'username' => $adminUsername,
-            'full_name' => $adminName,
-            'password' => Hash::make($adminPassword),
-            'is_admin' => true,
-            'email_verified_at' => now(),
-            'channel' => 'website',
-            'phone' => $adminPhone,
-            'company' => $adminCompany,
-            'address' => null,
-        ])->save();
+        if (! $admin) {
+            User::create([
+                'email' => $adminEmail,
+                'username' => $adminUsername,
+                'full_name' => $adminName,
+                'password' => Hash::make($adminPassword),
+                'is_admin' => true,
+                'email_verified_at' => now(),
+                'channel' => 'website',
+                'phone' => $adminPhone,
+                'company' => $adminCompany,
+                'address' => null,
+            ]);
+        } else {
+            // Jika akun admin sudah ada, jangan reset password agar password admin yang telah diganti tidak kembali ke default 12345678
+            $admin->forceFill([
+                'email' => $adminEmail,
+                'username' => $adminUsername,
+                'full_name' => $adminName,
+                'is_admin' => true,
+                'channel' => 'website',
+                'phone' => $adminPhone,
+                'company' => $adminCompany,
+            ])->save();
+        }
 
         // 3. Seed RBAC + backfill Personal Org untuk existing users.
         $this->call(RolePermissionSeeder::class);

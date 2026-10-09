@@ -156,10 +156,16 @@ class AdminApiController extends Controller
                     'reason' => 'Provisioning sukses via Admin API.',
                     'actor_type' => 'admin',
                     'metadata' => ['vps_instance_id' => $instance->id],
-                    'onLocked' => function (Order $locked) use ($startsAt, $expiresAt, $graceEndsAt) {
+                    'onLocked' => function (Order $locked) use ($startsAt, $expiresAt, $graceEndsAt, $validated, $isDb, $dbPassword) {
                         $locked->starts_at = $startsAt;
                         $locked->expires_at = $expiresAt;
                         $locked->grace_period_ends_at = $graceEndsAt;
+                        if (!empty($validated['server_root_password'])) {
+                            $locked->root_password = $validated['server_root_password'];
+                        }
+                        if ($isDb && empty($locked->db_password)) {
+                            $locked->db_password = $dbPassword;
+                        }
                         $locked->save();
                     },
                 ]);
@@ -262,24 +268,47 @@ class AdminApiController extends Controller
 
         $packageKey = strtolower(trim($validated['package']));
         $packageMap = [
-            'basic' => 1,
             'student basic' => 1,
+            'student-basic' => 1,
             'student' => 1,
+            'basic' => 1,
             'standard' => 2,
+            'standar' => 2,
             'premium' => 3,
-            'ai' => 4,
-            'ai production' => 4,
-            'ai-production' => 4,
             'startup' => 4,
-            'ai pro' => 5,
-            'ai-pro' => 5,
-            'aipro' => 5,
-            'ai production pro' => 5,
-            'ai-production-pro' => 5,
             'business' => 5,
-            'mahasiswa' => 6,
+            'bisnis' => 5,
             'mahasiswa basic' => 6,
             'mahasiswa-basic' => 6,
+            'mahasiswa' => 6,
+            'terminal coding agent' => 7,
+            'terminal-coding-agent' => 7,
+            'terminal' => 7,
+            'claude opencode' => 7,
+            'cloud ai workstation' => 8,
+            'cloud-ai-workstation' => 8,
+            'ai workstation' => 8,
+            'vscode server' => 8,
+            'hermes autonomous hub' => 9,
+            'hermes-autonomous-hub' => 9,
+            'hermes' => 9,
+            'omniroute' => 9,
+            'enterprise private ai & rag' => 10,
+            'enterprise private ai and rag' => 10,
+            'enterprise private ai' => 10,
+            'enterprise-private-ai-rag' => 10,
+            'private ai' => 10,
+            'dify' => 10,
+            'ollama' => 10,
+            'db micro' => 11,
+            'db-micro' => 11,
+            'micro' => 11,
+            'db standard' => 12,
+            'db-standard' => 12,
+            'db enterprise' => 13,
+            'db-enterprise' => 13,
+            'db enterprise / ai vector' => 13,
+            'ai vector' => 13,
         ];
         $specId = $packageMap[$packageKey] ?? (is_numeric($packageKey) ? (int)$packageKey : null);
         $spec = ($specId ? VpsSpec::find($specId) : null)

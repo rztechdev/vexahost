@@ -72,10 +72,16 @@
                                         Rp {{ number_format($spec->sell_price, 0, ',', '.') }}
                                     </td>
                                     <td class="px-5 py-4 align-top">
-                                        <a href="{{ route('checkout', $spec->id) }}"
-                                           class="inline-flex items-center whitespace-nowrap px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-black transition-colors">
-                                            Pesan
-                                        </a>
+                                        @if($spec->is_active)
+                                            <a href="{{ route('checkout', $spec->id) }}"
+                                               class="inline-flex items-center whitespace-nowrap px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-black transition-colors">
+                                                Pesan
+                                            </a>
+                                        @else
+                                            <span class="inline-flex items-center whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-semibold border border-slate-200 cursor-not-allowed" title="Stok sedang habis atau tidak tersedia">
+                                                Stok Habis
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

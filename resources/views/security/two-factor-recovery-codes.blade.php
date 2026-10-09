@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
         <h2 class="text-xl font-bold">Recovery codes</h2>
         <p class="text-sm text-slate-500 mt-2">Simpan codes ini di password manager. Setiap code hanya bisa dipakai sekali.</p>
         <div class="grid grid-cols-2 gap-2 mt-5 rounded-lg bg-slate-900 p-5 text-white font-mono-code text-sm">

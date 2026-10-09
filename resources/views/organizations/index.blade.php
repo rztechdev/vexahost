@@ -12,7 +12,7 @@
 
     <div class="grid md:grid-cols-2 gap-4">
         @forelse($orgs as $org)
-            <a href="{{ route('organizations.show', $org->id) }}" class="bg-white border {{ $currentOrgId === $org->id ? 'border-black ring-1 ring-black' : 'border-slate-200' }} rounded-xl p-5 hover:border-slate-400 transition-all block">
+            <a href="{{ route('organizations.show', $org->id) }}" class="bg-white border {{ $currentOrgId === $org->id ? 'border-black ring-1 ring-black' : 'border-slate-200' }} rounded-lg p-5 hover:border-slate-400 transition-all block">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="font-bold text-slate-900">{{ $org->name }}</p>
@@ -27,7 +27,7 @@
                 <p class="text-xs text-slate-500 mt-4">{{ $org->billing_email ?: 'Billing email belum diatur' }}</p>
             </a>
         @empty
-            <div class="bg-white border border-slate-200 rounded-xl p-8 text-center text-sm text-slate-500 md:col-span-2">
+            <div class="bg-white border border-slate-200 rounded-lg p-8 text-center text-sm text-slate-500 md:col-span-2">
                 Belum ada organisasi.
             </div>
         @endforelse
