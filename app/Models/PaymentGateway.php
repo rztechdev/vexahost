@@ -149,16 +149,22 @@ class PaymentGateway extends Model
     /**
      * Cek apakah suatu metode pembayaran ditangani oleh Xendit.
      */
-    public static function isXenditMethod(string $method): bool
+    public static function isXenditMethod(?string $method): bool
     {
+        if (empty($method)) {
+            return false;
+        }
         return (self::METHOD_GATEWAY[$method] ?? null) === 'xendit' || $method === 'online_payment';
     }
 
     /**
      * Cek apakah suatu metode pembayaran ditangani oleh Midtrans (legacy fallback).
      */
-    public static function isMidtransMethod(string $method): bool
+    public static function isMidtransMethod(?string $method): bool
     {
+        if (empty($method)) {
+            return false;
+        }
         return (self::METHOD_GATEWAY[$method] ?? null) === 'midtrans' || $method === 'midtrans_snap';
     }
 
@@ -197,8 +203,11 @@ class PaymentGateway extends Model
      * Dipanggil per metode di dalam loop checkout. once() menyimpan hasilnya
      * selama satu request agar tidak menjalankan kueri untuk setiap metode.
      */
-    public static function isMethodActive(string $method): bool
+    public static function isMethodActive(?string $method): bool
     {
+        if (empty($method)) {
+            return false;
+        }
         return in_array($method, once(fn () => self::activeMethods()), true);
     }
 

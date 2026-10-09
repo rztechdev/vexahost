@@ -36,6 +36,8 @@ class Order extends Model
         'datacenter_location',
         'os',
         'billing_cycle',
+        'order_type',
+        'vps_instance_id',
         'status',
         'channel',
         'shopee_order_id',
@@ -222,6 +224,26 @@ class Order extends Model
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    public function renewalVpsInstance()
+    {
+        return $this->belongsTo(VpsInstance::class, 'vps_instance_id');
+    }
+
+    public function getResolvedInstanceAttribute(): ?VpsInstance
+    {
+        return $this->vps_instance_id ? $this->renewalVpsInstance : $this->vpsInstance;
+    }
+
+    public function isRenewal(): bool
+    {
+        return $this->order_type === 'renewal' || !empty($this->vps_instance_id);
+    }
+
+    public function isNew(): bool
+    {
+        return !$this->isRenewal();
     }
 
     public function provisioningTasks()

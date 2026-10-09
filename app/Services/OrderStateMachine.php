@@ -49,7 +49,7 @@ class OrderStateMachine
      */
     public const TRANSITIONS = [
         'pending' => ['paid', 'cancelled', 'expired'],
-        'paid' => ['provisioning', 'cancelled', 'failed'],
+        'paid' => ['provisioning', 'active', 'cancelled', 'failed'],
         'provisioning' => ['active', 'failed', 'cancelled'],
         'active' => ['grace_period', 'suspended', 'expired', 'terminated'],
         'grace_period' => ['active', 'suspended', 'terminated'],

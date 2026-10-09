@@ -425,6 +425,15 @@ class MidtransService
             }
         }
 
+        // 2b. Jika order bertipe renewal, proses perpanjangan masa aktif instance VPS
+        if ($order->isRenewal()) {
+            try {
+                app(\App\Services\RenewalService::class)->handleRenewalPayment($order);
+            } catch (\Throwable $e) {
+                Log::error('midtrans.sync.renewal_failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         // 3. Catat WebhookEvent agar tidak terjadi proses duplikat jika webhook tiba belakangan
         if ($txId) {
             \App\Models\WebhookEvent::firstOrCreate(

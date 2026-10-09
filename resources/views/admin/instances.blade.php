@@ -181,7 +181,7 @@
                                             Panel: {{ $instance->panel_url }}
                                         </a>
                                     @elseif($instance->control_panel && $instance->control_panel !== 'none')
-                                        <span class="text-[11px] font-semibold text-amber-700 block mt-0.5">Link panel belum diisi</span>
+                                        <span class="text-[11px] font-semibold text-slate-600 block mt-0.5">Link panel belum diisi</span>
                                     @endif
                                 @endif
 
@@ -205,10 +205,27 @@
                                 <span class="text-slate-500 font-sans text-[10px] uppercase block mt-0.5">{{ $instance->provider_label }}</span>
                             </td>
 
-                            <!-- Spesifikasi -->
+                            <!-- Spesifikasi & Biaya Perpanjangan -->
                             <td class="px-5 py-3.5 text-slate-600">
                                 <span class="font-medium text-slate-900">{{ $instance->cpu ?? 1 }} vCPU &bull; {{ $instance->ram ?? 1 }} GB RAM</span>
                                 <span class="text-slate-400 text-[11px] block">{{ $instance->disk ?? 20 }} GB SSD NVMe</span>
+                                <div class="mt-1 text-[11px]">
+                                    <span class="text-slate-500">Renewal: </span>
+                                    <span class="font-mono-code font-bold text-slate-900">Rp {{ number_format($instance->renewal_price, 0, ',', '.') }}</span>
+                                    @if($instance->custom_renewal_price)
+                                        <span class="px-1 py-0.2 rounded text-[10px] bg-slate-200 text-slate-800 border border-slate-300">Custom</span>
+                                    @endif
+                                </div>
+                                <details class="mt-1 text-[11px]">
+                                    <summary class="cursor-pointer text-slate-500 hover:text-black font-medium">Ubah tarif perpanjangan</summary>
+                                    <form action="{{ route('admin.instances.renewal-price', $instance->id) }}" method="POST" class="mt-1.5 flex items-center gap-1.5">
+                                        @csrf
+                                        <input type="number" step="0.01" min="0" name="custom_renewal_price" value="{{ $instance->custom_renewal_price }}"
+                                               placeholder="Kosong = ikut katalog"
+                                               class="w-36 px-2 py-1 rounded border border-slate-300 font-mono-code bg-white focus:outline-none">
+                                        <button type="submit" class="px-2 py-1 rounded bg-black hover:bg-neutral-800 text-white font-bold">Simpan</button>
+                                    </form>
+                                </details>
                             </td>
 
                             <!-- Status -->

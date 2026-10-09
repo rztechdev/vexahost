@@ -113,3 +113,14 @@ Schedule::command('akun-tertaut:kirim')
     ->everyMinute()
     ->withoutOverlapping()
     ->description('Kirim ulang perubahan akun ke VexaHost WA Gateway.');
+
+// ============================================================
+// PILAR 3 - Auto-Expire Order pending (TTL 24 Jam)
+// ============================================================
+Schedule::command('orders:expire-pending')
+    ->hourly()
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->description('Batalkan secara otomatis order pending yang melebihi batas waktu pembayaran 24 jam.');
+

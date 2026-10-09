@@ -3,6 +3,7 @@
 @section('content')
 <div class="space-y-6" x-data="{
     activeTab: '{{ $vps->isAiPackage() ? 'webapp' : ($vps->isDatabasePackage() ? 'database' : 'overview') }}',
+    renewalModal: false,
     reinstallModal: {{ $errors->hasAny(['os', 'control_panel', 'confirm_hostname', 'notes']) ? 'true' : 'false' }},
     rebootGuideModal: false,
     unreachableModal: {{ $errors->has('description') ? 'true' : 'false' }},
@@ -67,28 +68,59 @@
 
     <!-- Lifecycle & Status Warning Alerts -->
     @if($vps->status === 'suspended')
-        <div class="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 flex items-start gap-3">
-            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-300 text-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="text-xs">
                 <strong class="font-bold text-sm block">Instance VPS Ditangguhkan (Suspended)</strong>
-                Layanan VPS ini sedang ditangguhkan. Operasi daya dan akses sistem dibatasi hingga tagihan diperbarui atau status diselesaikan.
+                Layanan VPS ini sedang ditangguhkan karena melewati jatuh tempo pembayaran. Perpanjang sekarang untuk mengaktifkan kembali server.
             </div>
+            @if($vps->canBeRenewed())
+                <button type="button" @click="renewalModal = true" class="px-3.5 py-1.5 rounded-lg bg-black text-white hover:bg-neutral-800 text-xs font-semibold whitespace-nowrap self-start sm:self-auto cursor-pointer">
+                    Perpanjang & Aktifkan Kembali
+                </button>
+            @endif
         </div>
     @elseif($vps->isInGracePeriod())
-        <div class="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 flex items-start gap-3">
-            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-300 text-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="text-xs">
                 <strong class="font-bold text-sm block">Masa Tenggang Berlangganan (Grace Period)</strong>
                 Masa aktif VPS telah jatuh tempo. Anda memiliki masa tenggang hingga <strong>{{ $vps->grace_period_ends_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }}</strong> sebelum layanan dihentikan otomatis.
             </div>
+            @if($vps->canBeRenewed())
+                <button type="button" @click="renewalModal = true" class="px-3.5 py-1.5 rounded-lg bg-black text-white hover:bg-neutral-800 text-xs font-semibold whitespace-nowrap self-start sm:self-auto cursor-pointer">
+                    Perpanjang Layanan Sekarang
+                </button>
+            @endif
         </div>
     @elseif($vps->isExpired())
-        <div class="p-4 rounded-lg bg-red-50 border border-red-300 text-red-900 flex items-start gap-3">
-            <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-300 text-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="text-xs">
                 <strong class="font-bold text-sm block">Masa Aktif Berakhir (Expired)</strong>
-                Masa aktif server telah kadaluarsa pada {{ $vps->expires_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }}. Harap segera hubungi billing untuk aktivasi kembali.
+                Masa aktif server telah kedaluwarsa pada {{ $vps->expires_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }}.
             </div>
+            @if($vps->canBeRenewed())
+                <button type="button" @click="renewalModal = true" class="px-3.5 py-1.5 rounded-lg bg-black text-white hover:bg-neutral-800 text-xs font-semibold whitespace-nowrap self-start sm:self-auto cursor-pointer">
+                    Perpanjang Layanan
+                </button>
+            @endif
+        </div>
+    @endif
+
+    @if($vps->isEolWithReplacement())
+        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 flex items-start gap-3">
+            <div class="text-xs leading-relaxed">
+                <strong class="font-bold text-slate-900 text-sm block mb-0.5">Penyesuaian Skema Paket (End-of-Life)</strong>
+                Paket lama Anda sudah tidak lagi diproduksi oleh penyedia infrastruktur (End-of-Life). Perpanjangan masa aktif untuk server ini akan disesuaikan secara otomatis ke skema paket <strong>{{ $vps->eol_replacement_spec?->name }}</strong> (Rp {{ number_format($vps->renewal_price, 0, ',', '.') }}/bulan) tanpa mengubah data di dalam server Anda.
+            </div>
+        </div>
+    @elseif($vps->isEolWithoutReplacement())
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-300 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="text-xs leading-relaxed">
+                <strong class="font-bold text-slate-900 text-sm block mb-0.5">Paket Dihentikan Permanen (End-of-Life)</strong>
+                Paket lama Anda telah dihentikan secara permanen oleh penyedia infrastruktur. Hubungi tim dukungan untuk bantuan migrasi server ke paket aktif.
+            </div>
+            <a href="{{ route('dashboard.support') }}" class="px-3.5 py-1.5 rounded-lg bg-black text-white hover:bg-neutral-800 text-xs font-semibold whitespace-nowrap self-start sm:self-auto">
+                Hubungi Tim Dukungan
+            </a>
         </div>
     @endif
 
@@ -150,6 +182,18 @@
 
         <!-- Action Toolbar -->
         <div class="flex flex-wrap items-center gap-2 shrink-0">
+            @if($vps->canBeRenewed())
+                <button type="button" @click="renewalModal = true" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Perpanjang Layanan</span>
+                </button>
+            @elseif($vps->isEolWithoutReplacement())
+                <a href="{{ route('dashboard.support') }}" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span>Hubungi Tim Migrasi</span>
+                </a>
+            @endif
+
             @if($vps->public_ip && $vps->status === 'running')
                 @if($vps->isAiPackage() && $vps->app_url)
                     <a href="{{ $vps->app_url }}" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-[#4A6FA5] hover:bg-[#3D5E8C] text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
@@ -1344,6 +1388,142 @@ WEB_MANAGER_URL={{ $webMgrUrl }} (CloudBeaver)
                         </button>
                         <button type="submit" class="px-4 py-2 rounded-lg bg-black hover:bg-neutral-800 text-white font-bold">
                             Kirim Permintaan Reinstall
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Perpanjang Layanan (Pilar 1, 2, 4) --}}
+    @if($vps->canBeRenewed())
+        <div x-show="renewalModal"
+             x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto"
+             @keydown.escape.window="renewalModal = false">
+            <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 my-8 text-slate-800"
+                 @click.away="renewalModal = false">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Perpanjang Layanan VPS</h3>
+                            <p class="text-xs text-slate-500 font-mono-code">{{ $vps->hostname }} ({{ $vps->public_ip ?? 'IP Pending' }})</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="renewalModal = false" class="text-slate-400 hover:text-slate-600 p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                {{-- Banner Fallback / EOL Replacement jika ada --}}
+                @if($vps->isEolWithReplacement())
+                    <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
+                        <div class="flex items-center gap-2 font-bold text-amber-950 mb-1">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Penyesuaian Skema Paket (End-of-Life)
+                        </div>
+                        Paket lama Anda sudah tidak lagi diproduksi oleh penyedia infrastruktur. Perpanjangan masa aktif untuk server ini dialihkan ke skema paket pengganti <strong>{{ $vps->eol_replacement_spec->name }}</strong> tanpa mengubah IP, data, atau konfigurasi di dalam server Anda.
+                    </div>
+                @endif
+
+                {{-- Ringkasan Periode & Durasi --}}
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-xs">
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Paket Layanan:</span>
+                        <span class="font-bold text-slate-900">{{ $vps->renewal_spec->name ?? $vps->package_name ?? 'Cloud VPS' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Masa Aktif Saat Ini:</span>
+                        <span class="font-semibold text-slate-800">
+                            {{ $vps->expires_at ? $vps->expires_at->timezone('Asia/Jakarta')->format('d M Y, H:i') . ' WIB' : 'Belum ditentukan' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Perpanjangan Ditambahkan:</span>
+                        <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            +1 Siklus ({{ ucfirst(str_replace('_', ' ', $vps->billing_cycle ?? 'monthly')) }})
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600 pt-1 border-t border-slate-200">
+                        <span>Masa Aktif Baru Menjadi:</span>
+                        <span class="font-bold text-slate-900">
+                            {{ ($vps->expires_at && $vps->expires_at->isFuture() ? $vps->expires_at->copy()->addMonth() : now()->addMonth())->timezone('Asia/Jakarta')->format('d M Y, H:i') . ' WIB' }}
+                        </span>
+                    </div>
+                    @if($vps->expires_at && $vps->expires_at->isFuture())
+                        <p class="text-[11px] text-slate-500 italic pt-0.5">
+                            * Sisa masa aktif Anda tetap utuh karena durasi perpanjangan diakumulasikan dari tanggal kedaluwarsa saat ini.
+                        </p>
+                    @endif
+                </div>
+
+                {{-- Rincian Biaya --}}
+                <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-2">
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-xs font-semibold text-slate-700">Total Biaya Perpanjangan:</span>
+                        <div class="text-right">
+                            <span class="text-lg font-bold text-slate-900">Rp {{ number_format($vps->renewal_price, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+                    @if($vps->custom_renewal_price)
+                        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-800 text-[11px] font-semibold rounded border border-blue-200">
+                            <span>Harga Khusus Kontrak / Pelanggan Loyal</span>
+                        </div>
+                    @elseif($vps->order && $vps->order->amount != $vps->renewal_price)
+                        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-700 text-[11px] font-semibold rounded border border-slate-300">
+                            <span>Penyesuaian tarif infrastruktur katalog terkini</span>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Form Checkout Perpanjangan --}}
+                <form action="{{ route('dashboard.vps.renew', $vps->id) }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Metode Pembayaran</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors has-checked:border-slate-900 has-checked:bg-slate-50">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="payment_method" value="midtrans_snap" checked class="text-black focus:ring-black">
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Pembayaran Online Otomatis</div>
+                                        <div class="text-[11px] text-slate-500">QRIS, Virtual Account (BCA/Mandiri/BRI/BNI), E-Wallet</div>
+                                    </div>
+                                </div>
+                                <span class="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">Instan</span>
+                            </label>
+
+                            @php
+                                $userBalance = auth()->user()->credit_balance ?? 0;
+                                $canPayWithBalance = $userBalance >= $vps->renewal_price;
+                            @endphp
+                            <label class="flex items-center justify-between p-3 border rounded-xl transition-colors {{ $canPayWithBalance ? 'border-slate-300 cursor-pointer hover:bg-slate-50 has-checked:border-slate-900 has-checked:bg-slate-50' : 'border-slate-200 bg-slate-50/50 opacity-60 cursor-not-allowed' }}">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="payment_method" value="credit" {{ $canPayWithBalance ? '' : 'disabled' }} class="text-black focus:ring-black">
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Potong Saldo Akun</div>
+                                        <div class="text-[11px] text-slate-500">Saldo saat ini: Rp {{ number_format($userBalance, 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+                                @if(!$canPayWithBalance)
+                                    <span class="text-[11px] font-medium text-red-600">Saldo Tidak Cukup</span>
+                                @else
+                                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Tersedia</span>
+                                @endif
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" @click="renewalModal = false" class="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-2">
+                            <span>Lanjutkan Pembayaran</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </form>

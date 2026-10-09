@@ -483,8 +483,163 @@ class DashboardController extends Controller
             ->with('order.vpsSpec')->orderBy('created_at', 'desc')->paginate(10);
         $subscriptions = Subscription::where('organization_id', $this->organizationId())
             ->with(['vpsSpec', 'vpsInstance'])->latest()->get();
+        $instances = VpsInstance::where('organization_id', $this->organizationId())
+            ->whereNotIn('status', ['terminated'])
+            ->with(['order.vpsSpec'])
+            ->orderBy('expires_at', 'asc')
+            ->get();
 
-        return view('dashboard.billing', compact('invoices', 'subscriptions'));
+        return view('dashboard.billing', compact('invoices', 'subscriptions', 'instances'));
+    }
+
+    /**
+     * PILAR 4 - Self-Service Renewal Checkout.
+     *
+     * Membuat Order bertipe 'renewal' yang tertaut langsung ke vps_instance_id.
+     * Menghitung tarif perpanjangan sesuai aturan harga dinamis (Pilar 2) dan lifecycle (Pilar 1).
+     */
+    public function renewVps(Request $request, $id)
+    {
+        $instance = VpsInstance::where('organization_id', $this->organizationId())
+            ->with(['order.vpsSpec'])
+            ->findOrFail($id);
+
+        if (!$instance->canBeRenewed()) {
+            if ($instance->isEolWithoutReplacement()) {
+                return back()->with('error', 'Paket server ini telah dihentikan secara permanen (End-of-Life). Silakan hubungi tim dukungan kami untuk proses migrasi.');
+            }
+            return back()->with('error', "Server dengan status '{$instance->status}' tidak dapat diperpanjang.");
+        }
+
+        $spec = $instance->renewal_spec ?? $instance->order?->vpsSpec;
+        if (!$spec) {
+            return back()->with('error', 'Spesifikasi paket untuk server ini tidak ditemukan.');
+        }
+
+        $renewalPrice = $instance->renewal_price;
+        if ($renewalPrice <= 0) {
+            return back()->with('error', 'Nominal perpanjangan tidak valid.');
+        }
+
+        // Pilihan metode pembayaran (opsional, default: midtrans_snap)
+        $paymentMethod = $request->input('payment_method', 'midtrans_snap');
+        $billingCycle = $request->input('billing_cycle', $instance->billing_cycle ?? 'monthly');
+
+        // Jika pelanggan memilih potong Saldo Credit
+        if (in_array($paymentMethod, ['credit', 'balance', 'saldo'], true)) {
+            $user = Auth::user();
+            $balance = \App\Models\CreditTransaction::balanceFor($user->id);
+            if ($balance < $renewalPrice) {
+                return back()->with('error', 'Saldo credit Anda (Rp ' . number_format($balance, 0, ',', '.') . ') tidak mencukupi untuk biaya perpanjangan Rp ' . number_format($renewalPrice, 0, ',', '.') . '.');
+            }
+
+            $order = DB::transaction(function () use ($instance, $spec, $renewalPrice, $billingCycle, $user) {
+                $order = Order::create([
+                    'customer_id' => $user->id,
+                    'organization_id' => $instance->organization_id,
+                    'vps_spec_id' => $spec->id,
+                    'order_type' => 'renewal',
+                    'vps_instance_id' => $instance->id,
+                    'control_panel' => $instance->control_panel ?? 'none',
+                    'datacenter_location' => $instance->datacenter_location ?? 'indonesia',
+                    'os' => $instance->os ?? 'ubuntu2404',
+                    'billing_cycle' => $billingCycle,
+                    'status' => 'paid',
+                    'channel' => 'website',
+                    'payment_method' => 'credit_balance',
+                    'amount' => $renewalPrice,
+                    'currency' => 'IDR',
+                    'setup_fee' => 0,
+                    'hostname' => $instance->hostname,
+                    'fulfillment_stage' => 'delivered',
+                    'paid_at' => now(),
+                    'delivered_at' => now(),
+                    'terms_version' => 'v3',
+                    'last_status_change_at' => now(),
+                ]);
+
+                // Potong saldo
+                $billingService = app(\App\Services\BillingService::class);
+                $billingService->deductCredit($user, $renewalPrice, "Perpanjangan server {$instance->hostname} (Order #{$order->id})");
+
+                // Generate Invoice Lunas
+                $breakdown = $billingService->calculatePrice($spec, $billingCycle, null, false, $user);
+                $breakdown['total'] = $renewalPrice;
+                $breakdown['gross'] = $renewalPrice;
+                $invoice = $billingService->generateInvoice($order, $breakdown, ['is_renewal' => true]);
+                $invoice->update(['status' => 'paid', 'paid_at' => now()]);
+
+                // Eksekusi perpanjangan
+                app(\App\Services\RenewalService::class)->handleRenewalPayment($order);
+
+                return $order;
+            });
+
+            return redirect()->route('dashboard.vps.show', $instance->id)
+                ->with('success', 'Perpanjangan layanan berhasil menggunakan Saldo Akun! Masa aktif server telah diperpanjang.');
+        }
+
+        // Cek apakah sudah ada pending renewal order yang dibuat < 24 jam untuk instance ini
+        $existingOrder = Order::where('vps_instance_id', $instance->id)
+            ->where('order_type', 'renewal')
+            ->where('status', 'pending')
+            ->where('created_at', '>=', now()->subHours(24))
+            ->latest()
+            ->first();
+
+        if ($existingOrder) {
+            $existingOrder->update([
+                'amount' => $renewalPrice,
+                'payment_method' => $paymentMethod,
+                'vps_spec_id' => $spec->id,
+            ]);
+
+            if ($existingOrder->invoice) {
+                $existingOrder->invoice->update([
+                    'amount' => $renewalPrice,
+                    'total' => $renewalPrice,
+                    'subtotal' => $renewalPrice,
+                ]);
+            }
+
+            return redirect()->route('order.payment', $existingOrder->id);
+        }
+
+        // Buat Order Renewal Baru
+        $order = DB::transaction(function () use ($instance, $spec, $renewalPrice, $paymentMethod, $billingCycle) {
+            $order = Order::create([
+                'customer_id' => Auth::id(),
+                'organization_id' => $instance->organization_id,
+                'vps_spec_id' => $spec->id,
+                'order_type' => 'renewal',
+                'vps_instance_id' => $instance->id,
+                'control_panel' => $instance->control_panel ?? 'none',
+                'datacenter_location' => $instance->datacenter_location ?? 'indonesia',
+                'os' => $instance->os ?? 'ubuntu2404',
+                'billing_cycle' => $billingCycle,
+                'status' => 'pending',
+                'channel' => 'website',
+                'payment_method' => $paymentMethod,
+                'amount' => $renewalPrice,
+                'currency' => 'IDR',
+                'setup_fee' => 0,
+                'hostname' => $instance->hostname,
+                'fulfillment_stage' => 'delivered',
+                'terms_version' => 'v3',
+                'last_status_change_at' => now(),
+            ]);
+
+            // Generate invoice
+            $billingService = app(\App\Services\BillingService::class);
+            $breakdown = $billingService->calculatePrice($spec, $billingCycle, null, false, Auth::user());
+            $breakdown['total'] = $renewalPrice;
+            $breakdown['gross'] = $renewalPrice;
+            $billingService->generateInvoice($order, $breakdown, ['is_renewal' => true]);
+
+            return $order;
+        });
+
+        return redirect()->route('order.payment', $order->id);
     }
 
     public function toggleAutoRenew(Request $request, $id)
